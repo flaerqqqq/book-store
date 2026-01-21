@@ -9,33 +9,49 @@ import com.epam.rd.autocode.spring.project.repo.ClientRepository;
 import com.epam.rd.autocode.spring.project.service.ClientService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class ClientServiceImpl implements ClientService {
 
+    private static final Integer DEFAULT_PAGE_SIZE = 10;
+
     private final ClientRepository clientRepository;
     private final ClientMapper clientMapper;
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public List<ClientDTO> getAllClients() {
-        return List.of();
+    public Page<ClientDTO> getAllClients(Pageable pageable) {
+        pageable = Objects.requireNonNullElse(pageable, Pageable.ofSize(DEFAULT_PAGE_SIZE));
+
+        return clientRepository.findAll(pageable).map(clientMapper::entityToDto);
     }
 
     @Override
     public ClientDTO getClientByEmail(String email) {
-        return null;
+        Objects.requireNonNull(email, "Email must not be null");
+
+        Client client = getClientOrThrow(email);
+        return clientMapper.entityToDto(client);
     }
 
     @Override
+    @Transactional
     public ClientDTO updateClientByEmail(String email, ClientDTO client) {
-        return null;
+        Objects.requireNonNull(email, "Email must not be null");
+        Objects.requireNonNull(client, "Client data must not be null");
+
+        Client existingClient = getClientOrThrow(email);
+        clientMapper.updateClientFromDto(client, existingClient);
+        Client savedClient = clientRepository.save(existingClient);
+
+        return clientMapper.entityToDto(savedClient);
     }
 
     @Override
@@ -55,8 +71,9 @@ public class ClientServiceImpl implements ClientService {
     public ClientDTO addClient(ClientDTO client) {
         Objects.requireNonNull(client, "Method argument cannot be null");
 
-        if (clientRepository.existsByEmail(client.getEmail()))
+        if (clientRepository.existsByEmail(client.getEmail())) {
             throw new AlreadyExistException(Client.class, "email", client.getEmail());
+        }
 
         String passwordHash = passwordEncoder.encode(client.getPassword());
 
@@ -66,5 +83,10 @@ public class ClientServiceImpl implements ClientService {
         Client savedClient = clientRepository.save(clientEntity);
 
         return clientMapper.entityToDto(savedClient);
+    }
+
+    private Client getClientOrThrow(String email) {
+        return clientRepository.findByEmail(email).orElseThrow(() ->
+                new NotFoundException(Client.class, "email", email));
     }
 }
