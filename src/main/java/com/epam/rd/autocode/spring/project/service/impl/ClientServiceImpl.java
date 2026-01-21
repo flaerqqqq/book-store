@@ -2,6 +2,7 @@ package com.epam.rd.autocode.spring.project.service.impl;
 
 import com.epam.rd.autocode.spring.project.dto.ClientDTO;
 import com.epam.rd.autocode.spring.project.exception.AlreadyExistException;
+import com.epam.rd.autocode.spring.project.exception.NotFoundException;
 import com.epam.rd.autocode.spring.project.mapper.ClientMapper;
 import com.epam.rd.autocode.spring.project.model.Client;
 import com.epam.rd.autocode.spring.project.repo.ClientRepository;
@@ -38,8 +39,15 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
+    @Transactional
     public void deleteClientByEmail(String email) {
+        Objects.requireNonNull(email, "Email must not be null");
 
+        Long deletedCount = clientRepository.deleteByEmail(email);
+
+        if (deletedCount == 0) {
+            throw new NotFoundException(Client.class, "email", email);
+        }
     }
 
     @Override
