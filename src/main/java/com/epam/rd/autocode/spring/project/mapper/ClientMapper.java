@@ -12,7 +12,7 @@ public interface ClientMapper {
 
     Client dtoToEntity(ClientDTO dto);
 
-    @BeanMapping
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "email", ignore = true)
     void updateClientFromDto(ClientDTO dto, @MappingTarget Client client);
 }
