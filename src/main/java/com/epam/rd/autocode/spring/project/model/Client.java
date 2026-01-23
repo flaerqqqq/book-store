@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "CLIENTS")
+@Table(name = "clients")
 @Getter
 @Setter
 @SuperBuilder
