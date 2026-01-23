@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.in;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -54,7 +53,6 @@ public class ClientServiceTest {
     @Test
     void getAllClients_ShouldReturnRequestedPage_WhenPageableIsPresent() {
         Client client = ClientTestFixture.getDefaultClient();
-        ClientDTO clientDto = ClientTestFixture.getDefaultClientDto();
         Pageable inputPageable = PageRequest.of(0, 1);
         Page<Client> clientPage = new PageImpl<>(Collections.singletonList(client), inputPageable, 1);
 
@@ -67,7 +65,9 @@ public class ClientServiceTest {
         assertThat(actualReturnPage.getContent()).hasSize(1);
 
         ClientDTO actualClientDto = actualReturnPage.getContent().get(0);
-        assertThat(actualClientDto.getEmail()).isEqualTo(clientDto.getEmail());
+        assertThat(actualClientDto.getEmail()).isEqualTo(client.getEmail());
+
+        verify(clientRepository, times(1)).findAll(inputPageable);
     }
 
     @Test
