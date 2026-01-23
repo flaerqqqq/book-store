@@ -8,6 +8,7 @@ import org.mapstruct.*;
 @Mapper(config = GlobalMapperConfig.class)
 public interface ClientMapper {
 
+    @Mapping(target = "password", ignore = true)
     ClientDTO entityToDto(Client entity);
 
     Client dtoToEntity(ClientDTO dto);

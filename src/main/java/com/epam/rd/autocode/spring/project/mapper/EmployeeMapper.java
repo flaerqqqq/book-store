@@ -8,9 +8,10 @@ import org.mapstruct.*;
 @Mapper(config = GlobalMapperConfig.class)
 public interface EmployeeMapper {
 
-    Employee dtoToEntity(EmployeeDTO dto);
-
+    @Mapping(target = "password", ignore = true)
     EmployeeDTO entityToDto(Employee entity);
+
+    Employee dtoToEntity(EmployeeDTO dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "email", ignore = true)
