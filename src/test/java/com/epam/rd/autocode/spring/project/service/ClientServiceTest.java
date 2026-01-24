@@ -6,6 +6,7 @@ import com.epam.rd.autocode.spring.project.exception.NotFoundException;
 import com.epam.rd.autocode.spring.project.mapper.ClientMapper;
 import com.epam.rd.autocode.spring.project.model.Client;
 import com.epam.rd.autocode.spring.project.repo.ClientRepository;
+import com.epam.rd.autocode.spring.project.service.fixture.ClientTestFixture;
 import com.epam.rd.autocode.spring.project.service.impl.ClientServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

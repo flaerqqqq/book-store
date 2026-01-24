@@ -1,4 +1,4 @@
-package com.epam.rd.autocode.spring.project.service;
+package com.epam.rd.autocode.spring.project.service.fixture;
 
 import com.epam.rd.autocode.spring.project.dto.EmployeeDTO;
 import com.epam.rd.autocode.spring.project.model.Employee;

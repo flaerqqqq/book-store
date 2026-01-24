@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BookDTO{
+public class BookDTO {
 
     private String name;
 

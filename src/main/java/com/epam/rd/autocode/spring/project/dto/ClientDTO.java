@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClientDTO{
+public class ClientDTO {
 
     private String email;
 

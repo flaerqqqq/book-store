@@ -6,6 +6,7 @@ import com.epam.rd.autocode.spring.project.exception.NotFoundException;
 import com.epam.rd.autocode.spring.project.mapper.EmployeeMapper;
 import com.epam.rd.autocode.spring.project.model.Employee;
 import com.epam.rd.autocode.spring.project.repo.EmployeeRepository;
+import com.epam.rd.autocode.spring.project.service.fixture.EmployeeTestFixture;
 import com.epam.rd.autocode.spring.project.service.impl.EmployeeServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
