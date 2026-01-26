@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 @Service
@@ -79,6 +80,7 @@ public class ClientServiceImpl implements ClientService {
         String passwordHash = passwordEncoder.encode(client.getPassword());
 
         Client clientEntity = clientMapper.dtoToEntity(client);
+        clientEntity.setBalance(BigDecimal.ZERO);
         clientEntity.setPassword(passwordHash);
 
         Client savedClient = clientRepository.save(clientEntity);
