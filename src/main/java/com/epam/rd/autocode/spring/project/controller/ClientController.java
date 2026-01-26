@@ -4,6 +4,7 @@ import com.epam.rd.autocode.spring.project.dto.ClientDTO;
 import com.epam.rd.autocode.spring.project.dto.ClientRegisterRequestDto;
 import com.epam.rd.autocode.spring.project.mapper.ClientMapper;
 import com.epam.rd.autocode.spring.project.service.ClientService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,15 +24,20 @@ public class ClientController {
 
     @GetMapping("/register")
     public String getRegisterPage(Model model) {
-        ClientRegisterRequestDto requestDTO  = new ClientRegisterRequestDto();
-        model.addAttribute("client", requestDTO);
+        model.addAttribute("client", new ClientRegisterRequestDto());
         return "register";
     }
 
     @PostMapping("/register")
-    public void registerClient(@ModelAttribute("client") ClientRegisterRequestDto requestDto,
+    public String registerClient(@ModelAttribute("client") @Valid ClientRegisterRequestDto requestDto,
                                  BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "register";
+        }
+
         ClientDTO clientDto = clientMapper.registerDtoToDto(requestDto);
         clientService.addClient(clientDto);
+
+        return "redirect:/login";
     }
 }
