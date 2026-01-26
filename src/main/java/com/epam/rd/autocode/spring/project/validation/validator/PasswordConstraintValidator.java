@@ -13,7 +13,24 @@ public class PasswordConstraintValidator implements ConstraintValidator<ValidPas
             Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d)(?=.*\\W).{8,64}$");
 
     @Override
-    public boolean isValid(String password, ConstraintValidatorContext constraintValidatorContext) {
-        return PASSWORD_PATTERN.matcher(password).matches();
+    public boolean isValid(String password, ConstraintValidatorContext context) {
+        context.disableDefaultConstraintViolation();
+
+        if (password == null || password.isBlank()) {
+            addViolation(context, "Password is required");
+            return false;
+        }
+
+        if (!PASSWORD_PATTERN.matcher(password).matches()) {
+            addViolation(context, "Password must be 8-64 characters long and contain at least one letter, one number, and one special character");
+            return false;
+        }
+
+        return true;
+    }
+
+    private void addViolation(ConstraintValidatorContext context, String message) {
+        context.buildConstraintViolationWithTemplate(message)
+                .addConstraintViolation();
     }
 }

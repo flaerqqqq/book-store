@@ -19,11 +19,10 @@ public class ClientRegisterRequestDto {
     @NotBlank(message = "Email is required")
     private String email;
 
-    @NotBlank(message = "Password is required")
-    @ValidPassword(message = "Password must follow next rules: min size 8, max size 64, at least 1 letter, at least 1 number, at least 1 symbol")
+    @ValidPassword
     private String password;
 
     @NotBlank(message = "Name is required")
-    @Size(min = 3)
+    @Size(min = 3, message = "Name must be at least 3 characters long")
     private String name;
 }
