@@ -3,6 +3,7 @@ package com.epam.rd.autocode.spring.project.dto;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 @Data
 @Builder
@@ -17,4 +18,6 @@ public class ClientDTO {
     private String name;
 
     private BigDecimal balance;
+
+    private Set<String> roles;
 }
