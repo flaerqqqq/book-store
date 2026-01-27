@@ -7,7 +7,9 @@ import lombok.experimental.SuperBuilder;
 import java.util.HashSet;
 import java.util.Set;
 
-@MappedSuperclass
+@Inheritance(strategy = InheritanceType.JOINED)
+@Entity
+@Table(name = "users")
 @Getter
 @Setter
 @SuperBuilder
