@@ -16,14 +16,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class Client extends User {
 
+    @Builder.Default
     @Column(nullable = false)
-    private BigDecimal balance;
-
-    public Client(Long id, String email, String password, String name, BigDecimal balance) {
-        this.setId(id);
-        this.setEmail(email);
-        this.setPassword(password);
-        this.setName(name);
-        this.setBalance(balance);
-    }
+    private BigDecimal balance = BigDecimal.ZERO;
 }

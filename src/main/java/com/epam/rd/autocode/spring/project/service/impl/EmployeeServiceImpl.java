@@ -5,7 +5,9 @@ import com.epam.rd.autocode.spring.project.exception.AlreadyExistException;
 import com.epam.rd.autocode.spring.project.exception.NotFoundException;
 import com.epam.rd.autocode.spring.project.mapper.EmployeeMapper;
 import com.epam.rd.autocode.spring.project.model.Employee;
+import com.epam.rd.autocode.spring.project.model.Role;
 import com.epam.rd.autocode.spring.project.repo.EmployeeRepository;
+import com.epam.rd.autocode.spring.project.repo.RoleRepository;
 import com.epam.rd.autocode.spring.project.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,6 +26,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private static final Integer DEFAULT_PAGE_SIZE = 10;
 
     private final EmployeeRepository employeeRepository;
+    private final RoleRepository roleRepository;
     private final EmployeeMapper employeeMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -76,9 +79,13 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new AlreadyExistException(Employee.class, "email", employee.getEmail());
         }
 
+        Role employeeRole = roleRepository.findByName(Role.RoleName.ROLE_EMPLOYEE).orElseThrow(() ->
+                new NotFoundException(Role.class, "name", Role.RoleName.ROLE_EMPLOYEE));
+
         String passwordHash = passwordEncoder.encode(employee.getPassword());
         Employee employeeEntity = employeeMapper.dtoToEntity(employee);
         employeeEntity.setPassword(passwordHash);
+        employeeEntity.getRoles().add(employeeRole);
 
         Employee savedEmployee = employeeRepository.save(employeeEntity);
 
