@@ -27,7 +27,7 @@ public class AuthController {
     @GetMapping("/login")
     public String getLoginPage(Model model) {
         model.addAttribute("login", new LoginRequestDto());
-        return "login";
+        return "auth/login";
     }
 
     @PostMapping("/login")
@@ -35,7 +35,7 @@ public class AuthController {
                         BindingResult bindingResult,
                         HttpServletResponse resp) {
         if (bindingResult.hasErrors()) {
-            return "login";
+            return "auth/login";
         }
 
         AuthTokenResponseDto responseDto = authService.login(loginRequestDto.getEmail(), loginRequestDto.getPassword());

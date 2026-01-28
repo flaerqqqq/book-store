@@ -23,14 +23,14 @@ public class ClientController {
     @GetMapping("/register")
     public String getRegisterPage(Model model) {
         model.addAttribute("client", new ClientRegisterRequestDto());
-        return "register";
+        return "auth/register";
     }
 
     @PostMapping("/register")
     public String registerClient(@ModelAttribute("client") @Valid ClientRegisterRequestDto requestDto,
                                  BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "register";
+            return "/auth/register";
         }
 
         ClientDTO clientDto = clientMapper.registerDtoToDto(requestDto);
