@@ -2,6 +2,7 @@ package com.epam.rd.autocode.spring.project.mapper;
 
 import com.epam.rd.autocode.spring.project.conf.GlobalMapperConfig;
 import com.epam.rd.autocode.spring.project.dto.EmployeeDTO;
+import com.epam.rd.autocode.spring.project.dto.EmployeeRegisterRequestDto;
 import com.epam.rd.autocode.spring.project.model.Employee;
 import com.epam.rd.autocode.spring.project.model.Role;
 import org.mapstruct.*;
@@ -18,6 +19,8 @@ public interface EmployeeMapper {
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "roles", ignore = true)
     Employee dtoToEntity(EmployeeDTO dto);
+
+    EmployeeDTO registerDtoToDto(EmployeeRegisterRequestDto registerDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "email", ignore = true)
