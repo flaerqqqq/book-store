@@ -7,14 +7,13 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class JwtServiceImpl implements JwtService {
@@ -61,9 +60,18 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private Map<String, Object> buildClaims(UserDetails userDetails) {
-        return Map.of(
-                "roles", userDetails.getAuthorities()
-        );
+        Map<String, Object> claims = new HashMap<>();
+
+        if (userDetails instanceof IdentifiableUser identifiable) {
+            claims.put("publicId", identifiable.getUniqueIdentifier());
+        }
+
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+        claims.put("roles", roles);
+
+        return claims;
     }
 
     private Claims extractClaims(String token) {
