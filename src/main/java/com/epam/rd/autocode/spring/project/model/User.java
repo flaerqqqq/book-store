@@ -6,6 +6,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Inheritance(strategy = InheritanceType.JOINED)
 @Entity
@@ -20,6 +21,9 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "public_id", nullable = false, unique = true)
+    private UUID publicId = UUID.randomUUID();
 
     @Column(nullable = false, unique = true)
     private String email;
