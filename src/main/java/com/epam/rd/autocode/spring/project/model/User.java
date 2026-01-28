@@ -22,6 +22,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Builder.Default
     @Column(name = "public_id", nullable = false, unique = true)
     private UUID publicId = UUID.randomUUID();
 
