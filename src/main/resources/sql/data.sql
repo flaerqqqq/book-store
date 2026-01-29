@@ -17,26 +17,26 @@ INSERT INTO users_roles (user_id, role_id) VALUES (3, 3);
 
 SELECT setval(pg_get_serial_sequence('users', 'id'), 4, false);
 
-INSERT INTO books (name, genre, age_group, price, publication_year, author, number_of_pages, characteristics, description, language) VALUES
-('The Great Gatsby', 'Classic', 'ADULT', 15.99, '1925-04-10', 'F. Scott Fitzgerald', 180, 'Hardcover', 'A story of wealth and love.', 'ENGLISH'),
-('1984', 'Dystopian', 'ADULT', 12.50, '1949-06-08', 'George Orwell', 328, 'Paperback', 'Big Brother is watching you.', 'ENGLISH'),
-('The Hobbit', 'Fantasy', 'CHILD', 20.00, '1937-09-21', 'J.R.R. Tolkien', 310, 'Illustrated', 'A hobbits unexpected journey.', 'ENGLISH'),
-('Harry Potter and the Sorcerers Stone', 'Fantasy', 'CHILD', 25.99, '1997-06-26', 'J.K. Rowling', 309, 'Hardcover', 'The boy who lived.', 'ENGLISH'),
-('Kobzar', 'Poetry', 'ADULT', 30.00, '1840-04-26', 'Taras Shevchenko', 115, 'Leather Bound', 'Foundational Ukrainian literature.', 'UKRAINIAN'),
-('The Catcher in the Rye', 'Fiction', 'TEEN', 11.99, '1951-07-16', 'J.D. Salinger', 214, 'Softcover', 'Holden Caulfields teenage angst.', 'ENGLISH'),
-('Dune', 'Sci-Fi', 'ADULT', 18.50, '1965-08-01', 'Frank Herbert', 412, 'Hardcover', 'The spice must flow.', 'ENGLISH'),
-('The Alchemist', 'Adventure', 'ADULT', 10.00, '1988-05-01', 'Paulo Coelho', 167, 'Paperback', 'Follow your personal legend.', 'SPANISH'),
-('Norwegian Wood', 'Fiction', 'ADULT', 14.00, '1987-09-04', 'Haruki Murakami', 296, 'Softcover', 'A story of loss and sexuality.', 'JAPANESE'),
-('Brave New World', 'Dystopian', 'ADULT', 13.00, '1932-10-01', 'Aldous Huxley', 268, 'Paperback', 'A futuristic society.', 'ENGLISH'),
-('The Book Thief', 'Historical', 'TEEN', 14.50, '2005-03-14', 'Markus Zusak', 552, 'Hardcover', 'Death tells a story.', 'GERMAN'),
-('Crime and Punishment', 'Psychological', 'ADULT', 16.00, '1866-01-01', 'Fyodor Dostoevsky', 671, 'Hardcover', 'A student commits a murder.', 'OTHER'),
-('Animal Farm', 'Satire', 'ADULT', 8.99, '1945-08-17', 'George Orwell', 112, 'Paperback', 'All animals are equal.', 'ENGLISH'),
-('The Shadow of the Wind', 'Mystery', 'ADULT', 16.50, '2001-04-01', 'Carlos Ruiz Zafón', 487, 'Hardcover', 'A boy discovers a secret library.', 'SPANISH'),
-('The Little Prince', 'Fable', 'CHILD', 11.50, '1943-04-06', 'Antoine de Saint-Exupéry', 96, 'Illustrated', 'A pilot meets a prince.', 'FRENCH'),
-('The Odyssey', 'Epic', 'ADULT', 15.00, '0800-01-01', 'Homer', 541, 'Hardcover', 'Odysseus travels home.', 'OTHER'),
-('Shadows of Forgotten Ancestors', 'Novella', 'ADULT', 12.00, '1911-01-01', 'Mykhailo Kotsiubynsky', 160, 'Paperback', 'A tale of Carpathian Hutsuls.', 'UKRAINIAN'),
-('The Road', 'Post-Apocalyptic', 'ADULT', 14.99, '2006-09-26', 'Cormac McCarthy', 287, 'Paperback', 'A father and son survive.', 'ENGLISH'),
-('Intermezzo', 'Novella', 'ADULT', 9.00, '1908-01-01', 'Mykhailo Kotsiubynsky', 80, 'Pocket Edition', 'A story of psychological fatigue.', 'UKRAINIAN'),
-('Anna Karenina', 'Realism', 'ADULT', 17.99, '1877-01-01', 'Leo Tolstoy', 864, 'Hardcover', 'A tragic love affair.', 'OTHER');
+INSERT INTO books (public_id, name, genre, age_group, price, publication_year, author, number_of_pages, characteristics, description, language) VALUES
+(gen_random_uuid(), 'The Great Gatsby', 'Classic', 'ADULT', 15.99, '1925-04-10', 'F. Scott Fitzgerald', 180, 'Hardcover', 'A story of wealth and love.', 'ENGLISH'),
+(gen_random_uuid(), '1984', 'Dystopian', 'ADULT', 12.50, '1949-06-08', 'George Orwell', 328, 'Paperback', 'Big Brother is watching you.', 'ENGLISH'),
+(gen_random_uuid(), 'The Hobbit', 'Fantasy', 'CHILD', 20.00, '1937-09-21', 'J.R.R. Tolkien', 310, 'Illustrated', 'A hobbits unexpected journey.', 'ENGLISH'),
+(gen_random_uuid(), 'Harry Potter and the Sorcerers Stone', 'Fantasy', 'CHILD', 25.99, '1997-06-26', 'J.K. Rowling', 309, 'Hardcover', 'The boy who lived.', 'ENGLISH'),
+(gen_random_uuid(), 'Kobzar', 'Poetry', 'ADULT', 30.00, '1840-04-26', 'Taras Shevchenko', 115, 'Leather Bound', 'Foundational Ukrainian literature.', 'UKRAINIAN'),
+(gen_random_uuid(), 'The Catcher in the Rye', 'Fiction', 'TEEN', 11.99, '1951-07-16', 'J.D. Salinger', 214, 'Softcover', 'Holden Caulfields teenage angst.', 'ENGLISH'),
+(gen_random_uuid(), 'Dune', 'Sci-Fi', 'ADULT', 18.50, '1965-08-01', 'Frank Herbert', 412, 'Hardcover', 'The spice must flow.', 'ENGLISH'),
+(gen_random_uuid(), 'The Alchemist', 'Adventure', 'ADULT', 10.00, '1988-05-01', 'Paulo Coelho', 167, 'Paperback', 'Follow your personal legend.', 'SPANISH'),
+(gen_random_uuid(), 'Norwegian Wood', 'Fiction', 'ADULT', 14.00, '1987-09-04', 'Haruki Murakami', 296, 'Softcover', 'A story of loss and sexuality.', 'JAPANESE'),
+(gen_random_uuid(), 'Brave New World', 'Dystopian', 'ADULT', 13.00, '1932-10-01', 'Aldous Huxley', 268, 'Paperback', 'A futuristic society.', 'ENGLISH'),
+(gen_random_uuid(), 'The Book Thief', 'Historical', 'TEEN', 14.50, '2005-03-14', 'Markus Zusak', 552, 'Hardcover', 'Death tells a story.', 'GERMAN'),
+(gen_random_uuid(), 'Crime and Punishment', 'Psychological', 'ADULT', 16.00, '1866-01-01', 'Fyodor Dostoevsky', 671, 'Hardcover', 'A student commits a murder.', 'OTHER'),
+(gen_random_uuid(), 'Animal Farm', 'Satire', 'ADULT', 8.99, '1945-08-17', 'George Orwell', 112, 'Paperback', 'All animals are equal.', 'ENGLISH'),
+(gen_random_uuid(), 'The Shadow of the Wind', 'Mystery', 'ADULT', 16.50, '2001-04-01', 'Carlos Ruiz Zafón', 487, 'Hardcover', 'A boy discovers a secret library.', 'SPANISH'),
+(gen_random_uuid(), 'The Little Prince', 'Fable', 'CHILD', 11.50, '1943-04-06', 'Antoine de Saint-Exupéry', 96, 'Illustrated', 'A pilot meets a prince.', 'FRENCH'),
+(gen_random_uuid(), 'The Odyssey', 'Epic', 'ADULT', 15.00, '0800-01-01', 'Homer', 541, 'Hardcover', 'Odysseus travels home.', 'OTHER'),
+(gen_random_uuid(), 'Shadows of Forgotten Ancestors', 'Novella', 'ADULT', 12.00, '1911-01-01', 'Mykhailo Kotsiubynsky', 160, 'Paperback', 'A tale of Carpathian Hutsuls.', 'UKRAINIAN'),
+(gen_random_uuid(), 'The Road', 'Post-Apocalyptic', 'ADULT', 14.99, '2006-09-26', 'Cormac McCarthy', 287, 'Paperback', 'A father and son survive.', 'ENGLISH'),
+(gen_random_uuid(), 'Intermezzo', 'Novella', 'ADULT', 9.00, '1908-01-01', 'Mykhailo Kotsiubynsky', 80, 'Pocket Edition', 'A story of psychological fatigue.', 'UKRAINIAN'),
+(gen_random_uuid(), 'Anna Karenina', 'Realism', 'ADULT', 17.99, '1877-01-01', 'Leo Tolstoy', 864, 'Hardcover', 'A tragic love affair.', 'OTHER');
 
 SELECT setval(pg_get_serial_sequence('books', 'id'), 21, false);

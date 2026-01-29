@@ -4,13 +4,14 @@ import com.epam.rd.autocode.spring.project.model.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
 
-    Optional<Book> findByName(String name);
+    Optional<Book> findByPublicId(UUID publicId);
 
-    Long deleteByName(String name);
+    Long deleteByPublicId(UUID publicId);
 
-    boolean existsByName(String name);
+    boolean existsByPublicId(UUID publicId);
 
 }

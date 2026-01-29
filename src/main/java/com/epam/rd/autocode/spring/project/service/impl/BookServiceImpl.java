@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,19 +34,19 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookDTO getBookByName(String name) {
-        Objects.requireNonNull(name, "Name must not be null");
+    public BookDTO getBookByPublicId(UUID publicId) {
+        Objects.requireNonNull(publicId, "Public ID must not be null");
 
-        return bookMapper.entityToDto(getBookByNameOrThrow(name));
+        return bookMapper.entityToDto(getBookByPublicIdOrThrow(publicId));
     }
 
     @Override
     @Transactional
-    public BookDTO updateBookByName(String name, BookDTO book) {
-        Objects.requireNonNull(name, "Name must not be null");
+    public BookDTO updateBookByPublicId(UUID publicId, BookDTO book) {
+        Objects.requireNonNull(publicId, "Public ID must not be null");
         Objects.requireNonNull(book, "Book data must not be null");
 
-        Book existingBook = getBookByNameOrThrow(name);
+        Book existingBook = getBookByPublicIdOrThrow(publicId);
         bookMapper.updateBookFromDto(book, existingBook);
         Book savedBook = bookRepository.save(existingBook);
 
@@ -54,13 +55,13 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    public void deleteBookByName(String name) {
-        Objects.requireNonNull(name, "Name must not be null");
+    public void deleteBookByPublicId(UUID publicId) {
+        Objects.requireNonNull(publicId, "Public ID must not be null");
 
-        Long deletedCount = bookRepository.deleteByName(name);
+        Long deletedCount = bookRepository.deleteByPublicId(publicId);
 
         if (deletedCount == 0) {
-            throw new NotFoundException(Book.class, "name", name);
+            throw new NotFoundException(Book.class, "publicId", publicId);
         }
     }
 
@@ -69,8 +70,8 @@ public class BookServiceImpl implements BookService {
     public BookDTO addBook(BookDTO book) {
         Objects.requireNonNull(book, "Book data must not be null");
 
-        if (bookRepository.existsByName(book.getName())) {
-            throw new AlreadyExistException(Book.class, "name", book.getName());
+        if (bookRepository.existsByPublicId(book.getPublicId())) {
+            throw new AlreadyExistException(Book.class, "publicId", book.getPublicId());
         }
 
         Book bookEntity = bookMapper.dtoToEntity(book);
@@ -79,8 +80,8 @@ public class BookServiceImpl implements BookService {
         return bookMapper.entityToDto(savedBook);
     }
 
-    private Book getBookByNameOrThrow(String name) {
-        return bookRepository.findByName(name).orElseThrow(() ->
-                new NotFoundException(Book.class, "name", name));
+    private Book getBookByPublicIdOrThrow(UUID publicId) {
+        return bookRepository.findByPublicId(publicId).orElseThrow(() ->
+                new NotFoundException(Book.class, "publicId", publicId));
     }
 }

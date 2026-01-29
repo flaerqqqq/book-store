@@ -4,17 +4,17 @@ import com.epam.rd.autocode.spring.project.dto.BookDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
+import java.util.UUID;
 
 public interface BookService {
 
     Page<BookDTO> getAllBooks(Pageable pageable);
 
-    BookDTO getBookByName(String name);
+    BookDTO getBookByPublicId(UUID publicId);
 
-    BookDTO updateBookByName(String name, BookDTO book);
+    BookDTO updateBookByPublicId(UUID publicId, BookDTO book);
 
-    void deleteBookByName(String name);
+    void deleteBookByPublicId(UUID publicId);
 
     BookDTO addBook(BookDTO book);
 }
