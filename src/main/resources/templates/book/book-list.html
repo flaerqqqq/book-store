@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Book Catalog</title>
+</head>
+<body>
+<h1>Book Catalog</h1>
+
+<table border="1">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Author</th>
+    <th>Price</th>
+    <th>Language</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="book : ${bookPage.content}">
+    <td th:text="${book.name}">Name</td>
+    <td th:text="${book.author}">Author</td>
+    <td th:text="${book.price}">0.00</td>
+    <td th:text="${book.language}">English</td>
+  </tr>
+  </tbody>
+</table>
+
+<div th:if="${totalPages > 1}">
+  <hr/>
+  <span>Pages: </span>
+
+  <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+            <a th:if="${currentPage != i}"
+               th:href="@{/books(page=${i}, size=${bookPage.size})}"
+               th:text="${i + 1}"></a>
+            <span th:if="${currentPage == i}" th:text="${i + 1}" style="font-weight: bold;"></span>
+            &nbsp;
+        </span>
+</div>
+
+<br/>
+<div sec:authorize="hasAnyRole('EMPLOYEE', 'ADMIN')">
+  <a th:href="@{/books/new}">Add New Book</a>
+</div>
+</body>
+</html>

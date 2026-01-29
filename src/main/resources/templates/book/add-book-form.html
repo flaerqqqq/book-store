@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Book</title>
+</head>
+<body>
+
+<h1>Add New Book</h1>
+
+<form th:action="@{/books/new}" th:object="${bookRequest}" method="post">
+
+    <div>
+        <label>Book Name:</label><br/>
+        <input type="text" th:field="*{name}" />
+        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color: red;"></span>
+    </div>
+
+    <div>
+        <label>Author:</label><br/>
+        <input type="text" th:field="*{author}" />
+        <span th:if="${#fields.hasErrors('author')}" th:errors="*{author}" style="color: red;"></span>
+    </div>
+
+    <div>
+        <label>Genre:</label><br/>
+        <input type="text" th:field="*{genre}" />
+        <span th:if="${#fields.hasErrors('genre')}" th:errors="*{genre}" style="color: red;"></span>
+    </div>
+
+    <div>
+        <label>Price:</label><br/>
+        <input type="number" step="0.01" th:field="*{price}" />
+        <span th:if="${#fields.hasErrors('price')}" th:errors="*{price}" style="color: red;"></span>
+    </div>
+
+    <div>
+        <label>Pages:</label><br/>
+        <input type="number" th:field="*{pages}" />
+        <span th:if="${#fields.hasErrors('pages')}" th:errors="*{pages}" style="color: red;"></span>
+    </div>
+
+    <div>
+        <label>Publication Date:</label><br/>
+        <input type="date" th:field="*{publicationDate}" />
+        <span th:if="${#fields.hasErrors('publicationDate')}" th:errors="*{publicationDate}" style="color: red;"></span>
+    </div>
+
+    <div>
+        <label>Age Group:</label><br/>
+        <select th:field="*{ageGroup}">
+            <option value="">-- Select Age Group --</option>
+            <option th:each="age : ${ageGroups}"
+                    th:value="${age}"
+                    th:text="${age}"></option>
+        </select>
+        <span th:if="${#fields.hasErrors('ageGroup')}" th:errors="*{ageGroup}" style="color: red;"></span>
+    </div>
+
+    <div>
+        <label>Language:</label><br/>
+        <select th:field="*{language}">
+            <option value="">-- Select Language --</option>
+            <option th:each="lang : ${languages}"
+                    th:value="${lang}"
+                    th:text="${lang}"></option>
+        </select>
+        <span th:if="${#fields.hasErrors('language')}" th:errors="*{language}" style="color: red;"></span>
+    </div>
+
+    <div>
+        <label>Characteristics:</label><br/>
+        <input type="text" th:field="*{characteristics}" />
+        <span th:if="${#fields.hasErrors('characteristics')}" th:errors="*{characteristics}" style="color: red;"></span>
+    </div>
+
+    <div>
+        <label>Description:</label><br/>
+        <textarea th:field="*{description}" rows="5"></textarea>
+        <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" style="color: red;"></span>
+    </div>
+
+    <br/>
+    <button type="submit">Create Book</button>
+    <a th:href="@{/books}">Back to list</a>
+</form>
+
+</body>
+</html>
