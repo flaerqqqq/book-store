@@ -13,7 +13,9 @@
     <th>Author</th>
     <th>Price</th>
     <th>Language</th>
-    <th>Actions</th>
+    <th sec:authorize="hasAnyRole('EMPLOYEE', 'ADMIN')">
+      Actions
+    </th>
   </tr>
   </thead>
   <tbody>
@@ -22,6 +24,11 @@
     <td th:text="${book.author}">Author</td>
     <td th:text="${book.price}">0.00</td>
     <td th:text="${book.language}">English</td>
+    <td sec:authorize="hasAnyRole('EMPLOYEE', 'ADMIN')">
+      <a th:href="@{/books/{uuid}/update(uuid=${book.publicId})}">
+        <button type="button" >Update</button>
+      </a>
+    </td>
   </tr>
   </tbody>
 </table>
@@ -32,7 +39,7 @@
 
   <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
             <a th:if="${currentPage != i}"
-               th:href="@{/books(page=${i}, size=${bookPage.size})}"
+               th:href="@{/books(page=${i})}"
                th:text="${i + 1}"></a>
             <span th:if="${currentPage == i}" th:text="${i + 1}" style="font-weight: bold;"></span>
             &nbsp;

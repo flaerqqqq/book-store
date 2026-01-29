@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Add Book</title>
+    <title>Update Book</title>
 </head>
 <body>
 
-<h1>Add New Book</h1>
+<h1>Update Book</h1>
 
-<form th:action="@{/books/new}" th:object="${bookRequest}" method="post">
+<form th:action="@{/books/{uuid}/update(uuid=${currentPublicId})}" th:object="${updateBook}" method="post">
 
     <div>
         <label>Book Name:</label><br/>
@@ -42,7 +42,7 @@
     <div>
         <label>Publication Date:</label><br/>
         <input type="date" th:name="publicationDate"
-               th:value="${bookRequest.publicationDate != null ? #temporals.format(bookRequest.publicationDate, 'yyyy-MM-dd') : ''}" />
+               th:value="${updateBook.publicationDate != null ? #temporals.format(updateBook.publicationDate, 'yyyy-MM-dd') : ''}" />
         <span th:if="${#fields.hasErrors('publicationDate')}" th:errors="*{publicationDate}" style="color: red;"></span>
     </div>
 
@@ -81,7 +81,7 @@
     </div>
 
     <br/>
-    <button type="submit">Create Book</button>
+    <button type="submit">Update Book</button>
     <a th:href="@{/books}">Back to list</a>
 </form>
 

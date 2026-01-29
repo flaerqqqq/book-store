@@ -2,6 +2,7 @@ package com.epam.rd.autocode.spring.project.controller;
 
 import com.epam.rd.autocode.spring.project.dto.BookDTO;
 import com.epam.rd.autocode.spring.project.dto.BookRequestDto;
+import com.epam.rd.autocode.spring.project.dto.BookResponseDto;
 import com.epam.rd.autocode.spring.project.mapper.BookMapper;
 import com.epam.rd.autocode.spring.project.model.enums.AgeGroup;
 import com.epam.rd.autocode.spring.project.model.enums.Language;
@@ -15,10 +16,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/books")
@@ -53,9 +53,10 @@ public class BookController {
     }
 
     @GetMapping
-    public String getBookListPage(@PageableDefault(size = 5, sort = "name") Pageable pageable,
+    public String getBookListPage(@PageableDefault(sort = "name") Pageable pageable,
                                   Model model) {
-        Page<BookDTO> bookPage = bookService.getAllBooks(pageable);
+        Page<BookResponseDto> bookPage = bookService.getAllBooks(pageable)
+                .map(bookMapper::dtoToResponseDto);
         model.addAttribute("bookPage", bookPage);
         model.addAttribute("currentPage", pageable.getPageNumber());
         model.addAttribute("totalPages", bookPage.getTotalPages());
@@ -63,4 +64,30 @@ public class BookController {
         return "book/book-list";
     }
 
+    @GetMapping("/{publicId}/update")
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
+    public String getUpdateBookPage(@PathVariable("publicId") UUID publicId,
+                                    Model model) {
+        BookDTO foundBook = bookService.getBookByPublicId(publicId);
+        model.addAttribute("updateBook", bookMapper.dtoToRequestDto(foundBook));
+        model.addAttribute("languages", Language.values());
+        model.addAttribute("ageGroups", AgeGroup.values());
+        model.addAttribute("currentPublicId", publicId);
+        return "book/update-book-form";
+    }
+
+    @PostMapping("/{publicId}/update")
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
+    public String updateBook(@PathVariable("publicId") UUID publicId,
+                             @ModelAttribute("updateBook") @Valid BookRequestDto requestDto,
+                             BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "book/update-book-form";
+        }
+
+        BookDTO bookDto = bookMapper.requestDtoToDto(requestDto);
+        bookService.updateBookByPublicId(publicId, bookDto);
+
+        return "book/book-page";
+    }
 }
