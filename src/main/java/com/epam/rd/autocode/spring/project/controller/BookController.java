@@ -32,8 +32,6 @@ public class BookController {
     @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
     public String getBookCreatePage(Model model) {
         model.addAttribute("bookRequest", new BookRequestDto());
-        model.addAttribute("languages", Language.values());
-        model.addAttribute("ageGroups", AgeGroup.values());
 
         return "book/add-book-form";
     }
@@ -41,7 +39,8 @@ public class BookController {
     @PostMapping("/new")
     @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
     public String addBook(@ModelAttribute("bookRequest") @Valid BookRequestDto requestDto,
-                          BindingResult bindingResult) {
+                          BindingResult bindingResult,
+                          Model model) {
         if (bindingResult.hasErrors()) {
             return "book/add-book-form";
         }
@@ -70,8 +69,6 @@ public class BookController {
                                     Model model) {
         BookDTO foundBook = bookService.getBookByPublicId(publicId);
         model.addAttribute("updateBook", bookMapper.dtoToRequestDto(foundBook));
-        model.addAttribute("languages", Language.values());
-        model.addAttribute("ageGroups", AgeGroup.values());
         model.addAttribute("currentPublicId", publicId);
         return "book/update-book-form";
     }
@@ -80,14 +77,34 @@ public class BookController {
     @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
     public String updateBook(@PathVariable("publicId") UUID publicId,
                              @ModelAttribute("updateBook") @Valid BookRequestDto requestDto,
-                             BindingResult bindingResult) {
+                             BindingResult bindingResult,
+                             Model model) {
         if (bindingResult.hasErrors()) {
+            model.addAttribute("currentPublicId", publicId);
             return "book/update-book-form";
         }
 
         BookDTO bookDto = bookMapper.requestDtoToDto(requestDto);
         bookService.updateBookByPublicId(publicId, bookDto);
 
-        return "book/book-page";
+        return "redirect:/books";
+    }
+
+    @PostMapping("/{publicId}/delete")
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
+    public String deleteBook(@PathVariable("publicId") UUID publicId) {
+        bookService.deleteBookByPublicId(publicId);
+
+        return "redirect:/books";
+    }
+
+    @ModelAttribute("languages")
+    public Language[] getLanguages() {
+        return Language.values();
+    }
+
+    @ModelAttribute("ageGroups")
+    public AgeGroup[] getAgeGroups() {
+        return AgeGroup.values();
     }
 }

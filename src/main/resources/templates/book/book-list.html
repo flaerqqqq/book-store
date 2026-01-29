@@ -26,8 +26,11 @@
     <td th:text="${book.language}">English</td>
     <td sec:authorize="hasAnyRole('EMPLOYEE', 'ADMIN')">
       <a th:href="@{/books/{uuid}/update(uuid=${book.publicId})}">
-        <button type="button" >Update</button>
+        <button type="button">Update</button>
       </a>
+      <form th:action="@{/books/{uuid}/delete(uuid=${book.publicId})}" th:method="post">
+        <button type="submit">Delete</button>
+      </form>
     </td>
   </tr>
   </tbody>
