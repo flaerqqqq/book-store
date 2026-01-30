@@ -6,7 +6,9 @@ import com.epam.rd.autocode.spring.project.validation.annotation.ValidDateRange;
 import com.epam.rd.autocode.spring.project.validation.annotation.ValidPriceRange;
 import com.epam.rd.autocode.spring.project.validation.validator.DateRangeAware;
 import com.epam.rd.autocode.spring.project.validation.validator.PriceRangeAware;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +25,8 @@ import java.util.List;
 @ValidPriceRange
 @ValidDateRange
 public class BookFilterDto implements PriceRangeAware, DateRangeAware {
+
+    private String searchQuery;
 
     private String genre;
 

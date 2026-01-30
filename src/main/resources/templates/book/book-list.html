@@ -8,6 +8,13 @@
 
 <form th:action="@{/books}" th:object="${bookFilter}" method="get">
   <div>
+    <label>Search:</label>
+    <input type="text" th:field="*{searchQuery}"
+           placeholder="Search by name, description, author..."
+           onkeydown="if(event.key === 'Enter'){this.form.submit();}"/>
+  </div>
+
+  <div>
     <label>Author:</label>
     <input type="text" th:field="*{author}" />
 
@@ -112,7 +119,8 @@
                          maxPrice=${bookFilter.maxPrice},
                          startPublicationDate=${bookFilter.startPublicationDate},
                          endPublicationDate=${bookFilter.endPublicationDate},
-                         languages=${bookFilter.languages})}"
+                         languages=${bookFilter.languages},
+                         searchQuery=${bookFilter.searchQuery})}"
                th:text="${i + 1}"></a>
             <span th:if="${currentPage == i}" th:text="${i + 1}" style="font-weight: bold;"></span>
             &nbsp;
