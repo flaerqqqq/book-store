@@ -28,6 +28,7 @@ spring:
     init:
       mode: always
       data-locations: classpath:/sql/data.sql
+      schema-locations: classpath:/sql/schema.sql
 
 jwt:
   expiration: 3600000

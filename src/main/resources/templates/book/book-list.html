@@ -58,6 +58,14 @@
 
   <button type="submit">Apply Filters</button>
   <a th:href="@{/books}">Clear</a>
+
+  <label>Sort By:</label>
+  <select name="sort" onchange="this.form.submit()">
+    <option value="name,asc" th:selected="${param.sort != null && param.sort[0] == 'name,asc'}">Name (A-Z)</option>
+    <option value="name,desc" th:selected="${param.sort != null && param.sort[0] == 'name,desc'}">Name (Z-A)</option>
+    <option value="price,asc" th:selected="${param.sort != null && param.sort[0] == 'price,asc'}">Price (Low-High)</option>
+    <option value="price,desc" th:selected="${param.sort != null && param.sort[0] == 'price,desc'}">Price (High-Low)</option>
+  </select>
 </form>
 <br/>
 <table border="1">
