@@ -39,7 +39,7 @@ public class Book {
     @Column(nullable = false)
     private BigDecimal price;
 
-    @Column(name = "publication_year", nullable = false)
+    @Column(name = "publication_date", nullable = false)
     private LocalDate publicationDate;
 
     @Column(nullable = false)

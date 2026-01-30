@@ -1,6 +1,7 @@
 package com.epam.rd.autocode.spring.project.controller;
 
 import com.epam.rd.autocode.spring.project.dto.BookDTO;
+import com.epam.rd.autocode.spring.project.dto.BookFilterDto;
 import com.epam.rd.autocode.spring.project.dto.BookRequestDto;
 import com.epam.rd.autocode.spring.project.dto.BookResponseDto;
 import com.epam.rd.autocode.spring.project.mapper.BookMapper;
@@ -39,8 +40,7 @@ public class BookController {
     @PostMapping("/new")
     @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
     public String addBook(@ModelAttribute("bookRequest") @Valid BookRequestDto requestDto,
-                          BindingResult bindingResult,
-                          Model model) {
+                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "book/add-book-form";
         }
@@ -53,12 +53,15 @@ public class BookController {
 
     @GetMapping
     public String getBookListPage(@PageableDefault(sort = "name") Pageable pageable,
+                                  @ModelAttribute("bookFilter") @Valid BookFilterDto bookFilter,
+                                  BindingResult bindingResult,
                                   Model model) {
-        Page<BookResponseDto> bookPage = bookService.getAllBooks(pageable)
+        Page<BookResponseDto> bookPage = bookService.findFilteredBooks(bookFilter, pageable)
                 .map(bookMapper::dtoToResponseDto);
         model.addAttribute("bookPage", bookPage);
         model.addAttribute("currentPage", pageable.getPageNumber());
         model.addAttribute("totalPages", bookPage.getTotalPages());
+        model.addAttribute("bookFilter", bookFilter == null ? new BookFilterDto() : bookFilter);
 
         return "book/book-list";
     }

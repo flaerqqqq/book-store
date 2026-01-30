@@ -1,11 +1,65 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <title>Book Catalog</title>
 </head>
 <body>
 <h1>Book Catalog</h1>
 
+<form th:action="@{/books}" th:object="${bookFilter}" method="get">
+  <div>
+    <label>Author:</label>
+    <input type="text" th:field="*{author}" />
+
+    <label>Genre:</label>
+    <input type="text" th:field="*{genre}" />
+
+    <label>Age Group:</label>
+    <select th:field="*{ageGroup}">
+      <option value="">All</option>
+      <option th:each="age : ${ageGroups}"
+              th:value="${age}" th:text="${age}"></option>
+    </select>
+  </div>
+
+  <div>
+    <label>Price Min:</label>
+    <input type="number" step="0.01" th:field="*{minPrice}" />
+    <span th:if="${#fields.hasErrors('minPrice')}"
+          th:errors="*{minPrice}"></span>
+
+    <label>Max:</label>
+    <input type="number" step="0.01" th:field="*{maxPrice}" />
+    <span th:if="${#fields.hasErrors('maxPrice')}"
+          th:errors="*{maxPrice}"></span>
+  </div>
+
+  <div>
+    <label>Publication Date From:</label>
+    <input type="date"
+           th:name="startPublicationDate"
+           th:value="${bookFilter.startPublicationDate != null ? #temporals.format(bookFilter.startPublicationDate, 'yyyy-MM-dd') : ''}" />
+    <span th:if="${#fields.hasErrors('startPublicationDate')}"
+          th:errors="*{startPublicationDate}"></span>
+
+    <label>To:</label>
+    <input type="date"
+           th:name="endPublicationDate"
+           th:value="${bookFilter.endPublicationDate != null ? #temporals.format(bookFilter.endPublicationDate, 'yyyy-MM-dd') : ''}" />
+  </div>
+
+  <div>
+    <label>Languages:</label>
+    <span th:each="lang : ${languages}">
+      <input type="checkbox" th:field="*{languages}" th:value="${lang}" />
+      <label th:text="${lang}"></label>
+    </span>
+  </div>
+
+  <button type="submit">Apply Filters</button>
+  <a th:href="@{/books}">Clear</a>
+</form>
+<br/>
 <table border="1">
   <thead>
   <tr>
@@ -42,7 +96,15 @@
 
   <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
             <a th:if="${currentPage != i}"
-               th:href="@{/books(page=${i})}"
+               th:href="@{/books(page=${i},
+                         author=${bookFilter.author},
+                         genre=${bookFilter.genre},
+                         ageGroup=${bookFilter.ageGroup},
+                         minPrice=${bookFilter.minPrice},
+                         maxPrice=${bookFilter.maxPrice},
+                         startPublicationDate=${bookFilter.startPublicationDate},
+                         endPublicationDate=${bookFilter.endPublicationDate},
+                         languages=${bookFilter.languages})}"
                th:text="${i + 1}"></a>
             <span th:if="${currentPage == i}" th:text="${i + 1}" style="font-weight: bold;"></span>
             &nbsp;

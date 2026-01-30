@@ -51,7 +51,7 @@ public class BookServiceTest {
 
         when(bookRepository.findAll(inputPageable)).thenReturn(foundPage);
 
-        Page<BookDTO> actualBookPage = bookService.getAllBooks(inputPageable);
+        Page<BookDTO> actualBookPage = bookService.findBooks(inputPageable);
 
         assertThat(actualBookPage).isNotNull()
                 .hasSize(1)
@@ -67,7 +67,7 @@ public class BookServiceTest {
 
         when(bookRepository.findAll(any(Pageable.class))).thenReturn(foundPage);
 
-        bookService.getAllBooks(inputPageable);
+        bookService.findBooks(inputPageable);
 
         ArgumentCaptor<Pageable> pageableArgCaptor = ArgumentCaptor.forClass(Pageable.class);
         verify(bookRepository, times(1)).findAll(pageableArgCaptor.capture());

@@ -1,15 +1,18 @@
 package com.epam.rd.autocode.spring.project.service.impl;
 
 import com.epam.rd.autocode.spring.project.dto.BookDTO;
+import com.epam.rd.autocode.spring.project.dto.BookFilterDto;
 import com.epam.rd.autocode.spring.project.exception.AlreadyExistException;
 import com.epam.rd.autocode.spring.project.exception.NotFoundException;
 import com.epam.rd.autocode.spring.project.mapper.BookMapper;
 import com.epam.rd.autocode.spring.project.model.Book;
 import com.epam.rd.autocode.spring.project.repo.BookRepository;
+import com.epam.rd.autocode.spring.project.repo.specification.BookSpecifications;
 import com.epam.rd.autocode.spring.project.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,10 +30,23 @@ public class BookServiceImpl implements BookService {
     private final BookMapper bookMapper;
 
     @Override
-    public Page<BookDTO> getAllBooks(Pageable pageable) {
+    public Page<BookDTO> findBooks(Pageable pageable) {
         pageable = Objects.requireNonNullElse(pageable, Pageable.ofSize(DEFAULT_PAGE_SIZE));
 
         return bookRepository.findAll(pageable).map(bookMapper::entityToDto);
+    }
+
+    @Override
+    public Page<BookDTO> findFilteredBooks(BookFilterDto filter, Pageable pageable) {
+        if (filter == null) {
+            return findBooks(pageable);
+        }
+
+        pageable = Objects.requireNonNullElse(pageable, Pageable.ofSize(DEFAULT_PAGE_SIZE));
+        Specification<Book> bookSpec = BookSpecifications.withFilters(filter);
+
+        return bookRepository.findAll(bookSpec, pageable)
+                .map(bookMapper::entityToDto);
     }
 
     @Override

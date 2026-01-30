@@ -17,7 +17,7 @@ INSERT INTO users_roles (user_id, role_id) VALUES (3, 3);
 
 SELECT setval(pg_get_serial_sequence('users', 'id'), 4, false);
 
-INSERT INTO books (public_id, name, genre, age_group, price, publication_year, author, number_of_pages, characteristics, description, language) VALUES
+INSERT INTO books (public_id, name, genre, age_group, price, publication_date, author, number_of_pages, characteristics, description, language) VALUES
 (gen_random_uuid(), 'The Great Gatsby', 'Classic', 'ADULT', 15.99, '1925-04-10', 'F. Scott Fitzgerald', 180, 'Hardcover', 'A story of wealth and love.', 'ENGLISH'),
 (gen_random_uuid(), '1984', 'Dystopian', 'ADULT', 12.50, '1949-06-08', 'George Orwell', 328, 'Paperback', 'Big Brother is watching you.', 'ENGLISH'),
 (gen_random_uuid(), 'The Hobbit', 'Fantasy', 'CHILD', 20.00, '1937-09-21', 'J.R.R. Tolkien', 310, 'Illustrated', 'A hobbits unexpected journey.', 'ENGLISH'),
