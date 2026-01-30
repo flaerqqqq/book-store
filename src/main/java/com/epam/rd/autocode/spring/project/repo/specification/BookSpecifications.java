@@ -13,9 +13,6 @@ import java.util.List;
 public class BookSpecifications {
 
     private static final double GENRE_SIMILARITY_SCORE = 0.4;
-    private static final double NAME_SIMILARITY_SCORE = 0.2;
-    private static final double DESCRIPTION_SIMILARITY_SCORE = 0.15;
-    private static final double CHARACTERISTICS_SIMILARITY_SCORE = 0.3;
     private static final double AUTHOR_SIMILARITY_SCORE = 0.25;
 
     public static Specification<Book> withFilters(BookFilterDto filter) {
@@ -23,22 +20,16 @@ public class BookSpecifications {
             List<Predicate> predicates = new ArrayList<>();
 
             if (StringUtils.isNotBlank(filter.getSearchQuery())) {
-                String searchQuery = filter.getSearchQuery();
-                Expression<Double> authorSim = cb.function("word_similarity", Double.class,
-                        root.get("author"), cb.literal(searchQuery));
-                Expression<Double> nameSim = cb.function("word_similarity", Double.class,
-                        root.get("name"), cb.literal(searchQuery));
-                Expression<Double> descriptionSim = cb.function("word_similarity", Double.class,
-                        root.get("description"), cb.literal(searchQuery));
-                Expression<Double> characteristicsSim = cb.function("word_similarity", Double.class,
-                        root.get("characteristics"), cb.literal(searchQuery));
+                Expression<Boolean> ftsMatch = cb.function(
+                        "search_books",
+                        Boolean.class,
+                        root.get("name"),
+                        root.get("author"),
+                        root.get("description"),
+                        cb.literal(filter.getSearchQuery())
+                );
 
-                Predicate authorPred = cb.greaterThan(authorSim, AUTHOR_SIMILARITY_SCORE);
-                Predicate namePred = cb.greaterThan(nameSim, NAME_SIMILARITY_SCORE);
-                Predicate descPred = cb.greaterThan(descriptionSim, DESCRIPTION_SIMILARITY_SCORE);
-                Predicate charPred = cb.greaterThan(characteristicsSim, CHARACTERISTICS_SIMILARITY_SCORE);
-
-                predicates.add(cb.or(authorPred, namePred, descPred, charPred));
+                predicates.add(cb.isTrue(ftsMatch));
             }
 
             if (StringUtils.isNotBlank(filter.getGenre())) {
