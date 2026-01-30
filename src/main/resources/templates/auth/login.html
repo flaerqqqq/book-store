@@ -6,6 +6,9 @@
 </head>
 <body>
 <h1>Login:</h1>
+    <div th:if="${param.error}" class="alert alert-danger">
+        Invalid username or password. Please try again.
+    </div>
     <form th:action="@{/login}" th:object="${login}" method="post">
         <div>
             <label>Email:</label>

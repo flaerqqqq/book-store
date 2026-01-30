@@ -49,6 +49,6 @@ public class AuthController {
                 .build();
         resp.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
 
-        return "redirect:/home";
+        return "redirect:/books";
     }
 }
