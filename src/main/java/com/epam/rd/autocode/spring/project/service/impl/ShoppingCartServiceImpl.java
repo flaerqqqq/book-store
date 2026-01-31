@@ -1,17 +1,23 @@
 package com.epam.rd.autocode.spring.project.service.impl;
 
 import com.epam.rd.autocode.spring.project.dto.ShoppingCartDto;
+import com.epam.rd.autocode.spring.project.dto.ShoppingCartItemDto;
 import com.epam.rd.autocode.spring.project.exception.AlreadyExistException;
 import com.epam.rd.autocode.spring.project.exception.NotFoundException;
+import com.epam.rd.autocode.spring.project.mapper.ShoppingCartItemMapper;
 import com.epam.rd.autocode.spring.project.mapper.ShoppingCartMapper;
 import com.epam.rd.autocode.spring.project.model.Book;
 import com.epam.rd.autocode.spring.project.model.ShoppingCart;
 import com.epam.rd.autocode.spring.project.model.ShoppingCartItem;
 import com.epam.rd.autocode.spring.project.model.User;
 import com.epam.rd.autocode.spring.project.repo.BookRepository;
+import com.epam.rd.autocode.spring.project.repo.ShoppingCartItemRepository;
+import com.epam.rd.autocode.spring.project.repo.ShoppingCartRepository;
 import com.epam.rd.autocode.spring.project.repo.UserRepository;
 import com.epam.rd.autocode.spring.project.service.ShoppingCartService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,9 +31,14 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class ShoppingCartServiceImpl implements ShoppingCartService {
 
+    private final static int DEFAULT_PAGE_SIZE = 10;
+
     private final UserRepository userRepository;
+    private final ShoppingCartRepository cartRepository;
+    private final ShoppingCartItemRepository cartItemRepository;
     private final BookRepository bookRepository;
     private final ShoppingCartMapper cartMapper;
+    private final ShoppingCartItemMapper cartItemMapper;
 
     @Override
     @Transactional
@@ -58,6 +69,18 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         ShoppingCart userCart = getCartOrThrow(user);
 
         return cartMapper.entityToDto(userCart);
+    }
+
+    @Override
+    public Page<ShoppingCartItemDto> getCartItems(UUID userPublicId, Pageable pageable) {
+        Objects.requireNonNull(userPublicId, "User public ID must not be null");
+        pageable = Objects.requireNonNullElse(pageable, Pageable.ofSize(DEFAULT_PAGE_SIZE));
+
+        ShoppingCart userCart = getCartOrThrow(userPublicId);
+
+        Page<ShoppingCartItem> cartItemPage = cartItemRepository.findByCart_PublicId(userCart.getPublicId(), pageable);
+
+        return cartItemPage.map(cartItemMapper::entityToDto);
     }
 
     @Override
@@ -125,5 +148,15 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         }
 
         return user.getShoppingCart();
+    }
+
+    private ShoppingCart getCartOrThrow(UUID userPublicId) {
+        if (!userRepository.existsByPublicId(userPublicId)) {
+            throw new NotFoundException(User.class, "publicId", userPublicId);
+        }
+
+        return cartRepository.findByUser_PublicId(userPublicId).orElseThrow(() ->
+                new NotFoundException("Shopping Cart for is not found for a User with publicId: %s".formatted(userPublicId))
+        );
     }
 }
