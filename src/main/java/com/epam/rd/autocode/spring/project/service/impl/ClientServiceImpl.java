@@ -9,6 +9,7 @@ import com.epam.rd.autocode.spring.project.model.Role;
 import com.epam.rd.autocode.spring.project.repo.ClientRepository;
 import com.epam.rd.autocode.spring.project.repo.RoleRepository;
 import com.epam.rd.autocode.spring.project.service.ClientService;
+import com.epam.rd.autocode.spring.project.service.ShoppingCartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,7 @@ public class ClientServiceImpl implements ClientService {
     private final RoleRepository roleRepository;
     private final ClientMapper clientMapper;
     private final PasswordEncoder passwordEncoder;
+    private final ShoppingCartService shoppingCartService;
 
     @Override
     public Page<ClientDTO> getAllClients(Pageable pageable) {
@@ -89,6 +91,8 @@ public class ClientServiceImpl implements ClientService {
         clientEntity.getRoles().add(clientRole);
 
         Client savedClient = clientRepository.save(clientEntity);
+
+        shoppingCartService.createCartForUser(savedClient.getPublicId());
 
         return clientMapper.entityToDto(savedClient);
     }

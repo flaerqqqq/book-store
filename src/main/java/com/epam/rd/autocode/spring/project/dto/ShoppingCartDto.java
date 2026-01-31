@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,6 +18,8 @@ public class ShoppingCartDto {
     private UUID publicId;
 
     private UUID userPublicId;
+
+    private BigDecimal totalAmount;
 
     private List<ShoppingCartItemDto> cartItems;
 }
