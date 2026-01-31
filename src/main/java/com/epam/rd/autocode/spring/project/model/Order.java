@@ -36,10 +36,10 @@ public class Order {
     private BigDecimal price;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BookItem> bookItems = new ArrayList<>();
+    private List<OrderItem> orderItems = new ArrayList<>();
 
-    public void addBookItem(BookItem bookItem) {
-        this.bookItems.add(bookItem);
-        bookItem.setOrder(this);
+    public void addOrderItem(OrderItem orderItem) {
+        this.orderItems.add(orderItem);
+        orderItem.setOrder(this);
     }
 }
