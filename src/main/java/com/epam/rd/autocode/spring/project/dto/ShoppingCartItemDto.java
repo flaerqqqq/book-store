@@ -22,7 +22,7 @@ public class ShoppingCartItemDto {
 
     private Integer quantity;
 
-    private BigDecimal price;
+    private BigDecimal priceAtAdd;
 
     private BigDecimal subtotal;
 }

@@ -30,12 +30,19 @@ public class ShoppingCartItem {
     private Integer quantity;
 
     @Column(nullable = false)
-    private BigDecimal price;
+    private BigDecimal priceAtAdd;
 
     @Column(nullable = false)
     private BigDecimal subtotal;
 
-    public BigDecimal getSubtotal() {
-        return price.multiply(BigDecimal.valueOf(quantity));
+    @PrePersist
+    @PreUpdate
+    public void calculateSubtotal() {
+        this.subtotal = priceAtAdd.multiply(BigDecimal.valueOf(quantity));
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+        this.subtotal = priceAtAdd.multiply(BigDecimal.valueOf(quantity));
     }
 }

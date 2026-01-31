@@ -37,8 +37,8 @@ public class ShoppingCart {
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShoppingCartItem> cartItems = new ArrayList<>();
 
-    public BigDecimal getTotalAmount() {
-        return cartItems.stream()
+    public void recalculateTotalAmount() {
+        this.totalAmount = cartItems.stream()
                 .map(ShoppingCartItem::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
