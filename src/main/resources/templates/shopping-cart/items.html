@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Shopping Cart</title>
+</head>
+<body>
+
+<h1>Your Shopping Cart</h1>
+<div>
+    <p>Total Items: <strong th:text="${summary.totalItems}">0</strong></p>
+    <p>Total Amount: <strong th:text="${summary.totalAmount}">0.00</strong> USD</p>
+</div>
+
+<hr/>
+
+<div th:if="${cartItemPage.isEmpty()}">
+    <p>Your cart is empty.</p>
+</div>
+
+<div th:unless="${cartItemPage.isEmpty()}">
+    <table border="1">
+        <thead>
+        <tr>
+            <th>Book</th>
+            <th>Author</th>
+            <th>Price Each</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${cartItemPage.content}">
+            <td th:text="${item.book.name}">Name</td>
+            <td th:text="${item.book.author}">Author</td>
+            <td th:text="${item.priceAtAdd}">0.00</td>
+            <td>
+                <form th:action="@{/shopping-cart/update}" method="post">
+                    <input type="hidden" name="bookId" th:value="${item.book.publicId}"/>
+                    <input type="number" name="quantity" th:value="${item.quantity}" min="1"/>
+                    <button type="submit">Update</button>
+                </form>
+            </td>
+            <td th:text="${item.subtotal}">0.00</td>
+            <td>
+                <form th:action="@{/shopping-cart/remove}" method="post">
+                    <input type="hidden" name="bookId" th:value="${item.book.publicId}"/>
+                    <button type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div th:if="${cartItemPage.totalPages > 1}">
+        <p>
+            <a th:if="${cartItemPage.hasPrevious()}"
+               th:href="@{/shopping-cart(page=${cartItemPage.number - 1}, size=${cartItemPage.size})}">
+                &laquo; Previous
+            </a>
+
+            <span th:each="i : ${#numbers.sequence(0, cartItemPage.totalPages - 1)}">
+                    <a th:if="${i != cartItemPage.number}"
+                       th:href="@{/shopping-cart(page=${i}, size=${cartItemPage.size})}"
+                       th:text="${i + 1}"></a>
+                    <span th:if="${i == cartItemPage.number}" th:text="${i + 1}" style="font-weight: bold;"></span>
+                </span>
+
+            <a th:if="${cartItemPage.hasNext()}"
+               th:href="@{/shopping-cart(page=${cartItemPage.number + 1}, size=${cartItemPage.size})}">
+                Next &raquo;
+            </a>
+        </p>
+    </div>
+</div>
+
+<hr/>
+
+<div>
+    <button>Proceed to Checkout</button>
+    <form th:action="@{/shopping-cart/empty}" method="post">
+        <button type="submit">Empty Cart</button>
+    </form>
+</div>
+
+</body>
+</html>

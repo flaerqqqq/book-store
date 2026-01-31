@@ -2,6 +2,7 @@ package com.epam.rd.autocode.spring.project.mapper;
 
 import com.epam.rd.autocode.spring.project.conf.GlobalMapperConfig;
 import com.epam.rd.autocode.spring.project.dto.ShoppingCartDto;
+import com.epam.rd.autocode.spring.project.dto.ShoppingCartSummaryDto;
 import com.epam.rd.autocode.spring.project.model.ShoppingCart;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -15,4 +16,7 @@ public interface ShoppingCartMapper {
     ShoppingCartDto entityToDto(ShoppingCart entity);
 
     ShoppingCart dtoToEntity(ShoppingCartDto dto);
+
+    @Mapping(target = "totalItems", expression = "java(entity.getCartItems() != null ? entity.getCartItems().size() : 0)")
+    ShoppingCartSummaryDto entityToSummaryDto(ShoppingCart entity);
 }

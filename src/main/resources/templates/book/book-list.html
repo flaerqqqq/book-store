@@ -82,9 +82,8 @@
     <th>Author</th>
     <th>Price</th>
     <th>Language</th>
-    <th sec:authorize="hasAnyRole('EMPLOYEE', 'ADMIN')">
-      Actions
-    </th>
+    <th sec:authorize="hasRole('CLIENT')">Purchase</th>
+    <th sec:authorize="hasAnyRole('EMPLOYEE', 'ADMIN')">Actions</th>
   </tr>
   </thead>
   <tbody>
@@ -93,6 +92,13 @@
     <td th:text="${book.author}">Author</td>
     <td th:text="${book.price}">0.00</td>
     <td th:text="${book.language}">English</td>
+    <td sec:authorize="hasRole('CLIENT')">
+      <button type="button"
+              class="add-to-cart-btn"
+              th:data-uuid="${book.publicId}">
+        Add to Cart
+      </button>
+    </td>
     <td sec:authorize="hasAnyRole('EMPLOYEE', 'ADMIN')">
       <a th:href="@{/books/{uuid}/update(uuid=${book.publicId})}">
         <button type="button">Update</button>
@@ -131,5 +137,31 @@
 <div sec:authorize="hasAnyRole('EMPLOYEE', 'ADMIN')">
   <a th:href="@{/books/new}">Add New Book</a>
 </div>
+<script>
+  document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+    button.addEventListener('click', function() {
+      const bookUuid = this.getAttribute('data-uuid');
+      const btn = this;
+
+      fetch('/api/shopping-carts/items', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ bookPublicId: bookUuid })
+      })
+              .then(response => {
+                if (response.ok) {
+                  btn.innerText = "Added! ✅";
+                  btn.style.backgroundColor = "#d4edda";
+                  btn.disabled = true; // Prevent double clicks
+                } else {
+                  alert("Could not add book. Please try again.");
+                }
+              })
+              .catch(error => console.error('Error:', error));
+    });
+  });
+</script>
 </body>
 </html>

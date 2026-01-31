@@ -12,17 +12,13 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ShoppingCartItemDto {
+public class ShoppingCartSummaryDto {
 
-    private Long id;
+    private UUID publicId;
 
-    private UUID cartPublicId;
+    private UUID userPublicId;
 
-    private BookDTO book;
+    private BigDecimal totalAmount;
 
-    private Integer quantity;
-
-    private BigDecimal priceAtAdd;
-
-    private BigDecimal subtotal;
+    private int totalItems;
 }

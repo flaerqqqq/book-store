@@ -57,4 +57,8 @@ public class CustomUserDetails implements UserDetails, IdentifiableUser {
     public String getUniqueIdentifier() {
         return user.getPublicId().toString();
     }
+
+    public UUID getPublicId() {
+        return user.getPublicId();
+    }
 }

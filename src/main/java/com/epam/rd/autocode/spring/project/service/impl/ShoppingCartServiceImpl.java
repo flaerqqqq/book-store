@@ -2,6 +2,7 @@ package com.epam.rd.autocode.spring.project.service.impl;
 
 import com.epam.rd.autocode.spring.project.dto.ShoppingCartDto;
 import com.epam.rd.autocode.spring.project.dto.ShoppingCartItemDto;
+import com.epam.rd.autocode.spring.project.dto.ShoppingCartSummaryDto;
 import com.epam.rd.autocode.spring.project.exception.AlreadyExistException;
 import com.epam.rd.autocode.spring.project.exception.NotFoundException;
 import com.epam.rd.autocode.spring.project.mapper.ShoppingCartItemMapper;
@@ -81,6 +82,15 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         Page<ShoppingCartItem> cartItemPage = cartItemRepository.findByCart_PublicId(userCart.getPublicId(), pageable);
 
         return cartItemPage.map(cartItemMapper::entityToDto);
+    }
+
+    @Override
+    public ShoppingCartSummaryDto getCartSummary(UUID userPublicId) {
+        Objects.requireNonNull(userPublicId, "User public ID must not be null");
+
+        ShoppingCart userCart = getCartOrThrow(userPublicId);
+
+        return cartMapper.entityToSummaryDto(userCart);
     }
 
     @Override

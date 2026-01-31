@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -12,17 +13,13 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ShoppingCartItemDto {
+public class ShoppingCartResponseDto {
 
-    private Long id;
+    private UUID publicId;
 
-    private UUID cartPublicId;
+    private UUID userPublicId;
 
-    private BookDTO book;
+    private BigDecimal totalAmount;
 
-    private Integer quantity;
-
-    private BigDecimal priceAtAdd;
-
-    private BigDecimal subtotal;
+    private Page<ShoppingCartItemDto> cartItems;
 }

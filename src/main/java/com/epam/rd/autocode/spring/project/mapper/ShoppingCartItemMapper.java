@@ -6,11 +6,12 @@ import com.epam.rd.autocode.spring.project.model.ShoppingCartItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(config = GlobalMapperConfig.class)
+@Mapper(config = GlobalMapperConfig.class, uses = {
+        BookMapper.class
+})
 public interface ShoppingCartItemMapper {
 
     @Mapping(target = "cartPublicId", source = "cart.publicId")
-    @Mapping(target = "bookPublicId", source = "book.publicId")
     ShoppingCartItemDto entityToDto(ShoppingCartItem entity);
 
     ShoppingCartItem dtoToEntity(ShoppingCartItemDto dto);

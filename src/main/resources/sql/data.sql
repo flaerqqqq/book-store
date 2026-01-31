@@ -1,21 +1,27 @@
 INSERT INTO roles (id, name) VALUES (1, 'ROLE_ADMIN'), (2, 'ROLE_EMPLOYEE'), (3, 'ROLE_CLIENT');
 
+
 INSERT INTO users (id, public_id, email, password, name)
 VALUES (1, '00000000-0000-0000-0000-000000000001', 'admin@gmail.com', '$2a$10$AbR3.AyqmNrpfuaCjMj4fOJMkl/YFBAGHQ1OqlyEtm7g2E4wBLUJi', 'Super Admin');
 INSERT INTO admins (id) VALUES (1);
 INSERT INTO users_roles (user_id, role_id) VALUES (1, 1);
+
 
 INSERT INTO users (id, public_id, email, password, name)
 VALUES (2, '00000000-0000-0000-0000-000000000002', 'employee@gmail.com', '$2a$10$AbR3.AyqmNrpfuaCjMj4fOJMkl/YFBAGHQ1OqlyEtm7g2E4wBLUJi', 'John Staff');
 INSERT INTO employees (id, phone, birth_date) VALUES (2, '+380991112233', '1992-08-24');
 INSERT INTO users_roles (user_id, role_id) VALUES (2, 2);
 
+
 INSERT INTO users (id, public_id, email, password, name)
 VALUES (3, '00000000-0000-0000-0000-000000000003', 'client@gmail.com', '$2a$10$AbR3.AyqmNrpfuaCjMj4fOJMkl/YFBAGHQ1OqlyEtm7g2E4wBLUJi', 'Ivan Client');
 INSERT INTO clients (id, balance) VALUES (3, 1500.50);
 INSERT INTO users_roles (user_id, role_id) VALUES (3, 3);
+INSERT INTO shopping_carts (public_id, total_amount, user_id) VALUES ('7a1b3c5d-9e8f-4a2b-b1c3-d5e7f9a1b3c5', 0.00, 3);
+
 
 SELECT setval(pg_get_serial_sequence('users', 'id'), 4, false);
+
 
 INSERT INTO books (public_id, name, genre, age_group, price, publication_date, author, number_of_pages, characteristics, description, language) VALUES
 (gen_random_uuid(), 'The Great Gatsby', 'Classic', 'ADULT', 15.99, '1925-04-10', 'F. Scott Fitzgerald', 180, 'Hardcover', 'A story of wealth and love.', 'ENGLISH'),
@@ -40,3 +46,27 @@ INSERT INTO books (public_id, name, genre, age_group, price, publication_date, a
 (gen_random_uuid(), 'Anna Karenina', 'Realism', 'ADULT', 17.99, '1877-01-01', 'Leo Tolstoy', 864, 'Hardcover', 'A tragic love affair.', 'OTHER');
 
 SELECT setval(pg_get_serial_sequence('books', 'id'), 21, false);
+
+
+INSERT INTO shopping_cart_items (cart_id, book_id, quantity, price_at_add, subtotal) VALUES
+(1, 1, 1, 15.99, 15.99),  -- Gatsby
+(1, 2, 1, 12.50, 12.50),  -- 1984
+(1, 3, 2, 20.00, 40.00),  -- Hobbit (qty 2)
+(1, 4, 1, 25.99, 25.99),  -- Harry Potter
+(1, 5, 1, 30.00, 30.00),  -- Kobzar
+(1, 6, 1, 11.99, 11.99),  -- Catcher
+(1, 7, 1, 18.50, 18.50),  -- Dune
+(1, 8, 1, 10.00, 10.00),  -- Alchemist
+(1, 9, 1, 14.00, 14.00),  -- Norwegian Wood
+(1, 10, 1, 13.00, 13.00), -- Brave New World
+(1, 11, 1, 14.50, 14.50), -- Book Thief
+(1, 12, 1, 16.00, 16.00), -- Crime and Punishment
+(1, 13, 1, 8.99, 8.99),   -- Animal Farm
+(1, 14, 1, 16.50, 16.50), -- Shadow of Wind
+(1, 15, 3, 11.50, 34.50), -- Little Prince (qty 3)
+(1, 16, 1, 15.00, 15.00), -- Odyssey
+(1, 17, 1, 12.00, 12.00), -- Shadows of Ancestors
+(1, 18, 1, 14.99, 14.99), -- The Road
+(1, 19, 1, 9.00, 9.00),   -- Intermezzo
+(1, 20, 1, 17.99, 17.99); -- Anna Karenina
+UPDATE shopping_carts SET total_amount = 358.43 WHERE id = 1;
