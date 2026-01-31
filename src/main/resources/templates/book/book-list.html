@@ -132,10 +132,12 @@
             &nbsp;
         </span>
 </div>
-
 <br/>
 <div sec:authorize="hasAnyRole('EMPLOYEE', 'ADMIN')">
   <a th:href="@{/books/new}">Add New Book</a>
+</div>
+<div sec:authorize="hasRole('CLIENT')">
+  <a th:href="@{/shopping-cart}">Go to Shopping Cart</a>
 </div>
 <script>
   document.querySelectorAll('.add-to-cart-btn').forEach(button => {

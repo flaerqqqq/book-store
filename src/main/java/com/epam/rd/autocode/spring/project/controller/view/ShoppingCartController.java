@@ -1,23 +1,30 @@
 package com.epam.rd.autocode.spring.project.controller.view;
 
 import com.epam.rd.autocode.spring.project.dto.ShoppingCartItemDto;
+import com.epam.rd.autocode.spring.project.dto.ShoppingCartItemRequestDto;
 import com.epam.rd.autocode.spring.project.dto.ShoppingCartSummaryDto;
 import com.epam.rd.autocode.spring.project.mapper.ShoppingCartMapper;
 import com.epam.rd.autocode.spring.project.security.CustomUserDetails;
 import com.epam.rd.autocode.spring.project.service.ShoppingCartService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/shopping-cart")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('CLIENT')")
 public class ShoppingCartController {
 
     private final ShoppingCartService cartService;
@@ -35,4 +42,48 @@ public class ShoppingCartController {
         return "shopping-cart/items";
     }
 
+    @PostMapping("/empty")
+    public String emptyShoppingCart(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        cartService.emptyCart(customUserDetails.getPublicId());
+
+        return "redirect:/books";
+    }
+
+    @PostMapping("/remove")
+    public String removeCartItem(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                 @RequestParam("bookPublicId") UUID bookPublicId,
+                                 Pageable pageable,
+                                 RedirectAttributes redirectAttributes) {
+        addPaginationAttributes(pageable, redirectAttributes);
+
+        cartService.removeCartItem(userDetails.getPublicId(), bookPublicId);
+
+        return "redirect:/shopping-cart";
+    }
+
+    @PostMapping("/update")
+    public String updateCartItemQuantity(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                         @ModelAttribute @Valid ShoppingCartItemRequestDto requestDto,
+                                         BindingResult bindingResult,
+                                         Pageable pageable,
+                                         RedirectAttributes redirectAttributes) {
+        addPaginationAttributes(pageable, redirectAttributes);
+
+        if (bindingResult.hasErrors()) {
+            return "redirect:/shopping-cart?error=invalid_quantity";
+        }
+
+        cartService.updateCartItemQuantity(userDetails.getPublicId(), requestDto.getBookPublicId(), requestDto.getQuantity());
+
+        return "redirect:/shopping-cart";
+    }
+
+    private void addPaginationAttributes(Pageable pageable, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addAttribute("page", pageable.getPageNumber());
+        redirectAttributes.addAttribute("size", pageable.getPageSize());
+        if (pageable.getSort().isSorted()) {
+            redirectAttributes.addAttribute("sort",
+                    pageable.getSort().toString().replace(": ", ","));
+        }
+    }
 }

@@ -1,6 +1,6 @@
 package com.epam.rd.autocode.spring.project.controller.api;
 
-import com.epam.rd.autocode.spring.project.dto.AddItemToCartRequestDto;
+import com.epam.rd.autocode.spring.project.dto.ShoppingCartItemRequestDto;
 import com.epam.rd.autocode.spring.project.security.CustomUserDetails;
 import com.epam.rd.autocode.spring.project.service.ShoppingCartService;
 import jakarta.validation.Valid;
@@ -20,7 +20,7 @@ public class ShoppingCartApiController {
 
     @PostMapping("/items")
     public void addItem(@AuthenticationPrincipal CustomUserDetails userDetails,
-                        @RequestBody @Valid AddItemToCartRequestDto requestDto) {
+                        @RequestBody @Valid ShoppingCartItemRequestDto requestDto) {
         cartService.addItemToCart(userDetails.getPublicId(), requestDto.getBookPublicId(), 1);
     }
 }

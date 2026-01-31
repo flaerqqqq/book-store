@@ -108,21 +108,14 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     @Transactional
     public ShoppingCartDto addItemToCart(UUID userPublicId, UUID bookPublicId, Integer quantity) {
-        Objects.requireNonNull(userPublicId, "User public Id must not be null");
-        Objects.requireNonNull(bookPublicId, "Book public Id must not be null");
-
-        if (quantity == null || quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be positive");
-        }
+        validateInputs(userPublicId, bookPublicId, quantity);
 
         User user = getUserOrThrow(userPublicId);
         ShoppingCart userCart = getCartOrThrow(user);
 
         Book book = getBookOrThrow(bookPublicId);
 
-        Optional<ShoppingCartItem> existingCartItemOpt = userCart.getCartItems().stream()
-                .filter(item -> Objects.equals(book.getPublicId(), item.getBook().getPublicId()))
-                .findFirst();
+        Optional<ShoppingCartItem> existingCartItemOpt = findItemInCart(userCart, book.getPublicId());
 
         existingCartItemOpt.ifPresentOrElse((item) -> {
             item.setQuantity(item.getQuantity() + quantity);
@@ -136,10 +129,63 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             userCart.getCartItems().add(cartItem);
         });
 
+        return saveAndMap(userCart, user);
+    }
+
+    @Override
+    @Transactional
+    public ShoppingCartDto updateCartItemQuantity(UUID userPublicId, UUID bookPublicId, Integer quantity) {
+        validateInputs(userPublicId, bookPublicId, quantity);
+
+        User user = getUserOrThrow(userPublicId);
+        ShoppingCart userCart = getCartOrThrow(user);
+
+        ShoppingCartItem existingCartItem = findItemInCart(userCart, bookPublicId).orElseThrow(() ->
+                        new NotFoundException(ShoppingCartItem.class, "bookPublicId", bookPublicId));
+
+        existingCartItem.setQuantity(quantity);
+        return saveAndMap(userCart, user);
+    }
+
+
+    @Override
+    @Transactional
+    public void removeCartItem(UUID userPublicId, UUID bookPublicId) {
+        Objects.requireNonNull(userPublicId, "User public Id must not be null");
+        Objects.requireNonNull(bookPublicId, "Book public Id must not be null");
+
+        ShoppingCart userCart = getCartOrThrow(userPublicId);
+
+        boolean removed = userCart.getCartItems().removeIf(item ->
+                Objects.equals(item.getBook().getPublicId(), bookPublicId));
+
+        if (removed) {
+            userCart.recalculateTotalAmount();
+        } else {
+            throw new NotFoundException(Book.class, "publicId", bookPublicId);
+        }
+    }
+
+    private ShoppingCartDto saveAndMap(ShoppingCart userCart, User user) {
         userCart.recalculateTotalAmount();
         ShoppingCart updatedUserCart = userRepository.save(user).getShoppingCart();
 
         return cartMapper.entityToDto(updatedUserCart);
+    }
+
+    private void validateInputs(UUID userPublicId, UUID bookPublicId, Integer quantity) {
+        Objects.requireNonNull(userPublicId, "User public Id must not be null");
+        Objects.requireNonNull(bookPublicId, "Book public Id must not be null");
+
+        if (quantity == null || quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be positive");
+        }
+    }
+
+    private Optional<ShoppingCartItem> findItemInCart(ShoppingCart userCart, UUID bookPublicId) {
+        return userCart.getCartItems().stream()
+                .filter(item -> Objects.equals(bookPublicId, item.getBook().getPublicId()))
+                .findFirst();
     }
 
     private User getUserOrThrow(UUID userPublicId) {

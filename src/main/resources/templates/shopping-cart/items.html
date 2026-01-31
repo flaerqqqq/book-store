@@ -18,6 +18,14 @@
 </div>
 
 <div th:unless="${cartItemPage.isEmpty()}">
+    <form th:action="@{/shopping-cart}">
+        <select name="sort" onchange="this.form.submit()">
+            <option value="quantity,asc" th:selected="${param.sort != null && param.sort[0] == 'quantity,asc'}">Quantity (Low-High)</option>
+            <option value="quantity,desc" th:selected="${param.sort != null && param.sort[0] == 'quantity,desc'}">Quantity (High-Low)</option>
+            <option value="subtotal,asc" th:selected="${param.sort != null && param.sort[0] == 'subtotal,asc'}">Subtotal (Low-High)</option>
+            <option value="subtotal,desc" th:selected="${param.sort != null && param.sort[0] == 'subtotal,desc'}">Subtotal (High-Low)</option>
+        </select>
+    </form>
     <table border="1">
         <thead>
         <tr>
@@ -36,21 +44,30 @@
             <td th:text="${item.priceAtAdd}">0.00</td>
             <td>
                 <form th:action="@{/shopping-cart/update}" method="post">
-                    <input type="hidden" name="bookId" th:value="${item.book.publicId}"/>
+                    <input type="hidden" name="bookPublicId" th:value="${item.book.publicId}"/>
                     <input type="number" name="quantity" th:value="${item.quantity}" min="1"/>
+                    <input type="hidden" name="page" th:value="${cartItemPage.number}"/>
+                    <input type="hidden" name="size" th:value="${cartItemPage.size}"/>
+                    <input type="hidden" name="sort" th:value="${param.sort}"/>
                     <button type="submit">Update</button>
                 </form>
             </td>
             <td th:text="${item.subtotal}">0.00</td>
             <td>
                 <form th:action="@{/shopping-cart/remove}" method="post">
-                    <input type="hidden" name="bookId" th:value="${item.book.publicId}"/>
+                    <input type="hidden" name="bookPublicId" th:value="${item.book.publicId}"/>
+                    <input type="hidden" name="page" th:value="${cartItemPage.number}"/>
+                    <input type="hidden" name="size" th:value="${cartItemPage.size}"/>
+                    <input type="hidden" name="sort" th:value="${param.sort}"/>
                     <button type="submit">Delete</button>
                 </form>
             </td>
         </tr>
         </tbody>
     </table>
+    <div th:if="${param.error != null and param.error[0] == 'invalid_quantity'}">
+        <p>Quantity must be positive</p>
+    </div>
 
     <div th:if="${cartItemPage.totalPages > 1}">
         <p>
@@ -82,6 +99,6 @@
         <button type="submit">Empty Cart</button>
     </form>
 </div>
-
+<a th:href="@{/books}">Go to Books</a>
 </body>
 </html>

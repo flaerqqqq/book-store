@@ -21,4 +21,8 @@ public interface ShoppingCartService {
     void emptyCart(UUID userPublicId);
 
     ShoppingCartDto addItemToCart(UUID userPublicId, UUID bookPublicId, Integer quantity);
+
+    ShoppingCartDto updateCartItemQuantity(UUID userPublicId, UUID bookPublicId, Integer quantity);
+
+    void removeCartItem(UUID userPublicId, UUID bookPublicId);
 }
