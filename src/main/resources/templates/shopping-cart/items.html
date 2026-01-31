@@ -43,7 +43,7 @@
             <td th:text="${item.book.author}">Author</td>
             <td th:text="${item.priceAtAdd}">0.00</td>
             <td>
-                <form th:action="@{/shopping-cart/update}" method="post">
+                <form th:action="@{/shopping-cart/update-item}" method="post">
                     <input type="hidden" name="bookPublicId" th:value="${item.book.publicId}"/>
                     <input type="number" name="quantity" th:value="${item.quantity}" min="1"/>
                     <input type="hidden" name="page" th:value="${cartItemPage.number}"/>
@@ -54,7 +54,7 @@
             </td>
             <td th:text="${item.subtotal}">0.00</td>
             <td>
-                <form th:action="@{/shopping-cart/remove}" method="post">
+                <form th:action="@{/shopping-cart/remove-item}" method="post">
                     <input type="hidden" name="bookPublicId" th:value="${item.book.publicId}"/>
                     <input type="hidden" name="page" th:value="${cartItemPage.number}"/>
                     <input type="hidden" name="size" th:value="${cartItemPage.size}"/>

@@ -49,7 +49,7 @@ public class ShoppingCartController {
         return "redirect:/books";
     }
 
-    @PostMapping("/remove")
+    @PostMapping("/remove-item")
     public String removeCartItem(@AuthenticationPrincipal CustomUserDetails userDetails,
                                  @RequestParam("bookPublicId") UUID bookPublicId,
                                  Pageable pageable,
@@ -58,10 +58,15 @@ public class ShoppingCartController {
 
         cartService.removeCartItem(userDetails.getPublicId(), bookPublicId);
 
+        int totalItems = cartService.getCartSummary(userDetails.getPublicId()).getTotalItems();
+        if (totalItems == pageable.getPageSize() * (pageable.getPageNumber()) && pageable.getPageNumber() > 0) {
+            redirectAttributes.addAttribute("page", pageable.getPageNumber() - 1);
+        }
+
         return "redirect:/shopping-cart";
     }
 
-    @PostMapping("/update")
+    @PostMapping("/update-item")
     public String updateCartItemQuantity(@AuthenticationPrincipal CustomUserDetails userDetails,
                                          @ModelAttribute @Valid ShoppingCartItemRequestDto requestDto,
                                          BindingResult bindingResult,
