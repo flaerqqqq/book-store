@@ -1,4 +1,4 @@
-package com.epam.rd.autocode.spring.project.controller;
+package com.epam.rd.autocode.spring.project.controller.view;
 
 import com.epam.rd.autocode.spring.project.dto.AuthTokenResponseDto;
 import com.epam.rd.autocode.spring.project.dto.LoginRequestDto;
