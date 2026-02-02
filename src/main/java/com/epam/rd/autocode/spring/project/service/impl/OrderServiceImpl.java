@@ -109,6 +109,15 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.entityToSummaryDto(getOrderOrThrow(orderPublicId));
     }
 
+    @Override
+    public Page<OrderSummaryDto> getOrderSummariesByClient(UUID clientPublicId, Pageable pageable) {
+        Objects.requireNonNull(clientPublicId, "Client public ID must not be null");
+        pageable = Objects.requireNonNullElse(pageable, Pageable.ofSize(DEFAULT_PAGE_SIZE));
+
+        return orderRepository.findAllByClient_PublicId(clientPublicId, pageable)
+                .map(orderMapper::entityToSummaryDto);
+    }
+
     private Order getOrderOrThrow(UUID orderPublicId) {
         return orderRepository.findByPublicId(orderPublicId).orElseThrow(() ->
                 new NotFoundException(Order.class, "publicId", orderPublicId));

@@ -49,6 +49,7 @@ public class SecurityConfig {
                         .requestMatchers("/register", "/login").permitAll()
                         .requestMatchers("/shopping-cart", "/shopping-cart/**", "/api/shopping-carts/**").hasRole("CLIENT")
                         .requestMatchers("/orders/checkout").hasRole("CLIENT")
+                        .requestMatchers("/orders/**").authenticated()
                         .requestMatchers("/books/new", "/books/*/update", "/books/*/delete").hasAnyRole("EMPLOYEE", "ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/books").permitAll()

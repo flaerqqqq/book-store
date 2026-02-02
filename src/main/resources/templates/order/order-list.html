@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Orders</title>
+</head>
+<body>
+
+<h1>My Order History</h1>
+
+<hr/>
+
+<form th:action="@{/orders}" method="get">
+    <label>Sort By:</label>
+    <select name="sort" onchange="this.form.submit()">
+        <option value="orderDate,desc" th:selected="${param.sort != null && param.sort[0] == 'orderDate,desc'}">Newest First</option>
+        <option value="orderDate,asc" th:selected="${param.sort != null && param.sort[0] == 'orderDate,asc'}">Oldest First</option>
+        <option value="totalAmount,desc" th:selected="${param.sort != null && param.sort[0] == 'totalAmount,desc'}">Price (High-Low)</option>
+        <option value="totalAmount,asc" th:selected="${param.sort != null && param.sort[0] == 'totalAmount,asc'}">Price (Low-High)</option>
+    </select>
+    <input type="hidden" name="size" th:value="${orderSummaryPage.size}"/>
+</form>
+
+<br/>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>Date</th>
+        <th>Order ID</th>
+        <th>Total Amount</th>
+        <th>Items</th>
+        <th>Status</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="order : ${orderSummaryPage.content}">
+        <td th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}"></td>
+        <td th:text="${order.publicId}"></td>
+        <td th:text="${order.totalAmount} + ' USD'"></td>
+        <td th:text="${order.totalItems}"></td>
+        <td th:text="${order.status}"></td>
+        <td>
+            <a th:href="@{/orders/{id}(id=${order.publicId})}">View Details</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<div th:if="${orderSummaryPage.totalPages > 1}">
+    <p>
+        <a th:if="${orderSummaryPage.hasPrevious()}"
+           th:href="@{/orders(page=${orderSummaryPage.number - 1},
+                      size=${orderSummaryPage.size},
+                      sort=${#strings.replace(orderSummaryPage.sort, ': ', ',')})}">
+            &laquo; Previous
+        </a>
+
+        <span th:each="i : ${#numbers.sequence(0, orderSummaryPage.totalPages - 1)}">
+            <a th:if="${i != orderSummaryPage.number}"
+               th:href="@{/orders(page=${i},
+                          size=${orderSummaryPage.size},
+                          sort=${#strings.replace(orderSummaryPage.sort, ': ', ',')})}"
+               th:text="${i + 1}"></a>
+            <span th:if="${i == orderSummaryPage.number}" th:text="${i + 1}" style="font-weight: bold;"></span>
+        </span>
+
+        <a th:if="${orderSummaryPage.hasNext()}"
+           th:href="@{/orders(page=${orderSummaryPage.number + 1},
+                      size=${orderSummaryPage.size},
+                      sort=${#strings.replace(orderSummaryPage.sort, ': ', ',')})}">
+            Next &raquo;
+        </a>
+    </p>
+</div>
+
+<div th:if="${orderSummaryPage.isEmpty()}">
+    <p>You haven't placed any orders yet.</p>
+</div>
+
+</body>
+</html>

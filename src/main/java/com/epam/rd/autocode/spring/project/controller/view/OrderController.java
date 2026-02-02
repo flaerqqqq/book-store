@@ -18,7 +18,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.UUID;
 
@@ -28,6 +27,17 @@ import java.util.UUID;
 public class OrderController {
 
     private final OrderService orderService;
+
+    @GetMapping
+    public String getOrdersPage(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                @PageableDefault(sort = "orderDate", direction = Sort.Direction.DESC) Pageable pageable,
+                                Model model) {
+        Page<OrderSummaryDto> orderSummaryPage = orderService.getOrderSummariesByClient(userDetails.getPublicId(), pageable);
+
+        model.addAttribute("orderSummaryPage", orderSummaryPage);
+
+        return "order/order-list";
+    }
 
     @GetMapping("/checkout")
     public String getCheckoutPage(@ModelAttribute("orderRequest") OrderRequestDto requestDto) {

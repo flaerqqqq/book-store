@@ -20,4 +20,6 @@ public interface OrderService {
     Page<OrderItemDto> getOrderItems(UUID orderPublicId, Pageable pageable);
 
     OrderSummaryDto getOrderSummary(UUID orderPublicId);
+
+    Page<OrderSummaryDto> getOrderSummariesByClient(UUID clientPublicId, Pageable pageable);
 }
