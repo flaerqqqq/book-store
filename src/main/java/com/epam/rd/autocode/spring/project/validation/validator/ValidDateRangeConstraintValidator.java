@@ -14,9 +14,8 @@ public class ValidDateRangeConstraintValidator implements ConstraintValidator<Va
         boolean isValid = value.getDateFrom().isBefore(value.getDateTo());
 
         if (!isValid) {
-            context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate())
-                    .addPropertyNode("dateFrom")
+                    .addPropertyNode(value.getDateFieldName())
                     .addConstraintViolation();
         }
 

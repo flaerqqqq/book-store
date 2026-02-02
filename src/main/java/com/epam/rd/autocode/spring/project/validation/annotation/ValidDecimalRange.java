@@ -1,6 +1,6 @@
 package com.epam.rd.autocode.spring.project.validation.annotation;
 
-import com.epam.rd.autocode.spring.project.validation.validator.ValidPriceRangeConstraintValidator;
+import com.epam.rd.autocode.spring.project.validation.validator.ValidDecimalRangeConstraintValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -9,12 +9,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Constraint(validatedBy = ValidPriceRangeConstraintValidator.class)
+@Constraint(validatedBy = ValidDecimalRangeConstraintValidator.class)
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidPriceRange {
+public @interface ValidDecimalRange {
 
-    String message() default "Minimum price must be lower than maximum";
+    String message() default "Minimum value must be lower than maximum value";
 
     Class<?>[] groups() default {};
 

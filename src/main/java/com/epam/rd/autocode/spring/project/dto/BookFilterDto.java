@@ -3,12 +3,10 @@ package com.epam.rd.autocode.spring.project.dto;
 import com.epam.rd.autocode.spring.project.model.enums.AgeGroup;
 import com.epam.rd.autocode.spring.project.model.enums.Language;
 import com.epam.rd.autocode.spring.project.validation.annotation.ValidDateRange;
-import com.epam.rd.autocode.spring.project.validation.annotation.ValidPriceRange;
+import com.epam.rd.autocode.spring.project.validation.annotation.ValidDecimalRange;
 import com.epam.rd.autocode.spring.project.validation.validator.DateRangeAware;
-import com.epam.rd.autocode.spring.project.validation.validator.PriceRangeAware;
-import jakarta.validation.constraints.Max;
+import com.epam.rd.autocode.spring.project.validation.validator.DecimalRangeAware;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,9 +20,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ValidPriceRange
+@ValidDecimalRange(message = "Minimum price cannot be greater than maximum")
 @ValidDateRange
-public class BookFilterDto implements PriceRangeAware, DateRangeAware {
+public class BookFilterDto implements DecimalRangeAware, DateRangeAware {
 
     private String searchQuery;
 
@@ -46,7 +44,6 @@ public class BookFilterDto implements PriceRangeAware, DateRangeAware {
 
     private List<Language> languages;
 
-
     @Override
     public LocalDate getDateFrom() {
         return startPublicationDate;
@@ -55,5 +52,25 @@ public class BookFilterDto implements PriceRangeAware, DateRangeAware {
     @Override
     public LocalDate getDateTo() {
         return endPublicationDate;
+    }
+
+    @Override
+    public String getDateFieldName() {
+        return "startPublicationDate";
+    }
+
+    @Override
+    public BigDecimal getMin() {
+        return minPrice;
+    }
+
+    @Override
+    public BigDecimal getMax() {
+        return maxPrice;
+    }
+
+    @Override
+    public String getDecimalFieldName() {
+        return "minPrice";
     }
 }

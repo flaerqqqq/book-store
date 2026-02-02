@@ -44,15 +44,15 @@ public class BookSpecifications {
                 );
             }
 
-            if (filter.getMinPrice() != null) {
+            if (filter.getMin() != null) {
                 predicates.add(
-                        cb.greaterThanOrEqualTo(root.get("price"), filter.getMinPrice())
+                        cb.greaterThanOrEqualTo(root.get("price"), filter.getMin())
                 );
             }
 
-            if (filter.getMaxPrice() != null) {
+            if (filter.getMax() != null) {
                 predicates.add(
-                        cb.lessThanOrEqualTo(root.get("price"), filter.getMaxPrice())
+                        cb.lessThanOrEqualTo(root.get("price"), filter.getMax())
                 );
             }
 
