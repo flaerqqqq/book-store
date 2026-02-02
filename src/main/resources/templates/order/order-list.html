@@ -1,23 +1,71 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>My Orders</title>
 </head>
 <body>
 
-<h1>My Order History</h1>
+<h1>Order History</h1>
 
-<hr/>
+<form th:action="@{/orders}" th:object="${orderFilter}" method="get">
 
-<form th:action="@{/orders}" method="get">
-    <label>Sort By:</label>
-    <select name="sort" onchange="this.form.submit()">
-        <option value="orderDate,desc" th:selected="${param.sort != null && param.sort[0] == 'orderDate,desc'}">Newest First</option>
-        <option value="orderDate,asc" th:selected="${param.sort != null && param.sort[0] == 'orderDate,asc'}">Oldest First</option>
-        <option value="totalAmount,desc" th:selected="${param.sort != null && param.sort[0] == 'totalAmount,desc'}">Price (High-Low)</option>
-        <option value="totalAmount,asc" th:selected="${param.sort != null && param.sort[0] == 'totalAmount,asc'}">Price (Low-High)</option>
-    </select>
-    <input type="hidden" name="size" th:value="${orderSummaryPage.size}"/>
+    <div sec:authorize="hasRole('EMPLOYEE')">
+        <label>Order ID:</label>
+        <input type="text" th:field="*{orderPublicId}" placeholder="UUID format..." />
+        <label>Client ID:</label>
+        <input type="text" th:field="*{clientPublicId}" placeholder="UUID format..." />
+        <label>Employee ID:</label>
+        <input type="text" th:field="*{employeePublicId}" placeholder="UUID format..." />
+    </div>
+
+    <div>
+        <label>Status:</label>
+        <select th:field="*{status}">
+            <option value="">All Statuses</option>
+            <option th:each="st : ${orderStatuses}" th:value="${st}" th:text="${st}"></option>
+        </select>
+
+        <label>Delivery:</label>
+        <select th:field="*{deliveryType}">
+            <option value="">All Types</option>
+            <option th:each="dt : ${deliveryTypes}" th:value="${dt}" th:text="${dt}"></option>
+        </select>
+    </div>
+
+    <div>
+        <label>Total Amount Min:</label>
+        <input type="number" step="0.01" th:field="*{minTotalAmount}" />
+        <span th:if="${#fields.hasErrors('minTotalAmount')}" th:errors="*{minTotalAmount}" style="color:red"></span>
+
+        <label>Max:</label>
+        <input type="number" step="0.01" th:field="*{maxTotalAmount}" />
+    </div>
+
+    <div>
+        <label>Date From:</label>
+        <input type="datetime-local"
+               th:name="startOrderDate"
+               th:value="${orderFilter.startOrderDate != null ? #temporals.format(orderFilter.startOrderDate, 'yyyy-MM-dd''T''HH:mm') : ''}" />
+        <span th:if="${#fields.hasErrors('startOrderDate')}" th:errors="*{startOrderDate}" style="color:red"></span>
+
+        <label>To:</label>
+        <input type="datetime-local"
+               th:name="endOrderDate"
+               th:value="${orderFilter.endOrderDate != null ? #temporals.format(orderFilter.endOrderDate, 'yyyy-MM-dd''T''HH:mm') : ''}" />
+    </div>
+
+    <div style="margin-top: 10px;">
+        <button type="submit">Apply Filters</button>
+        <a th:href="@{/orders}">Clear All</a>
+
+        <label style="margin-left: 20px;">Sort By:</label>
+        <select name="sort" onchange="this.form.submit()">
+            <option value="orderDate,desc" th:selected="${param.sort != null && param.sort[0] == 'orderDate,desc'}">Newest First</option>
+            <option value="orderDate,asc" th:selected="${param.sort != null && param.sort[0] == 'orderDate,asc'}">Oldest First</option>
+            <option value="totalAmount,desc" th:selected="${param.sort != null && param.sort[0] == 'totalAmount,desc'}">Price (High-Low)</option>
+            <option value="totalAmount,asc" th:selected="${param.sort != null && param.sort[0] == 'totalAmount,asc'}">Price (Low-High)</option>
+        </select>
+    </div>
 </form>
 
 <br/>
@@ -48,34 +96,29 @@
 </table>
 
 <div th:if="${orderSummaryPage.totalPages > 1}">
-    <p>
-        <a th:if="${orderSummaryPage.hasPrevious()}"
-           th:href="@{/orders(page=${orderSummaryPage.number - 1},
+    <hr/>
+    <span th:each="i : ${#numbers.sequence(0, orderSummaryPage.totalPages - 1)}">
+        <a th:if="${i != orderSummaryPage.number}"
+           th:href="@{/orders(page=${i},
                       size=${orderSummaryPage.size},
-                      sort=${#strings.replace(orderSummaryPage.sort, ': ', ',')})}">
-            &laquo; Previous
-        </a>
-
-        <span th:each="i : ${#numbers.sequence(0, orderSummaryPage.totalPages - 1)}">
-            <a th:if="${i != orderSummaryPage.number}"
-               th:href="@{/orders(page=${i},
-                          size=${orderSummaryPage.size},
-                          sort=${#strings.replace(orderSummaryPage.sort, ': ', ',')})}"
-               th:text="${i + 1}"></a>
-            <span th:if="${i == orderSummaryPage.number}" th:text="${i + 1}" style="font-weight: bold;"></span>
-        </span>
-
-        <a th:if="${orderSummaryPage.hasNext()}"
-           th:href="@{/orders(page=${orderSummaryPage.number + 1},
-                      size=${orderSummaryPage.size},
-                      sort=${#strings.replace(orderSummaryPage.sort, ': ', ',')})}">
-            Next &raquo;
-        </a>
-    </p>
+                      sort=${#strings.replace(orderSummaryPage.sort, ': ', ',')},
+                      status=${orderFilter.status},
+                      deliveryType=${orderFilter.deliveryType},
+                      minTotalAmount=${orderFilter.minTotalAmount},
+                      maxTotalAmount=${orderFilter.maxTotalAmount},
+                      startOrderDate=${orderFilter.startOrderDate},
+                      endOrderDate=${orderFilter.endOrderDate},
+                      clientPublicId=${orderFilter.clientPublicId},
+                      orderPublicId=${orderFilter.orderPublicId},
+                      employeePublicId=${orderFilter.employeePublicId})}"
+           th:text="${i + 1}"></a>
+        <span th:if="${i == orderSummaryPage.number}" th:text="${i + 1}" style="font-weight: bold;"></span>
+        &nbsp;
+    </span>
 </div>
 
 <div th:if="${orderSummaryPage.isEmpty()}">
-    <p>You haven't placed any orders yet.</p>
+    <p>No orders found matching your criteria.</p>
 </div>
 
 </body>

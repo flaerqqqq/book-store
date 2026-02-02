@@ -1,10 +1,8 @@
 package com.epam.rd.autocode.spring.project.controller.view;
 
-import com.epam.rd.autocode.spring.project.dto.OrderDTO;
-import com.epam.rd.autocode.spring.project.dto.OrderItemDto;
-import com.epam.rd.autocode.spring.project.dto.OrderRequestDto;
-import com.epam.rd.autocode.spring.project.dto.OrderSummaryDto;
+import com.epam.rd.autocode.spring.project.dto.*;
 import com.epam.rd.autocode.spring.project.model.enums.DeliveryType;
+import com.epam.rd.autocode.spring.project.model.enums.OrderStatus;
 import com.epam.rd.autocode.spring.project.security.CustomUserDetails;
 import com.epam.rd.autocode.spring.project.service.OrderService;
 import jakarta.validation.Valid;
@@ -31,8 +29,10 @@ public class OrderController {
     @GetMapping
     public String getOrdersPage(@AuthenticationPrincipal CustomUserDetails userDetails,
                                 @PageableDefault(sort = "orderDate", direction = Sort.Direction.DESC) Pageable pageable,
+                                @ModelAttribute("orderFilter") @Valid OrderFilterDto orderFilterDto,
+                                BindingResult bindingResult,
                                 Model model) {
-        Page<OrderSummaryDto> orderSummaryPage = orderService.getOrderSummariesByClient(userDetails.getPublicId(), pageable);
+        Page<OrderSummaryDto> orderSummaryPage = orderService.getFilteredOrderSummaries(orderFilterDto, pageable, userDetails);
 
         model.addAttribute("orderSummaryPage", orderSummaryPage);
 
@@ -73,5 +73,10 @@ public class OrderController {
     @ModelAttribute("deliveryTypes")
     public DeliveryType[] getDeliveryTypes() {
         return DeliveryType.values();
+    }
+
+    @ModelAttribute("orderStatuses")
+    public OrderStatus[] getOrderStatuses() {
+        return OrderStatus.values();
     }
 }

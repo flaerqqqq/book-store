@@ -1,6 +1,7 @@
 package com.epam.rd.autocode.spring.project.service;
 
 import com.epam.rd.autocode.spring.project.dto.*;
+import com.epam.rd.autocode.spring.project.security.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -22,5 +23,5 @@ public interface OrderService {
 
     Page<OrderSummaryDto> getOrderSummaries(Pageable pageable);
 
-    Page<OrderSummaryDto> getFilteredOrderSummaries(OrderFilterDto filter, Pageable pageable);
+    Page<OrderSummaryDto> getFilteredOrderSummaries(OrderFilterDto filter, Pageable pageable, CustomUserDetails userDetails);
 }

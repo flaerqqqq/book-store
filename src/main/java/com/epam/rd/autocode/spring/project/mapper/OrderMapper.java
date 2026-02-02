@@ -19,5 +19,7 @@ public interface OrderMapper {
     Order dtoToEntity(OrderDTO dto);
 
     @Mapping(target = "totalItems", expression = "java(entity.getOrderItems() != null ? entity.getOrderItems().size() : 0)")
+    @Mapping(target = "clientPublicId", source = "client.publicId")
+    @Mapping(target = "employeePublicId", source = "employee.publicId")
     OrderSummaryDto entityToSummaryDto(Order entity);
 }

@@ -7,11 +7,13 @@ import com.epam.rd.autocode.spring.project.exception.NotFoundException;
 import com.epam.rd.autocode.spring.project.mapper.OrderItemMapper;
 import com.epam.rd.autocode.spring.project.mapper.OrderMapper;
 import com.epam.rd.autocode.spring.project.model.*;
+import com.epam.rd.autocode.spring.project.model.enums.DeliveryType;
 import com.epam.rd.autocode.spring.project.model.enums.OrderStatus;
 import com.epam.rd.autocode.spring.project.repo.ClientRepository;
 import com.epam.rd.autocode.spring.project.repo.OrderItemRepository;
 import com.epam.rd.autocode.spring.project.repo.OrderRepository;
 import com.epam.rd.autocode.spring.project.repo.specification.OrderSpecifications;
+import com.epam.rd.autocode.spring.project.security.CustomUserDetails;
 import com.epam.rd.autocode.spring.project.service.OrderService;
 import com.epam.rd.autocode.spring.project.service.ShoppingCartService;
 import lombok.RequiredArgsConstructor;
@@ -82,6 +84,10 @@ public class OrderServiceImpl implements OrderService {
                 .build();
         orderItems.forEach(order::addOrderItem);
 
+        if (orderRequest.getDeliveryType() == DeliveryType.PICKUP) {
+            order.setDeliveryAddress(null);
+        }
+
         order.recalculateTotalAmount(orderRequest.getDeliveryType().getBaseCost());
         checkBalanceAndSubtract(client, order.getTotalAmount());
 
@@ -126,16 +132,22 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<OrderSummaryDto> getFilteredOrderSummaries(OrderFilterDto filter, Pageable pageable) {
+    public Page<OrderSummaryDto> getFilteredOrderSummaries(OrderFilterDto filter, Pageable pageable, CustomUserDetails userDetails) {
         pageable = Objects.requireNonNullElse(pageable, Pageable.ofSize(DEFAULT_PAGE_SIZE));
+        filter = Objects.requireNonNullElse(filter, new OrderFilterDto());
 
-        if (filter == null) {
-            return getOrderSummaries(pageable);
+        UUID callerPublicId = userDetails.getPublicId();
+        boolean isClient = userDetails.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_CLIENT"));
+
+        if (isClient) {
+            filter.setClientPublicId(callerPublicId.toString());
+            filter.setEmployeePublicId(null);
         }
 
-        Specification<Order> orderSpefication = OrderSpecifications.withFilters(filter);
+        Specification<Order> orderSpecification = OrderSpecifications.withFilters(filter);
 
-        return orderRepository.findAll(orderSpefication, pageable)
+        return orderRepository.findAll(orderSpecification, pageable)
                 .map(orderMapper::entityToSummaryDto);
     }
 
