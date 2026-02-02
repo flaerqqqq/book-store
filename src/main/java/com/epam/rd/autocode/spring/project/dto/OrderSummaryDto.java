@@ -36,4 +36,10 @@ public class OrderSummaryDto {
     private OrderStatus status;
 
     private long totalItems;
+
+    private UUID canceledByPublicId;
+
+    private String reason;
+
+    private LocalDateTime canceledAt;
 }

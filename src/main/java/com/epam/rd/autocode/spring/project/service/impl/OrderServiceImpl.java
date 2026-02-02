@@ -10,10 +10,7 @@ import com.epam.rd.autocode.spring.project.mapper.OrderMapper;
 import com.epam.rd.autocode.spring.project.model.*;
 import com.epam.rd.autocode.spring.project.model.enums.DeliveryType;
 import com.epam.rd.autocode.spring.project.model.enums.OrderStatus;
-import com.epam.rd.autocode.spring.project.repo.ClientRepository;
-import com.epam.rd.autocode.spring.project.repo.EmployeeRepository;
-import com.epam.rd.autocode.spring.project.repo.OrderItemRepository;
-import com.epam.rd.autocode.spring.project.repo.OrderRepository;
+import com.epam.rd.autocode.spring.project.repo.*;
 import com.epam.rd.autocode.spring.project.repo.specification.OrderSpecifications;
 import com.epam.rd.autocode.spring.project.security.CustomUserDetails;
 import com.epam.rd.autocode.spring.project.service.OrderService;
@@ -22,13 +19,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -43,6 +41,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemRepository orderItemRepository;
     private final ClientRepository clientRepository;
     private final EmployeeRepository employeeRepository;
+    private final UserRepository userRepository;
     private final OrderMapper orderMapper;
     private final OrderItemMapper orderItemMapper;
     private final ShoppingCartService cartService;
@@ -126,8 +125,7 @@ public class OrderServiceImpl implements OrderService {
         Objects.requireNonNull(orderPublicId, "Order public ID must not be null");
         Objects.requireNonNull(employeePublicId, "Order public ID must not be null");
 
-        Order order = orderRepository.findByPublicIdWithLock(orderPublicId).orElseThrow(() ->
-                new NotFoundException(Order.class, "publicId", orderPublicId));
+        Order order = getOrderWithLockOrThrow(orderPublicId);
 
         if (order.getEmployee() != null) {
             throw new IllegalOrderStateException("Order is already claimed by another Employee");
@@ -166,6 +164,56 @@ public class OrderServiceImpl implements OrderService {
         Order savedOrder = orderRepository.save(claimedOrder);
 
         return orderMapper.entityToSummaryDto(savedOrder);
+    }
+
+    @Override
+    @Transactional
+    public OrderSummaryDto cancelOrder(UUID orderPublicId, UUID cancelledByPublicId, String reason) {
+        Objects.requireNonNull(orderPublicId, "Order public ID must not be null");
+        Objects.requireNonNull(cancelledByPublicId, "User public ID must not be null");
+
+        Order order = getOrderWithLockOrThrow(orderPublicId);
+        OrderStatus status = order.getStatus();
+
+        if (status == OrderStatus.CANCELED) {
+            throw new IllegalOrderStateException("Order already has status 'CANCELED' with publicId: %s".formatted(orderPublicId));
+        }
+
+        if (status == OrderStatus.SHIPPED || status == OrderStatus.DELIVERED || status == OrderStatus.COMPLETED) {
+            throw new IllegalOrderStateException("Order cannot be canceled with status '%s' and publicId: %s".formatted(status, orderPublicId));
+        }
+
+        User cancelledBy = userRepository.findByPublicId(cancelledByPublicId).orElseThrow(() ->
+                new NotFoundException(User.class, "publicId", cancelledByPublicId));
+
+        if (cancelledBy instanceof Client client) {
+            if (!Objects.equals(client.getPublicId(), order.getClient().getPublicId())) {
+                throw new AccessDeniedException("Only Client who created order or Employee who claimed can cancel it");
+            }
+            if (status != OrderStatus.CREATED) {
+                throw new IllegalOrderStateException("Order with publicId: %s is already claimed and cannot be canceled by Client with publicId: %s".formatted(orderPublicId, cancelledByPublicId));
+            }
+
+        } else if (cancelledBy instanceof Employee employee) {
+            if (order.getEmployee() == null
+                    || !Objects.equals(employee.getPublicId(), order.getEmployee().getPublicId())) {
+               throw new IllegalOrderStateException("Order with publicId: %s is not claimed by Employee with publicId: %s".formatted(orderPublicId, cancelledByPublicId));
+            }
+        }
+
+        order.setStatus(OrderStatus.CANCELED);
+        order.setCancelledBy(cancelledBy);
+        order.setReason(reason);
+        order.setCancelledAt(LocalDateTime.now());
+
+        Order savedOrder = orderRepository.save(order);
+
+        return orderMapper.entityToSummaryDto(savedOrder);
+    }
+
+    private Order getOrderWithLockOrThrow(UUID orderPublicId) {
+        return orderRepository.findByPublicIdWithLock(orderPublicId).orElseThrow(() ->
+                new NotFoundException(Order.class, "publicId", orderPublicId));
     }
 
     private Order getOrderOrThrow(UUID orderPublicId) {

@@ -2,9 +2,6 @@ package com.epam.rd.autocode.spring.project.dto;
 
 import com.epam.rd.autocode.spring.project.model.enums.DeliveryType;
 import com.epam.rd.autocode.spring.project.model.enums.OrderStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,6 +35,12 @@ public class OrderDTO {
     private String comment;
 
     private OrderStatus status;
+
+    private UUID canceledByPublicId;
+
+    private String reason;
+
+    private LocalDateTime canceledAt;
 
     private List<OrderItemDto> orderItems;
 }

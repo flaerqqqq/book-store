@@ -21,4 +21,6 @@ public interface OrderService {
     OrderSummaryDto claimOrder(UUID orderPublicId, UUID employeePublicId);
 
     OrderSummaryDto updateStatus(UUID orderPublicId, UUID employeePublicId, OrderStatus status);
+
+    OrderSummaryDto cancelOrder(UUID orderPublicId, UUID cancelledByPublicId, String reason);
 }

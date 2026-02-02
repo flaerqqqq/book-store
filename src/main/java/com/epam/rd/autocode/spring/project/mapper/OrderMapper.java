@@ -14,6 +14,7 @@ public interface OrderMapper {
 
     @Mapping(target = "clientPublicId", source = "client.publicId")
     @Mapping(target = "employeePublicId", source = "employee.publicId")
+    @Mapping(target = "canceledByPublicId", source = "canceledBy.publicId")
     OrderDTO entityToDto(Order entity);
 
     Order dtoToEntity(OrderDTO dto);
@@ -21,5 +22,6 @@ public interface OrderMapper {
     @Mapping(target = "totalItems", expression = "java(entity.getOrderItems() != null ? entity.getOrderItems().size() : 0)")
     @Mapping(target = "clientPublicId", source = "client.publicId")
     @Mapping(target = "employeePublicId", source = "employee.publicId")
+    @Mapping(target = "canceledByPublicId", source = "canceledBy.publicId")
     OrderSummaryDto entityToSummaryDto(Order entity);
 }
