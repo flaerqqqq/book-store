@@ -9,19 +9,13 @@ import java.util.*;
 
 public interface OrderService {
 
-    Page<OrderDTO> getOrdersByClient(UUID clientPublicId, Pageable pageable);
-
-    Page<OrderDTO> getOrdersByEmployee(UUID employeePublicId, Pageable pageable);
-
     OrderDTO createFromShoppingCart(UUID clientPublicId, OrderRequestDto orderRequest);
 
     Page<OrderItemDto> getOrderItems(UUID orderPublicId, Pageable pageable);
 
     OrderSummaryDto getOrderSummary(UUID orderPublicId);
 
-    Page<OrderSummaryDto> getOrderSummariesByClient(UUID clientPublicId, Pageable pageable);
-
-    Page<OrderSummaryDto> getOrderSummaries(Pageable pageable);
-
     Page<OrderSummaryDto> getFilteredOrderSummaries(OrderFilterDto filter, Pageable pageable, CustomUserDetails userDetails);
+
+    OrderSummaryDto claimOrder(UUID orderPublicId, UUID employeePublicId);
 }

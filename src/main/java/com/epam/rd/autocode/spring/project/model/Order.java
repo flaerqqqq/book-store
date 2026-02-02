@@ -63,6 +63,9 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
 
+    @Version
+    private long version;
+
     public void addOrderItem(OrderItem orderItem) {
         this.orderItems.add(orderItem);
         orderItem.setOrder(this);

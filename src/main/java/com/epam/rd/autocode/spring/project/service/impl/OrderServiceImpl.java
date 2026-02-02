@@ -2,6 +2,7 @@ package com.epam.rd.autocode.spring.project.service.impl;
 
 import com.epam.rd.autocode.spring.project.dto.*;
 import com.epam.rd.autocode.spring.project.exception.EmptyCartException;
+import com.epam.rd.autocode.spring.project.exception.IllegalOrderStateException;
 import com.epam.rd.autocode.spring.project.exception.InsufficientFundsException;
 import com.epam.rd.autocode.spring.project.exception.NotFoundException;
 import com.epam.rd.autocode.spring.project.mapper.OrderItemMapper;
@@ -10,6 +11,7 @@ import com.epam.rd.autocode.spring.project.model.*;
 import com.epam.rd.autocode.spring.project.model.enums.DeliveryType;
 import com.epam.rd.autocode.spring.project.model.enums.OrderStatus;
 import com.epam.rd.autocode.spring.project.repo.ClientRepository;
+import com.epam.rd.autocode.spring.project.repo.EmployeeRepository;
 import com.epam.rd.autocode.spring.project.repo.OrderItemRepository;
 import com.epam.rd.autocode.spring.project.repo.OrderRepository;
 import com.epam.rd.autocode.spring.project.repo.specification.OrderSpecifications;
@@ -39,27 +41,10 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final ClientRepository clientRepository;
+    private final EmployeeRepository employeeRepository;
     private final OrderMapper orderMapper;
     private final OrderItemMapper orderItemMapper;
     private final ShoppingCartService cartService;
-
-    @Override
-    public Page<OrderDTO> getOrdersByClient(UUID clientPublicId, Pageable pageable) {
-        Objects.requireNonNull(clientPublicId, "Client public ID mus not be null");
-        pageable = Objects.requireNonNullElse(pageable, Pageable.ofSize(DEFAULT_PAGE_SIZE));
-
-        return orderRepository.findAllByClient_PublicId(clientPublicId, pageable)
-                .map(orderMapper::entityToDto);
-    }
-
-    @Override
-    public Page<OrderDTO> getOrdersByEmployee(UUID employeePublicId, Pageable pageable) {
-        Objects.requireNonNull(employeePublicId, "Employee public ID mus not be null");
-        pageable = Objects.requireNonNullElse(pageable, Pageable.ofSize(DEFAULT_PAGE_SIZE));
-
-        return orderRepository.findAllByEmployee_PublicId(employeePublicId, pageable)
-                .map(orderMapper::entityToDto);
-    }
 
     @Override
     @Transactional
@@ -115,23 +100,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<OrderSummaryDto> getOrderSummariesByClient(UUID clientPublicId, Pageable pageable) {
-        Objects.requireNonNull(clientPublicId, "Client public ID must not be null");
-        pageable = Objects.requireNonNullElse(pageable, Pageable.ofSize(DEFAULT_PAGE_SIZE));
-
-        return orderRepository.findAllByClient_PublicId(clientPublicId, pageable)
-                .map(orderMapper::entityToSummaryDto);
-    }
-
-    @Override
-    public Page<OrderSummaryDto> getOrderSummaries(Pageable pageable) {
-        pageable = Objects.requireNonNullElse(pageable, Pageable.ofSize(DEFAULT_PAGE_SIZE));
-
-        return orderRepository.findAll(pageable)
-                .map(orderMapper::entityToSummaryDto);
-    }
-
-    @Override
     public Page<OrderSummaryDto> getFilteredOrderSummaries(OrderFilterDto filter, Pageable pageable, CustomUserDetails userDetails) {
         pageable = Objects.requireNonNullElse(pageable, Pageable.ofSize(DEFAULT_PAGE_SIZE));
         filter = Objects.requireNonNullElse(filter, new OrderFilterDto());
@@ -149,6 +117,32 @@ public class OrderServiceImpl implements OrderService {
 
         return orderRepository.findAll(orderSpecification, pageable)
                 .map(orderMapper::entityToSummaryDto);
+    }
+
+    @Override
+    @Transactional
+    public OrderSummaryDto claimOrder(UUID orderPublicId, UUID employeePublicId) {
+        Objects.requireNonNull(orderPublicId, "Order public ID must not be null");
+        Objects.requireNonNull(employeePublicId, "Order public ID must not be null");
+
+        Order order = orderRepository.findByPublicIdWithLock(orderPublicId).orElseThrow(() ->
+                new NotFoundException(Order.class, "publicId", orderPublicId));
+
+        if (order.getEmployee() != null) {
+            throw new IllegalOrderStateException("Order is already claimed by another Employee");
+        }
+
+        if (order.getStatus() != OrderStatus.CREATED) {
+            throw new IllegalOrderStateException("Only Orders with status: CREATED can be claimed");
+        }
+
+        Employee employee = getEmployeeOrThrow(employeePublicId);
+        order.setEmployee(employee);
+        order.setStatus(OrderStatus.CLAIMED);
+
+        Order savedOrder = orderRepository.save(order);
+
+        return orderMapper.entityToSummaryDto(savedOrder);
     }
 
     private Order getOrderOrThrow(UUID orderPublicId) {
@@ -187,5 +181,10 @@ public class OrderServiceImpl implements OrderService {
     private Client getClientOrThrow(UUID clientPublicId) {
         return clientRepository.findByPublicId(clientPublicId).orElseThrow(() ->
                 new NotFoundException(Client.class, "publicId", clientPublicId));
+    }
+
+    private Employee getEmployeeOrThrow(UUID employeePublicId) {
+        return employeeRepository.findByPublicId(employeePublicId).orElseThrow(() ->
+                new NotFoundException(Employee.class, "publicId", employeePublicId));
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,6 +28,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('CLIENT', 'EMPLOYEE')")
     public String getOrdersPage(@AuthenticationPrincipal CustomUserDetails userDetails,
                                 @PageableDefault(sort = "orderDate", direction = Sort.Direction.DESC) Pageable pageable,
                                 @ModelAttribute("orderFilter") @Valid OrderFilterDto orderFilterDto,
@@ -40,11 +42,13 @@ public class OrderController {
     }
 
     @GetMapping("/checkout")
+    @PreAuthorize("hasRole('CLIENT')")
     public String getCheckoutPage(@ModelAttribute("orderRequest") OrderRequestDto requestDto) {
         return "order/checkout";
     }
 
     @PostMapping("/checkout")
+    @PreAuthorize("hasRole('CLIENT')")
     public String checkout(@AuthenticationPrincipal CustomUserDetails userDetails,
                            @ModelAttribute("orderRequest") @Valid OrderRequestDto requestDto,
                            BindingResult bindingResult) {
@@ -58,6 +62,7 @@ public class OrderController {
     }
 
     @GetMapping("/{orderPublicId}")
+    @PreAuthorize("hasAnyRole('CLIENT', 'EMPLOYEE')")
     public String getOrderPage(@PathVariable("orderPublicId") UUID orderPublicId,
                                @PageableDefault(sort = "quantity") Pageable pageable,
                                Model model) {
