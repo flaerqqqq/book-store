@@ -2,6 +2,7 @@ package com.epam.rd.autocode.spring.project.mapper;
 
 import com.epam.rd.autocode.spring.project.conf.GlobalMapperConfig;
 import com.epam.rd.autocode.spring.project.dto.OrderDTO;
+import com.epam.rd.autocode.spring.project.dto.OrderSummaryDto;
 import com.epam.rd.autocode.spring.project.model.Order;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -16,4 +17,7 @@ public interface OrderMapper {
     OrderDTO entityToDto(Order entity);
 
     Order dtoToEntity(OrderDTO dto);
+
+    @Mapping(target = "totalItems", expression = "java(entity.getOrderItems() != null ? entity.getOrderItems().size() : 0)")
+    OrderSummaryDto entityToSummaryDto(Order entity);
 }
