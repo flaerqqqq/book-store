@@ -137,7 +137,7 @@
                th:text="${i + 1}"></a>
             <span th:if="${currentPage == i}" th:text="${i + 1}" style="font-weight: bold;"></span>
             &nbsp;
-        </span>
+  </span>
 </div>
 <br/>
 <div sec:authorize="hasAnyRole('EMPLOYEE', 'ADMIN')">
@@ -161,9 +161,11 @@
       })
               .then(response => {
                 if (response.ok) {
-                  btn.innerText = "Added! ✅";
-                  btn.style.backgroundColor = "#d4edda";
-                  btn.disabled = true;
+                  const textNode = document.createElement('span');
+                  textNode.innerText = "In Cart ✅";
+                  textNode.style.color = "green";
+                  textNode.style.fontWeight = "bold";
+                  btn.parentNode.replaceChild(textNode, btn);
                 } else {
                   alert("Could not add book. Please try again.");
                 }

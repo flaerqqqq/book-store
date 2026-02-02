@@ -3,6 +3,9 @@ package com.epam.rd.autocode.spring.project.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+import java.util.UUID;
+
 @Entity
 @Table(name = "order_items")
 @Getter
@@ -20,10 +23,24 @@ public class OrderItem {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id", nullable = false)
-    private Book book;
+    @Column(name = "book_public_id", nullable = false)
+    private UUID bookPublicId;
+
+    @Column(name = "book_name", nullable = false)
+    private String bookName;
+
+    @Column(name = "price_at_purchase", nullable = false)
+    private BigDecimal priceAtPurchase;
 
     @Column(nullable = false)
     private Integer quantity;
+
+    @Column(nullable = false)
+    private BigDecimal subtotal;
+
+    @PrePersist
+    @PreUpdate
+    public void calculateSubtotal() {
+        this.subtotal = priceAtPurchase.multiply(BigDecimal.valueOf(quantity));
+    }
 }

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -15,13 +16,15 @@ import java.util.List;
 @Builder
 public class OrderDTO {
 
-    private String clientEmail;
+    private UUID publicId;
 
-    private String employeeEmail;
+    private UUID clientPublicId;
+
+    private UUID employeePublicId;
 
     private LocalDateTime orderDate;
 
-    private BigDecimal price;
+    private BigDecimal totalAmount;
 
-    private List<BookItemDTO> bookItems;
+    private List<OrderItemDto> orderItems;
 }
