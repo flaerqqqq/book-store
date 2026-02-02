@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -141,6 +142,28 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(OrderStatus.CLAIMED);
 
         Order savedOrder = orderRepository.save(order);
+
+        return orderMapper.entityToSummaryDto(savedOrder);
+    }
+
+    @Override
+    @Transactional
+    public OrderSummaryDto updateStatus(UUID orderPublicId, UUID employeePublicId, OrderStatus status) {
+        Objects.requireNonNull(orderPublicId, "Order public ID must not be null");
+        Objects.requireNonNull(employeePublicId, "Order public ID must not be null");
+
+        if (status == OrderStatus.CREATED || status == OrderStatus.CLAIMED || status == OrderStatus.CANCELED) {
+            throw new IllegalOrderStateException(
+                    "Status %s must be updated via its dedicated action method, not a general update".formatted(status)
+            );
+        }
+
+        Order claimedOrder = orderRepository.findClaimedOrderWithLock(orderPublicId, employeePublicId).orElseThrow(() ->
+                new NotFoundException("Order with publicId: %s is not found or not claimed by Employee with publicId: %s".formatted(orderPublicId, employeePublicId)));
+
+        claimedOrder.setStatus(status);
+
+        Order savedOrder = orderRepository.save(claimedOrder);
 
         return orderMapper.entityToSummaryDto(savedOrder);
     }
