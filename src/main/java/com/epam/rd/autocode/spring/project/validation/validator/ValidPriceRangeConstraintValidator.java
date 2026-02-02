@@ -15,6 +15,7 @@ public class ValidPriceRangeConstraintValidator implements ConstraintValidator<V
         boolean isValid = value.getMinPrice().compareTo(value.getMaxPrice()) <= 0;
 
         if (!isValid) {
+            context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate())
                     .addPropertyNode("minPrice")
                     .addConstraintViolation();
