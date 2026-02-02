@@ -19,7 +19,7 @@ public interface ShoppingCartService {
 
     ShoppingCartSummaryDto getCartSummary(UUID clientPublicId);
 
-    void emptyCart(UUID userPublicId);
+    void emptyCart(UUID clientPublicId);
 
     ShoppingCartDto addItemToCart(UUID clientPublicId, UUID bookPublicId, Integer quantity);
 

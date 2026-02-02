@@ -2,6 +2,7 @@ package com.epam.rd.autocode.spring.project.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -35,6 +36,7 @@ public class Order {
     private Employee employee;
 
     @Column(name = "order_date", nullable = false)
+    @CreatedDate
     private LocalDateTime orderDate;
 
     @Column(nullable = false)
@@ -46,5 +48,11 @@ public class Order {
     public void addOrderItem(OrderItem orderItem) {
         this.orderItems.add(orderItem);
         orderItem.setOrder(this);
+    }
+
+    public void recalculateTotalAmount() {
+        this.totalAmount = orderItems.stream()
+                .map(OrderItem::getSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }
