@@ -4,9 +4,12 @@ import com.epam.rd.autocode.spring.project.model.enums.AgeGroup;
 import com.epam.rd.autocode.spring.project.model.enums.Language;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity

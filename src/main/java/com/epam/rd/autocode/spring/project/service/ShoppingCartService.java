@@ -6,6 +6,7 @@ import com.epam.rd.autocode.spring.project.dto.ShoppingCartSummaryDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Set;
 import java.util.UUID;
 
 public interface ShoppingCartService {
@@ -25,4 +26,8 @@ public interface ShoppingCartService {
     ShoppingCartDto updateCartItemQuantity(UUID userPublicId, UUID bookPublicId, Integer quantity);
 
     void removeCartItem(UUID userPublicId, UUID bookPublicId);
+
+    Set<UUID> getCartItemBookIds(UUID userPublicId);
+
+    void syncCartsWithDeletedBook(UUID bookPublicId);
 }

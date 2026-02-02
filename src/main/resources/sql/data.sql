@@ -48,25 +48,25 @@ INSERT INTO books (public_id, name, genre, age_group, price, publication_date, a
 SELECT setval(pg_get_serial_sequence('books', 'id'), 21, false);
 
 
-INSERT INTO shopping_cart_items (cart_id, book_id, quantity, price_at_add, subtotal) VALUES
-(1, 1, 1, 15.99, 15.99),  -- Gatsby
-(1, 2, 1, 12.50, 12.50),  -- 1984
-(1, 3, 2, 20.00, 40.00),  -- Hobbit (qty 2)
-(1, 4, 1, 25.99, 25.99),  -- Harry Potter
-(1, 5, 1, 30.00, 30.00),  -- Kobzar
-(1, 6, 1, 11.99, 11.99),  -- Catcher
-(1, 7, 1, 18.50, 18.50),  -- Dune
-(1, 8, 1, 10.00, 10.00),  -- Alchemist
-(1, 9, 1, 14.00, 14.00),  -- Norwegian Wood
-(1, 10, 1, 13.00, 13.00), -- Brave New World
-(1, 11, 1, 14.50, 14.50), -- Book Thief
-(1, 12, 1, 16.00, 16.00), -- Crime and Punishment
-(1, 13, 1, 8.99, 8.99),   -- Animal Farm
-(1, 14, 1, 16.50, 16.50), -- Shadow of Wind
-(1, 15, 3, 11.50, 34.50), -- Little Prince (qty 3)
-(1, 16, 1, 15.00, 15.00), -- Odyssey
-(1, 17, 1, 12.00, 12.00), -- Shadows of Ancestors
-(1, 18, 1, 14.99, 14.99), -- The Road
-(1, 19, 1, 9.00, 9.00),   -- Intermezzo
-(1, 20, 1, 17.99, 17.99); -- Anna Karenina
+INSERT INTO shopping_cart_items (public_id, cart_id, book_id, quantity, price_at_add, subtotal) VALUES
+(gen_random_uuid(), 1, 1, 1, 15.99, 15.99),  -- Gatsby
+(gen_random_uuid(), 1, 2, 1, 12.50, 12.50),  -- 1984
+(gen_random_uuid(), 1, 3, 2, 20.00, 40.00),  -- Hobbit (qty 2)
+(gen_random_uuid(), 1, 4, 1, 25.99, 25.99),  -- Harry Potter
+(gen_random_uuid(), 1, 5, 1, 30.00, 30.00),  -- Kobzar
+(gen_random_uuid(), 1, 6, 1, 11.99, 11.99),  -- Catcher
+(gen_random_uuid(), 1, 7, 1, 18.50, 18.50),  -- Dune
+(gen_random_uuid(), 1, 8, 1, 10.00, 10.00),  -- Alchemist
+(gen_random_uuid(), 1, 9, 1, 14.00, 14.00),  -- Norwegian Wood
+(gen_random_uuid(), 1, 10, 1, 13.00, 13.00), -- Brave New World
+(gen_random_uuid(), 1, 11, 1, 14.50, 14.50), -- Book Thief
+(gen_random_uuid(), 1, 12, 1, 16.00, 16.00), -- Crime and Punishment
+(gen_random_uuid(), 1, 13, 1, 8.99, 8.99),   -- Animal Farm
+(gen_random_uuid(), 1, 14, 1, 16.50, 16.50), -- Shadow of Wind
+(gen_random_uuid(), 1, 15, 3, 11.50, 34.50), -- Little Prince (qty 3)
+(gen_random_uuid(), 1, 16, 1, 15.00, 15.00), -- Odyssey
+(gen_random_uuid(), 1, 17, 1, 12.00, 12.00), -- Shadows of Ancestors
+(gen_random_uuid(), 1, 18, 1, 14.99, 14.99), -- The Road
+(gen_random_uuid(), 1, 19, 1, 9.00, 9.00),   -- Intermezzo
+(gen_random_uuid(), 1, 20, 1, 17.99, 17.99); -- Anna Karenina
 UPDATE shopping_carts SET total_amount = 358.43 WHERE id = 1;

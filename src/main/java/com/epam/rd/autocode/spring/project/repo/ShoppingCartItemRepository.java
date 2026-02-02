@@ -9,5 +9,7 @@ import java.util.UUID;
 
 public interface ShoppingCartItemRepository extends JpaRepository<ShoppingCartItem, Long> {
 
+    void deleteByBook_PublicId(UUID bookPublicId);
+
     Page<ShoppingCartItem> findByCart_PublicId(UUID cartPublicId, Pageable pageable);
 }

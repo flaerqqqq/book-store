@@ -20,4 +20,6 @@ public interface BookService {
     void deleteBookByPublicId(UUID publicId);
 
     BookDTO addBook(BookDTO book);
+
+    long getBooksCount();
 }

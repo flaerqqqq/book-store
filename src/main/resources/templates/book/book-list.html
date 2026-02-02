@@ -93,17 +93,24 @@
     <td th:text="${book.price}">0.00</td>
     <td th:text="${book.language}">English</td>
     <td sec:authorize="hasRole('CLIENT')">
-      <button type="button"
+      <span th:if="${book.inCart}" style="color: green; font-weight: bold;">
+        In Cart ✅
+      </span>
+
+      <button th:unless="${book.inCart}"
+              type="button"
               class="add-to-cart-btn"
               th:data-uuid="${book.publicId}">
         Add to Cart
       </button>
-    </td>
-    <td sec:authorize="hasAnyRole('EMPLOYEE', 'ADMIN')">
+    </td>    <td sec:authorize="hasAnyRole('EMPLOYEE', 'ADMIN')">
       <a th:href="@{/books/{uuid}/update(uuid=${book.publicId})}">
         <button type="button">Update</button>
       </a>
       <form th:action="@{/books/{uuid}/delete(uuid=${book.publicId})}" th:method="post">
+        <input type="hidden" name="page" th:value="${bookPage.number}"/>
+        <input type="hidden" name="size" th:value="${bookPage.size}"/>
+        <input type="hidden" name="sort" th:value="${param.sort}"/>
         <button type="submit">Delete</button>
       </form>
     </td>
@@ -156,7 +163,7 @@
                 if (response.ok) {
                   btn.innerText = "Added! ✅";
                   btn.style.backgroundColor = "#d4edda";
-                  btn.disabled = true; // Prevent double clicks
+                  btn.disabled = true;
                 } else {
                   alert("Could not add book. Please try again.");
                 }

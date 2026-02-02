@@ -38,4 +38,6 @@ public class BookResponseDto {
     private String description;
 
     private Language language;
+
+    private boolean inCart;
 }

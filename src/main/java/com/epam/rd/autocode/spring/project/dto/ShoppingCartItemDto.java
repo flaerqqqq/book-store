@@ -14,7 +14,7 @@ import java.util.UUID;
 @Builder
 public class ShoppingCartItemDto {
 
-    private Long id;
+    private UUID publicId;
 
     private UUID cartPublicId;
 

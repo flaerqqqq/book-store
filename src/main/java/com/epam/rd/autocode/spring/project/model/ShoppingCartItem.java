@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Table(name = "shopping_cart_items")
@@ -17,6 +18,10 @@ public class ShoppingCartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Builder.Default
+    @Column(name = "public_id", nullable = false, unique = true)
+    private UUID publicId = UUID.randomUUID();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = false)

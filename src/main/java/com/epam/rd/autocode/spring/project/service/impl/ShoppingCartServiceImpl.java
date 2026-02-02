@@ -23,9 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -147,7 +146,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return saveAndMap(userCart, user);
     }
 
-
     @Override
     @Transactional
     public void removeCartItem(UUID userPublicId, UUID bookPublicId) {
@@ -163,6 +161,30 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             userCart.recalculateTotalAmount();
         } else {
             throw new NotFoundException(Book.class, "publicId", bookPublicId);
+        }
+    }
+
+    @Override
+    public Set<UUID> getCartItemBookIds(UUID userPublicId) {
+        Objects.requireNonNull(userPublicId, "User public Id must not be null");
+
+        ShoppingCart userCart = getCartOrThrow(userPublicId);
+
+        return userCart.getCartItems().stream()
+                .map(item -> item.getBook().getPublicId())
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    @Transactional
+    public void syncCartsWithDeletedBook(UUID bookPublicId) {
+        Objects.requireNonNull(bookPublicId, "Book public Id must not be null");
+
+        List<ShoppingCart> carts = cartRepository.findAllByCartItems_Book_PublicId(bookPublicId);
+
+        for (ShoppingCart cart : carts) {
+            cart.getCartItems().removeIf(item -> Objects.equals(item.getBook().getPublicId(), bookPublicId));
+            cart.recalculateTotalAmount();
         }
     }
 
