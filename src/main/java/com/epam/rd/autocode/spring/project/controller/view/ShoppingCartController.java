@@ -3,7 +3,6 @@ package com.epam.rd.autocode.spring.project.controller.view;
 import com.epam.rd.autocode.spring.project.dto.ShoppingCartItemDto;
 import com.epam.rd.autocode.spring.project.dto.ShoppingCartItemRequestDto;
 import com.epam.rd.autocode.spring.project.dto.ShoppingCartSummaryDto;
-import com.epam.rd.autocode.spring.project.mapper.ShoppingCartMapper;
 import com.epam.rd.autocode.spring.project.security.CustomUserDetails;
 import com.epam.rd.autocode.spring.project.service.ShoppingCartService;
 import jakarta.validation.Valid;
@@ -31,7 +30,7 @@ public class ShoppingCartController {
 
     @GetMapping
     public String getCartPage(@AuthenticationPrincipal CustomUserDetails userDetails,
-                              @PageableDefault(size = 10) Pageable pageable,
+                              @PageableDefault(size = 10, sort = "quantity") Pageable pageable,
                               Model model) {
         Page<ShoppingCartItemDto> cartItemPage = cartService.getCartItems(userDetails.getPublicId(), pageable);
         ShoppingCartSummaryDto summary = cartService.getCartSummary(userDetails.getPublicId());

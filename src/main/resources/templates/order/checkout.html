@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Checkout</title>
+</head>
+<body>
+
+<h2>Place Your Order</h2>
+
+<form th:action="@{/orders/checkout}" th:object="${orderRequest}" method="post">
+
+    <div th:if="${#fields.hasErrors('global')}" style="color: red;">
+        <p th:each="err : ${#fields.errors('global')}" th:text="${err}"></p>
+    </div>
+
+    <div>
+        <label>Delivery Type:</label>
+        <select th:field="*{deliveryType}">
+            <option value="">-- Select Type --</option>
+            <option th:each="type : ${deliveryTypes}"
+                    th:value="${type}"
+                    th:text="${type}"></option>
+        </select>
+        <span th:if="${#fields.hasErrors('deliveryType')}" th:errors="*{deliveryType}" style="color: red;"></span>
+    </div>
+
+    <br/>
+
+    <div>
+        <label>Delivery Address:</label>
+        <input type="text" th:field="*{deliveryAddress}" placeholder="Enter address..."/>
+        <span th:if="${#fields.hasErrors('deliveryAddress')}" th:errors="*{deliveryAddress}" style="color: red;"></span>
+    </div>
+
+    <br/>
+
+    <div>
+        <label>Comment (Optional):</label>
+        <textarea th:field="*{comment}"></textarea>
+    </div>
+
+    <br/>
+
+    <button type="submit">Complete Order</button>
+
+</form>
+
+</body>
+</html>

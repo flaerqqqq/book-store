@@ -133,7 +133,8 @@
                          startPublicationDate=${bookFilter.startPublicationDate},
                          endPublicationDate=${bookFilter.endPublicationDate},
                          languages=${bookFilter.languages},
-                         searchQuery=${bookFilter.searchQuery})}"
+                         searchQuery=${bookFilter.searchQuery},
+                         sort=${#strings.replace(bookPage.sort, ': ', ',')})}"
                th:text="${i + 1}"></a>
             <span th:if="${currentPage == i}" th:text="${i + 1}" style="font-weight: bold;"></span>
             &nbsp;

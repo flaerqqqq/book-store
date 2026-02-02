@@ -72,19 +72,19 @@
     <div th:if="${cartItemPage.totalPages > 1}">
         <p>
             <a th:if="${cartItemPage.hasPrevious()}"
-               th:href="@{/shopping-cart(page=${cartItemPage.number - 1}, size=${cartItemPage.size})}">
+               th:href="@{/shopping-cart(page=${cartItemPage.number - 1}, size=${cartItemPage.size}, sort=${#strings.replace(cartItemPage.sort, ': ', ',')})}">
                 &laquo; Previous
             </a>
 
             <span th:each="i : ${#numbers.sequence(0, cartItemPage.totalPages - 1)}">
                     <a th:if="${i != cartItemPage.number}"
-                       th:href="@{/shopping-cart(page=${i}, size=${cartItemPage.size})}"
+                       th:href="@{/shopping-cart(page=${i}, size=${cartItemPage.size}, sort=${#strings.replace(cartItemPage.sort, ': ', ',')})}"
                        th:text="${i + 1}"></a>
                     <span th:if="${i == cartItemPage.number}" th:text="${i + 1}" style="font-weight: bold;"></span>
                 </span>
 
             <a th:if="${cartItemPage.hasNext()}"
-               th:href="@{/shopping-cart(page=${cartItemPage.number + 1}, size=${cartItemPage.size})}">
+               th:href="@{/shopping-cart(page=${cartItemPage.number + 1}, size=${cartItemPage.size}, sort=${#strings.replace(cartItemPage.sort, ': ', ',')})}">
                 Next &raquo;
             </a>
         </p>
@@ -94,7 +94,9 @@
 <hr/>
 
 <div>
-    <button>Proceed to Checkout</button>
+    <form th:action="@{/orders/checkout}">
+        <button type="submit">Proceed to Checkout</button>
+    </form>
     <form th:action="@{/shopping-cart/empty}" method="post">
         <button type="submit">Empty Cart</button>
     </form>

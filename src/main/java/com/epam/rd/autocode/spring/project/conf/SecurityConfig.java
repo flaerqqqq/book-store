@@ -48,9 +48,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/register", "/login").permitAll()
                         .requestMatchers("/shopping-cart", "/shopping-cart/**", "/api/shopping-carts/**").hasRole("CLIENT")
+                        .requestMatchers("/orders/checkout").hasRole("CLIENT")
                         .requestMatchers("/books/new", "/books/*/update", "/books/*/delete").hasAnyRole("EMPLOYEE", "ADMIN")
-                        .requestMatchers("/adming/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/books").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(AbstractHttpConfigurer::disable)

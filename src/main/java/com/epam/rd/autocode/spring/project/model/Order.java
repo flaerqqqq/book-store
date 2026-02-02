@@ -36,7 +36,7 @@ public class Order {
     private Client client;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee_id", nullable = false)
+    @JoinColumn(name = "employee_id")
     private Employee employee;
 
     @Column(name = "order_date", nullable = false)
@@ -59,6 +59,7 @@ public class Order {
     @Column(nullable = false)
     private OrderStatus status;
 
+    @Builder.Default
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
 

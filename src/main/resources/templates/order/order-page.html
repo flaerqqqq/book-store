@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Order Details</title>
+</head>
+<body>
+
+<h1>Order Details</h1>
+<a th:href="@{/orders}">← Back to Orders</a>
+
+<hr/>
+
+<section th:object="${orderSummary}">
+    <h3>Summary</h3>
+    <p><strong>Order ID:</strong> <span th:text="*{publicId}"></span></p>
+    <p><strong>Status:</strong> <span th:text="*{status}"></span></p>
+    <p><strong>Date:</strong> <span th:text="${#temporals.format(orderSummary.orderDate, 'yyyy-MM-dd HH:mm')}"></span></p>
+    <p><strong>Total Amount:</strong> <span th:text="*{totalAmount} + ' USD'"></span></p>
+    <p><strong>Total Items:</strong> <span th:text="*{totalItems}"></span></p>
+
+    <h4>Shipping Info</h4>
+    <p><strong>Method:</strong> <span th:text="*{deliveryType}"></span></p>
+    <p><strong>Address:</strong> <span th:text="*{deliveryAddress}"></span></p>
+    <p><strong>Comment:</strong> <span th:text="*{comment != null && !comment.isEmpty() ? comment : 'No comment'}"></span></p>
+</section>
+
+<hr/>
+
+<h3>Items in this Order</h3>
+<form th:action="@{/orders/{orderPublicId}(orderPublicId=${orderSummary.getPublicId()})}">
+    <select name="sort" onchange="this.form.submit()">
+        <option value="quantity,asc" th:selected="${param.sort != null && param.sort[0] == 'quantity,asc'}">Quantity (Low-High)</option>
+        <option value="quantity,desc" th:selected="${param.sort != null && param.sort[0] == 'quantity,desc'}">Quantity (High-Low)</option>
+        <option value="subtotal,asc" th:selected="${param.sort != null && param.sort[0] == 'subtotal,asc'}">Subtotal (Low-High)</option>
+        <option value="subtotal,desc" th:selected="${param.sort != null && param.sort[0] == 'subtotal,desc'}">Subtotal (High-Low)</option>
+    </select>
+</form>
+<table border="1">
+    <thead>
+    <tr>
+        <th>Book Name</th>
+        <th>Price (at purchase)</th>
+        <th>Quantity</th>
+        <th>Subtotal</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${orderItemPage.content}">
+        <td th:text="${item.bookName}"></td>
+        <td th:text="${item.priceAtPurchase}"></td>
+        <td th:text="${item.quantity}"></td>
+        <td th:text="${item.subtotal}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<div th:if="${orderItemPage.totalPages > 1}">
+    <p>
+        <a th:if="${orderItemPage.hasPrevious()}"
+           th:href="@{/orders/{orderPublicId}(page=${orderItemPage.number - 1},
+             size=${orderItemPage.size},
+             orderPublicId=${orderSummary.getPublicId()},
+             sort=${#strings.replace(orderItemPage.sort, ': ', ',')}
+             )}">
+            &laquo; Previous
+        </a>
+
+        <span th:each="i : ${#numbers.sequence(0, orderItemPage.totalPages - 1)}">
+                    <a th:if="${i != orderItemPage.number}"
+                       th:href="@{/orders/{orderPublicId}(page=${i},
+                        size=${orderItemPage.size},
+                        orderPublicId=${orderSummary.getPublicId()},
+                        sort=${#strings.replace(orderItemPage.sort, ': ', ',')})}"
+                       th:text="${i + 1}"></a>
+                    <span th:if="${i == orderItemPage.number}" th:text="${i + 1}" style="font-weight: bold;"></span>
+                </span>
+
+        <a th:if="${orderItemPage.hasNext()}"
+           th:href="@{/orders/{orderPublicId}(page=${orderItemPage.number + 1},
+            size=${orderItemPage.size},
+             orderPublicId=${orderSummary.getPublicId()},
+             sort=${#strings.replace(orderItemPage.sort, ': ', ',')}
+             )}">
+            Next &raquo;
+        </a>
+    </p>
+</div>
+
+</body>
+</html>
