@@ -1,11 +1,13 @@
 package com.epam.rd.autocode.spring.project.service.impl;
 
 import com.epam.rd.autocode.spring.project.dto.OrderDTO;
+import com.epam.rd.autocode.spring.project.dto.OrderRequestDto;
 import com.epam.rd.autocode.spring.project.exception.EmptyCartException;
 import com.epam.rd.autocode.spring.project.exception.InsufficientFundsException;
 import com.epam.rd.autocode.spring.project.exception.NotFoundException;
 import com.epam.rd.autocode.spring.project.mapper.OrderMapper;
 import com.epam.rd.autocode.spring.project.model.*;
+import com.epam.rd.autocode.spring.project.model.enums.OrderStatus;
 import com.epam.rd.autocode.spring.project.repo.ClientRepository;
 import com.epam.rd.autocode.spring.project.repo.OrderRepository;
 import com.epam.rd.autocode.spring.project.service.OrderService;
@@ -54,7 +56,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDTO createFromShoppingCart(UUID clientPublicId) {
+    public OrderDTO createFromShoppingCart(UUID clientPublicId, OrderRequestDto orderRequest) {
         Objects.requireNonNull(clientPublicId, "Client public ID mus not be null");
 
         Client client = getClientOrThrow(clientPublicId);
@@ -64,15 +66,19 @@ public class OrderServiceImpl implements OrderService {
             throw new EmptyCartException("Cannot create an Order for Client with publicId: %s because the Shopping Cart is empty".formatted(clientPublicId));
         }
 
-        checkBalanceAndSubtract(client, cart.getTotalAmount());
-
         List<OrderItem> orderItems = mapCartToOrderItems(cart.getCartItems());
 
         Order order = Order.builder()
                 .client(client)
+                .deliveryType(orderRequest.getDeliveryType())
+                .deliveryAddress(orderRequest.getDeliveryAddress())
+                .comment(orderRequest.getComment())
+                .status(OrderStatus.CREATED)
                 .build();
         orderItems.forEach(order::addOrderItem);
-        order.recalculateTotalAmount();
+
+        order.recalculateTotalAmount(orderRequest.getDeliveryType().getBaseCost());
+        checkBalanceAndSubtract(client, order.getTotalAmount());
 
         Order savedOrder = orderRepository.save(order);
 

@@ -2,34 +2,16 @@ package com.epam.rd.autocode.spring.project.dto;
 
 import com.epam.rd.autocode.spring.project.model.enums.DeliveryType;
 import com.epam.rd.autocode.spring.project.model.enums.OrderStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderDTO {
-
-    private UUID publicId;
-
-    private UUID clientPublicId;
-
-    private UUID employeePublicId;
-
-    private LocalDateTime orderDate;
-
-    private BigDecimal totalAmount;
+public class OrderRequestDto {
 
     private DeliveryType deliveryType;
 
@@ -38,6 +20,4 @@ public class OrderDTO {
     private String comment;
 
     private OrderStatus status;
-
-    private List<OrderItemDto> orderItems;
 }

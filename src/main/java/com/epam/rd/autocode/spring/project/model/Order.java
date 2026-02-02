@@ -1,8 +1,11 @@
 package com.epam.rd.autocode.spring.project.model;
 
+import com.epam.rd.autocode.spring.project.model.enums.DeliveryType;
+import com.epam.rd.autocode.spring.project.model.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,6 +15,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "orders")
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -42,6 +46,19 @@ public class Order {
     @Column(nullable = false)
     private BigDecimal totalAmount;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delivery_type", nullable = false)
+    private DeliveryType deliveryType;
+
+    @Column(name = "delivery_address")
+    private String deliveryAddress;
+
+    private String comment;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OrderStatus status;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
 
@@ -50,9 +67,11 @@ public class Order {
         orderItem.setOrder(this);
     }
 
-    public void recalculateTotalAmount() {
-        this.totalAmount = orderItems.stream()
+    public void recalculateTotalAmount(BigDecimal shippingCost) {
+        BigDecimal itemsTotal = orderItems.stream()
                 .map(OrderItem::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        this.totalAmount = itemsTotal.add(shippingCost);
     }
 }
