@@ -1,9 +1,6 @@
 package com.epam.rd.autocode.spring.project.service;
 
-import com.epam.rd.autocode.spring.project.dto.OrderDTO;
-import com.epam.rd.autocode.spring.project.dto.OrderItemDto;
-import com.epam.rd.autocode.spring.project.dto.OrderRequestDto;
-import com.epam.rd.autocode.spring.project.dto.OrderSummaryDto;
+import com.epam.rd.autocode.spring.project.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -22,4 +19,8 @@ public interface OrderService {
     OrderSummaryDto getOrderSummary(UUID orderPublicId);
 
     Page<OrderSummaryDto> getOrderSummariesByClient(UUID clientPublicId, Pageable pageable);
+
+    Page<OrderSummaryDto> getOrderSummaries(Pageable pageable);
+
+    Page<OrderSummaryDto> getFilteredOrderSummaries(OrderFilterDto filter, Pageable pageable);
 }

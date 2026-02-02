@@ -1,9 +1,6 @@
 package com.epam.rd.autocode.spring.project.service.impl;
 
-import com.epam.rd.autocode.spring.project.dto.OrderDTO;
-import com.epam.rd.autocode.spring.project.dto.OrderItemDto;
-import com.epam.rd.autocode.spring.project.dto.OrderRequestDto;
-import com.epam.rd.autocode.spring.project.dto.OrderSummaryDto;
+import com.epam.rd.autocode.spring.project.dto.*;
 import com.epam.rd.autocode.spring.project.exception.EmptyCartException;
 import com.epam.rd.autocode.spring.project.exception.InsufficientFundsException;
 import com.epam.rd.autocode.spring.project.exception.NotFoundException;
@@ -14,11 +11,13 @@ import com.epam.rd.autocode.spring.project.model.enums.OrderStatus;
 import com.epam.rd.autocode.spring.project.repo.ClientRepository;
 import com.epam.rd.autocode.spring.project.repo.OrderItemRepository;
 import com.epam.rd.autocode.spring.project.repo.OrderRepository;
+import com.epam.rd.autocode.spring.project.repo.specification.OrderSpecifications;
 import com.epam.rd.autocode.spring.project.service.OrderService;
 import com.epam.rd.autocode.spring.project.service.ShoppingCartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -115,6 +114,28 @@ public class OrderServiceImpl implements OrderService {
         pageable = Objects.requireNonNullElse(pageable, Pageable.ofSize(DEFAULT_PAGE_SIZE));
 
         return orderRepository.findAllByClient_PublicId(clientPublicId, pageable)
+                .map(orderMapper::entityToSummaryDto);
+    }
+
+    @Override
+    public Page<OrderSummaryDto> getOrderSummaries(Pageable pageable) {
+        pageable = Objects.requireNonNullElse(pageable, Pageable.ofSize(DEFAULT_PAGE_SIZE));
+
+        return orderRepository.findAll(pageable)
+                .map(orderMapper::entityToSummaryDto);
+    }
+
+    @Override
+    public Page<OrderSummaryDto> getFilteredOrderSummaries(OrderFilterDto filter, Pageable pageable) {
+        pageable = Objects.requireNonNullElse(pageable, Pageable.ofSize(DEFAULT_PAGE_SIZE));
+
+        if (filter == null) {
+            return getOrderSummaries(pageable);
+        }
+
+        Specification<Order> orderSpefication = OrderSpecifications.withFilters(filter);
+
+        return orderRepository.findAll(orderSpefication, pageable)
                 .map(orderMapper::entityToSummaryDto);
     }
 
