@@ -20,7 +20,7 @@ public class OrderServiceImpl implements OrderService {
     private static final int DEFAULT_PAGE_SIZE = 10;
 
     private final OrderRepository orderRepository;
-    private final ClientRepository
+    private final ClientRepository clientRepository;
     private final OrderMapper orderMapper;
 
     @Override

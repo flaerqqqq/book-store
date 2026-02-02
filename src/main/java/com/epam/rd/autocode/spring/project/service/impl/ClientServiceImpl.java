@@ -92,7 +92,7 @@ public class ClientServiceImpl implements ClientService {
 
         Client savedClient = clientRepository.save(clientEntity);
 
-        shoppingCartService.createCartForUser(savedClient.getPublicId());
+        shoppingCartService.createCart(savedClient.getPublicId());
 
         return clientMapper.entityToDto(savedClient);
     }

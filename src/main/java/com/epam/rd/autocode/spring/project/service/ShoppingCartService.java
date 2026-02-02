@@ -11,23 +11,23 @@ import java.util.UUID;
 
 public interface ShoppingCartService {
 
-    ShoppingCartDto createCartForUser(UUID userPublicId);
+    ShoppingCartDto createCart(UUID clientPublicId);
 
-    ShoppingCartDto getCartByUser(UUID userPublicId);
+    ShoppingCartDto getCart(UUID clientPublicId);
 
-    Page<ShoppingCartItemDto> getCartItems(UUID userPublicId, Pageable pageable);
+    Page<ShoppingCartItemDto> getCartItems(UUID clientPublicId, Pageable pageable);
 
-    ShoppingCartSummaryDto getCartSummary(UUID userPublicId);
+    ShoppingCartSummaryDto getCartSummary(UUID clientPublicId);
 
     void emptyCart(UUID userPublicId);
 
-    ShoppingCartDto addItemToCart(UUID userPublicId, UUID bookPublicId, Integer quantity);
+    ShoppingCartDto addItemToCart(UUID clientPublicId, UUID bookPublicId, Integer quantity);
 
-    ShoppingCartDto updateCartItemQuantity(UUID userPublicId, UUID bookPublicId, Integer quantity);
+    ShoppingCartDto updateCartItemQuantity(UUID clientPublicId, UUID bookPublicId, Integer quantity);
 
-    void removeCartItem(UUID userPublicId, UUID bookPublicId);
+    void removeCartItem(UUID clientPublicId, UUID bookPublicId);
 
-    Set<UUID> getCartItemBookIds(UUID userPublicId);
+    Set<UUID> getCartItemBookIds(UUID clientPublicId);
 
     void syncCartsWithDeletedBook(UUID bookPublicId);
 }

@@ -4,6 +4,7 @@ import com.epam.rd.autocode.spring.project.model.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public interface ClientRepository extends JpaRepository<Client, Long> {
 
@@ -12,4 +13,8 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     Long deleteByEmail(String email);
 
     Optional<Client> findByEmail(String email);
+
+    Optional<Client> findByPublicId(UUID publicId);
+
+    boolean existsByPublicId(UUID publicID);
 }

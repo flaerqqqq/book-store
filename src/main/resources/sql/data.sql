@@ -17,7 +17,7 @@ INSERT INTO users (id, public_id, email, password, name)
 VALUES (3, '00000000-0000-0000-0000-000000000003', 'client@gmail.com', '$2a$10$AbR3.AyqmNrpfuaCjMj4fOJMkl/YFBAGHQ1OqlyEtm7g2E4wBLUJi', 'Ivan Client');
 INSERT INTO clients (id, balance) VALUES (3, 1500.50);
 INSERT INTO users_roles (user_id, role_id) VALUES (3, 3);
-INSERT INTO shopping_carts (public_id, total_amount, user_id) VALUES ('7a1b3c5d-9e8f-4a2b-b1c3-d5e7f9a1b3c5', 0.00, 3);
+INSERT INTO shopping_carts (public_id, total_amount, client_id) VALUES ('7a1b3c5d-9e8f-4a2b-b1c3-d5e7f9a1b3c5', 0.00, 3);
 
 
 SELECT setval(pg_get_serial_sequence('users', 'id'), 4, false);

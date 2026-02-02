@@ -28,7 +28,6 @@ import java.util.UUID;
 public class ShoppingCartController {
 
     private final ShoppingCartService cartService;
-    private final ShoppingCartMapper cartMapper;
 
     @GetMapping
     public String getCartPage(@AuthenticationPrincipal CustomUserDetails userDetails,

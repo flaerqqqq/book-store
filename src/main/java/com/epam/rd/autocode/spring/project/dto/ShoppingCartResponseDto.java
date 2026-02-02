@@ -17,7 +17,7 @@ public class ShoppingCartResponseDto {
 
     private UUID publicId;
 
-    private UUID userPublicId;
+    private UUID clientPublicId;
 
     private BigDecimal totalAmount;
 

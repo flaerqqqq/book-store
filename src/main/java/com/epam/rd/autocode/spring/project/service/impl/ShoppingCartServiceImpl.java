@@ -7,14 +7,8 @@ import com.epam.rd.autocode.spring.project.exception.AlreadyExistException;
 import com.epam.rd.autocode.spring.project.exception.NotFoundException;
 import com.epam.rd.autocode.spring.project.mapper.ShoppingCartItemMapper;
 import com.epam.rd.autocode.spring.project.mapper.ShoppingCartMapper;
-import com.epam.rd.autocode.spring.project.model.Book;
-import com.epam.rd.autocode.spring.project.model.ShoppingCart;
-import com.epam.rd.autocode.spring.project.model.ShoppingCartItem;
-import com.epam.rd.autocode.spring.project.model.User;
-import com.epam.rd.autocode.spring.project.repo.BookRepository;
-import com.epam.rd.autocode.spring.project.repo.ShoppingCartItemRepository;
-import com.epam.rd.autocode.spring.project.repo.ShoppingCartRepository;
-import com.epam.rd.autocode.spring.project.repo.UserRepository;
+import com.epam.rd.autocode.spring.project.model.*;
+import com.epam.rd.autocode.spring.project.repo.*;
 import com.epam.rd.autocode.spring.project.service.ShoppingCartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,7 +27,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     private final static int DEFAULT_PAGE_SIZE = 10;
 
-    private final UserRepository userRepository;
+    private final ClientRepository clientRepository;
     private final ShoppingCartRepository cartRepository;
     private final ShoppingCartItemRepository cartItemRepository;
     private final BookRepository bookRepository;
@@ -42,135 +36,135 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     @Transactional
-    public ShoppingCartDto createCartForUser(UUID userPublicId) {
-        Objects.requireNonNull(userPublicId, "User public ID must not be null");
+    public ShoppingCartDto createCart(UUID clientPublicId) {
+        Objects.requireNonNull(clientPublicId, "Client public ID must not be null");
 
-        User user = getUserOrThrow(userPublicId);
+        Client client = getClientOrThrow(clientPublicId);
 
-        if (user.getShoppingCart() != null) {
-            throw new AlreadyExistException("Shopping Cart already exists for a User with publicId: %s".formatted(userPublicId));
+        if (client.getShoppingCart() != null) {
+            throw new AlreadyExistException("Shopping Cart already exists for a Client with publicId: %s".formatted(clientPublicId));
         }
 
         ShoppingCart cart = ShoppingCart.builder()
-                .user(user)
+                .client(client)
                 .build();
-        user.setShoppingCart(cart);
+        client.setShoppingCart(cart);
 
-        ShoppingCart savedCart = userRepository.save(user).getShoppingCart();
+        ShoppingCart savedCart = clientRepository.save(client).getShoppingCart();
 
         return cartMapper.entityToDto(savedCart);
     }
 
     @Override
-    public ShoppingCartDto getCartByUser(UUID userPublicId) {
-        Objects.requireNonNull(userPublicId, "User public ID must not be null");
+    public ShoppingCartDto getCart(UUID clientPublicId) {
+        Objects.requireNonNull(clientPublicId, "Client public ID must not be null");
 
-        User user = getUserOrThrow(userPublicId);
-        ShoppingCart userCart = getCartOrThrow(user);
+        Client client = getClientOrThrow(clientPublicId);
+        ShoppingCart cart = getCartOrThrow(client);
 
-        return cartMapper.entityToDto(userCart);
+        return cartMapper.entityToDto(cart);
     }
 
     @Override
-    public Page<ShoppingCartItemDto> getCartItems(UUID userPublicId, Pageable pageable) {
-        Objects.requireNonNull(userPublicId, "User public ID must not be null");
+    public Page<ShoppingCartItemDto> getCartItems(UUID clientPublicId, Pageable pageable) {
+        Objects.requireNonNull(clientPublicId, "Client public ID must not be null");
         pageable = Objects.requireNonNullElse(pageable, Pageable.ofSize(DEFAULT_PAGE_SIZE));
 
-        ShoppingCart userCart = getCartOrThrow(userPublicId);
+        ShoppingCart cart = getCartOrThrow(clientPublicId);
 
-        Page<ShoppingCartItem> cartItemPage = cartItemRepository.findByCart_PublicId(userCart.getPublicId(), pageable);
+        Page<ShoppingCartItem> cartItemPage = cartItemRepository.findByCart_PublicId(cart.getPublicId(), pageable);
 
         return cartItemPage.map(cartItemMapper::entityToDto);
     }
 
     @Override
-    public ShoppingCartSummaryDto getCartSummary(UUID userPublicId) {
-        Objects.requireNonNull(userPublicId, "User public ID must not be null");
+    public ShoppingCartSummaryDto getCartSummary(UUID clientPublicId) {
+        Objects.requireNonNull(clientPublicId, "Client public ID must not be null");
 
-        ShoppingCart userCart = getCartOrThrow(userPublicId);
+        ShoppingCart cart = getCartOrThrow(clientPublicId);
 
-        return cartMapper.entityToSummaryDto(userCart);
+        return cartMapper.entityToSummaryDto(cart);
     }
 
     @Override
     @Transactional
-    public void emptyCart(UUID userPublicId) {
-        Objects.requireNonNull(userPublicId, "User public ID must not be null");
+    public void emptyCart(UUID clientPublicId) {
+        Objects.requireNonNull(clientPublicId, "Client public ID must not be null");
 
-        User user = getUserOrThrow(userPublicId);
-        ShoppingCart userCart = getCartOrThrow(user);
+        Client client = getClientOrThrow(clientPublicId);
+        ShoppingCart cart = getCartOrThrow(client);
 
-        userCart.getCartItems().clear();
-        userCart.setTotalAmount(BigDecimal.ZERO);
+        cart.getCartItems().clear();
+        cart.setTotalAmount(BigDecimal.ZERO);
     }
 
     @Override
     @Transactional
-    public ShoppingCartDto addItemToCart(UUID userPublicId, UUID bookPublicId, Integer quantity) {
-        validateInputs(userPublicId, bookPublicId, quantity);
+    public ShoppingCartDto addItemToCart(UUID clientPublicId, UUID bookPublicId, Integer quantity) {
+        validateInputs(clientPublicId, bookPublicId, quantity);
 
-        User user = getUserOrThrow(userPublicId);
-        ShoppingCart userCart = getCartOrThrow(user);
+        Client client = getClientOrThrow(clientPublicId);
+        ShoppingCart cart = getCartOrThrow(client);
 
         Book book = getBookOrThrow(bookPublicId);
 
-        Optional<ShoppingCartItem> existingCartItemOpt = findItemInCart(userCart, book.getPublicId());
+        Optional<ShoppingCartItem> existingCartItemOpt = findItemInCart(cart, book.getPublicId());
 
         existingCartItemOpt.ifPresentOrElse((item) -> {
             item.setQuantity(item.getQuantity() + quantity);
         }, () -> {
             ShoppingCartItem cartItem = ShoppingCartItem.builder()
-                .cart(userCart)
+                .cart(cart)
                 .book(book)
                 .priceAtAdd(book.getPrice())
                 .build();
             cartItem.setQuantity(quantity);
-            userCart.getCartItems().add(cartItem);
+            cart.getCartItems().add(cartItem);
         });
 
-        return saveAndMap(userCart, user);
+        return saveAndMap(cart, client);
     }
 
     @Override
     @Transactional
-    public ShoppingCartDto updateCartItemQuantity(UUID userPublicId, UUID bookPublicId, Integer quantity) {
-        validateInputs(userPublicId, bookPublicId, quantity);
+    public ShoppingCartDto updateCartItemQuantity(UUID clientPublicId, UUID bookPublicId, Integer quantity) {
+        validateInputs(clientPublicId, bookPublicId, quantity);
 
-        User user = getUserOrThrow(userPublicId);
-        ShoppingCart userCart = getCartOrThrow(user);
+        Client client = getClientOrThrow(clientPublicId);
+        ShoppingCart cart = getCartOrThrow(client);
 
-        ShoppingCartItem existingCartItem = findItemInCart(userCart, bookPublicId).orElseThrow(() ->
+        ShoppingCartItem existingCartItem = findItemInCart(cart, bookPublicId).orElseThrow(() ->
                         new NotFoundException(ShoppingCartItem.class, "bookPublicId", bookPublicId));
 
         existingCartItem.setQuantity(quantity);
-        return saveAndMap(userCart, user);
+        return saveAndMap(cart, client);
     }
 
     @Override
     @Transactional
-    public void removeCartItem(UUID userPublicId, UUID bookPublicId) {
-        Objects.requireNonNull(userPublicId, "User public Id must not be null");
+    public void removeCartItem(UUID clientPublicId, UUID bookPublicId) {
+        Objects.requireNonNull(clientPublicId, "Client public Id must not be null");
         Objects.requireNonNull(bookPublicId, "Book public Id must not be null");
 
-        ShoppingCart userCart = getCartOrThrow(userPublicId);
+        ShoppingCart cart = getCartOrThrow(clientPublicId);
 
-        boolean removed = userCart.getCartItems().removeIf(item ->
+        boolean removed = cart.getCartItems().removeIf(item ->
                 Objects.equals(item.getBook().getPublicId(), bookPublicId));
 
         if (removed) {
-            userCart.recalculateTotalAmount();
+            cart.recalculateTotalAmount();
         } else {
             throw new NotFoundException(Book.class, "publicId", bookPublicId);
         }
     }
 
     @Override
-    public Set<UUID> getCartItemBookIds(UUID userPublicId) {
-        Objects.requireNonNull(userPublicId, "User public Id must not be null");
+    public Set<UUID> getCartItemBookIds(UUID clientPublicId) {
+        Objects.requireNonNull(clientPublicId, "Client public Id must not be null");
 
-        ShoppingCart userCart = getCartOrThrow(userPublicId);
+        ShoppingCart cart = getCartOrThrow(clientPublicId);
 
-        return userCart.getCartItems().stream()
+        return cart.getCartItems().stream()
                 .map(item -> item.getBook().getPublicId())
                 .collect(Collectors.toSet());
     }
@@ -188,15 +182,15 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         }
     }
 
-    private ShoppingCartDto saveAndMap(ShoppingCart userCart, User user) {
-        userCart.recalculateTotalAmount();
-        ShoppingCart updatedUserCart = userRepository.save(user).getShoppingCart();
+    private ShoppingCartDto saveAndMap(ShoppingCart cart, Client client) {
+        cart.recalculateTotalAmount();
+        ShoppingCart updatedCart = clientRepository.save(client).getShoppingCart();
 
-        return cartMapper.entityToDto(updatedUserCart);
+        return cartMapper.entityToDto(updatedCart);
     }
 
-    private void validateInputs(UUID userPublicId, UUID bookPublicId, Integer quantity) {
-        Objects.requireNonNull(userPublicId, "User public Id must not be null");
+    private void validateInputs(UUID clientPublicId, UUID bookPublicId, Integer quantity) {
+        Objects.requireNonNull(clientPublicId, "Client public Id must not be null");
         Objects.requireNonNull(bookPublicId, "Book public Id must not be null");
 
         if (quantity == null || quantity <= 0) {
@@ -204,15 +198,15 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         }
     }
 
-    private Optional<ShoppingCartItem> findItemInCart(ShoppingCart userCart, UUID bookPublicId) {
-        return userCart.getCartItems().stream()
+    private Optional<ShoppingCartItem> findItemInCart(ShoppingCart cart, UUID bookPublicId) {
+        return cart.getCartItems().stream()
                 .filter(item -> Objects.equals(bookPublicId, item.getBook().getPublicId()))
                 .findFirst();
     }
 
-    private User getUserOrThrow(UUID userPublicId) {
-        return userRepository.findByPublicId(userPublicId).orElseThrow(() ->
-                new NotFoundException(User.class, "publicId", userPublicId));
+    private Client getClientOrThrow(UUID clientPublicId) {
+        return clientRepository.findByPublicId(clientPublicId).orElseThrow(() ->
+                new NotFoundException(Client.class, "publicId", clientPublicId));
     }
 
     private Book getBookOrThrow(UUID bookPublicId) {
@@ -220,21 +214,21 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                 new NotFoundException(Book.class, "publicId", bookPublicId));
     }
 
-    private ShoppingCart getCartOrThrow(User user) {
-        if (user.getShoppingCart() == null) {
-            throw new NotFoundException("Shopping Cart for is not found for a User with publicId: %s".formatted(user.getPublicId()));
+    private ShoppingCart getCartOrThrow(Client client) {
+        if (client.getShoppingCart() == null) {
+            throw new NotFoundException("Shopping Cart for is not found for a Client with publicId: %s".formatted(client.getPublicId()));
         }
 
-        return user.getShoppingCart();
+        return client.getShoppingCart();
     }
 
-    private ShoppingCart getCartOrThrow(UUID userPublicId) {
-        if (!userRepository.existsByPublicId(userPublicId)) {
-            throw new NotFoundException(User.class, "publicId", userPublicId);
+    private ShoppingCart getCartOrThrow(UUID clientPublicId) {
+        if (!clientRepository.existsByPublicId(clientPublicId)) {
+            throw new NotFoundException(Client.class, "publicId", clientPublicId);
         }
 
-        return cartRepository.findByUser_PublicId(userPublicId).orElseThrow(() ->
-                new NotFoundException("Shopping Cart for is not found for a User with publicId: %s".formatted(userPublicId))
+        return cartRepository.findByClient_PublicId(clientPublicId).orElseThrow(() ->
+                new NotFoundException("Shopping Cart for is not found for a Client with publicId: %s".formatted(clientPublicId))
         );
     }
 }
