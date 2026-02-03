@@ -206,6 +206,14 @@ public class OrderServiceImpl implements OrderService {
         order.setReason(reason);
         order.setCancelledAt(LocalDateTime.now());
 
+        BigDecimal clientBalance = order.getClient().getBalance();
+        clientBalance = clientBalance == null ? BigDecimal.ZERO : clientBalance;
+
+        BigDecimal orderTotalAmount = order.getTotalAmount();
+        orderTotalAmount = orderTotalAmount == null ? BigDecimal.ZERO : orderTotalAmount;
+
+        order.getClient().setBalance(clientBalance.add(orderTotalAmount));
+
         Order savedOrder = orderRepository.save(order);
 
         return orderMapper.entityToSummaryDto(savedOrder);
