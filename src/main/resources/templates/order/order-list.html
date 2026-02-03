@@ -12,10 +12,17 @@
     <div sec:authorize="hasRole('EMPLOYEE')">
         <label>Order ID:</label>
         <input type="text" th:field="*{orderPublicId}" placeholder="UUID format..." />
+        <span th:if="${#fields.hasErrors('orderPublicId')}" th:errors="*{orderPublicId}" style="color:red"></span>
         <label>Client ID:</label>
         <input type="text" th:field="*{clientPublicId}" placeholder="UUID format..." />
+        <span th:if="${#fields.hasErrors('clientPublicId')}" th:errors="*{clientPublicId}" style="color:red"></span>
         <label>Employee ID:</label>
         <input type="text" th:field="*{employeePublicId}" placeholder="UUID format..." />
+        <span th:if="${#fields.hasErrors('employeePublicId')}" th:errors="*{employeePublicId}" style="color:red"></span>
+        <br/>
+        <a th:href="@{/orders(employeePublicId=${#authentication.principal.publicId})}">
+            Show Only My Orders
+        </a>
     </div>
 
     <div>

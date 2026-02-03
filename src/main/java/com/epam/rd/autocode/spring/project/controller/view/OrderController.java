@@ -7,6 +7,7 @@ import com.epam.rd.autocode.spring.project.security.CustomUserDetails;
 import com.epam.rd.autocode.spring.project.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -16,6 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -35,6 +37,11 @@ public class OrderController {
                                 @ModelAttribute("orderFilter") @Valid OrderFilterDto orderFilterDto,
                                 BindingResult bindingResult,
                                 Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("orderSummaryPage", Page.empty());
+            return "order/order-list";
+        }
+
         Page<OrderSummaryDto> orderSummaryPage = orderService.getFilteredOrderSummaries(orderFilterDto, pageable, userDetails);
 
         model.addAttribute("orderSummaryPage", orderSummaryPage);
@@ -109,5 +116,10 @@ public class OrderController {
     @ModelAttribute("orderStatuses")
     public OrderStatus[] getOrderStatuses() {
         return OrderStatus.values();
+    }
+
+    @InitBinder
+    public void initBinder(WebDataBinder dataBinder) {
+        dataBinder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
     }
 }
