@@ -101,13 +101,25 @@
         </a>
     </p>
 </div>
-<div th:if="${isCreatedByClient || isClaimedByEmployee}">
+<div th:if="${(isCreatedByClient && orderSummary.getStatus().name() == 'CREATED') || isClaimedByEmployee}">
     <form th:action="@{/orders/{id}/cancel(id=${orderPublicId})}" method="post" class="mt-4">
         <div class="input-group">
             <input type="text" name="reason" placeholder="Reason for canceling" required class="form-control">
             <button class="btn btn-outline-danger" type="submit">Cancel Order</button>
         </div>
     </form>
+    <div th:if="${isClaimedByEmployee}">
+        <form th:action="@{/orders/{id}/update-status(id=${orderPublicId})}" method="post">
+            <label for="orderStatus">Status:</label>
+            <select name="orderStatus" id="orderStatus">
+                <option th:each="status : ${orderStatuses}"
+                        th:value="${status}"
+                        th:text="${status}"
+                        th:selected="${status == orderSummary.status}"> </option>
+            </select>
+            <button type="submit">Update</button>
+        </form>
+    </div>
 </div>
 </body>
 </html>

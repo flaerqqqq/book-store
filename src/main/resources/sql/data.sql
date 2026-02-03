@@ -2,23 +2,20 @@ INSERT INTO roles (id, name) VALUES (1, 'ROLE_ADMIN'), (2, 'ROLE_EMPLOYEE'), (3,
 
 
 INSERT INTO users (id, public_id, email, password, name)
-VALUES (1, '00000000-0000-0000-0000-000000000001', 'admin@gmail.com', '$2a$10$AbR3.AyqmNrpfuaCjMj4fOJMkl/YFBAGHQ1OqlyEtm7g2E4wBLUJi', 'Super Admin');
+VALUES (1, 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 'admin@gmail.com', '$2a$10$AbR3.AyqmNrpfuaCjMj4fOJMkl/YFBAGHQ1OqlyEtm7g2E4wBLUJi', 'Super Admin');
 INSERT INTO admins (id) VALUES (1);
 INSERT INTO users_roles (user_id, role_id) VALUES (1, 1);
 
-
 INSERT INTO users (id, public_id, email, password, name)
-VALUES (2, '00000000-0000-0000-0000-000000000002', 'employee@gmail.com', '$2a$10$AbR3.AyqmNrpfuaCjMj4fOJMkl/YFBAGHQ1OqlyEtm7g2E4wBLUJi', 'John Staff');
+VALUES (2, 'c9bf9e57-1685-4c89-bafb-ff5af830be8a', 'employee@gmail.com', '$2a$10$AbR3.AyqmNrpfuaCjMj4fOJMkl/YFBAGHQ1OqlyEtm7g2E4wBLUJi', 'John Staff');
 INSERT INTO employees (id, phone, birth_date) VALUES (2, '+380991112233', '1992-08-24');
 INSERT INTO users_roles (user_id, role_id) VALUES (2, 2);
 
-
 INSERT INTO users (id, public_id, email, password, name)
-VALUES (3, '00000000-0000-0000-0000-000000000003', 'client@gmail.com', '$2a$10$AbR3.AyqmNrpfuaCjMj4fOJMkl/YFBAGHQ1OqlyEtm7g2E4wBLUJi', 'Ivan Client');
+VALUES (3, '2ba82d8c-2831-4ec3-93d4-651630132da9', 'client@gmail.com', '$2a$10$AbR3.AyqmNrpfuaCjMj4fOJMkl/YFBAGHQ1OqlyEtm7g2E4wBLUJi', 'Ivan Client');
 INSERT INTO clients (id, balance) VALUES (3, 1500.50);
 INSERT INTO users_roles (user_id, role_id) VALUES (3, 3);
 INSERT INTO shopping_carts (public_id, total_amount, client_id) VALUES ('7a1b3c5d-9e8f-4a2b-b1c3-d5e7f9a1b3c5', 0.00, 3);
-
 
 SELECT setval(pg_get_serial_sequence('users', 'id'), 4, false);
 
@@ -49,24 +46,19 @@ SELECT setval(pg_get_serial_sequence('books', 'id'), 21, false);
 
 
 INSERT INTO shopping_cart_items (public_id, cart_id, book_id, quantity, price_at_add, subtotal) VALUES
-(gen_random_uuid(), 1, 1, 1, 15.99, 15.99),  -- Gatsby
-(gen_random_uuid(), 1, 2, 1, 12.50, 12.50),  -- 1984
-(gen_random_uuid(), 1, 3, 2, 20.00, 40.00),  -- Hobbit (qty 2)
-(gen_random_uuid(), 1, 4, 1, 25.99, 25.99),  -- Harry Potter
-(gen_random_uuid(), 1, 5, 1, 30.00, 30.00),  -- Kobzar
-(gen_random_uuid(), 1, 6, 1, 11.99, 11.99),  -- Catcher
-(gen_random_uuid(), 1, 7, 1, 18.50, 18.50),  -- Dune
-(gen_random_uuid(), 1, 8, 1, 10.00, 10.00),  -- Alchemist
-(gen_random_uuid(), 1, 9, 1, 14.00, 14.00),  -- Norwegian Wood
-(gen_random_uuid(), 1, 10, 1, 13.00, 13.00), -- Brave New World
-(gen_random_uuid(), 1, 11, 1, 14.50, 14.50), -- Book Thief
-(gen_random_uuid(), 1, 12, 1, 16.00, 16.00), -- Crime and Punishment
-(gen_random_uuid(), 1, 13, 1, 8.99, 8.99),   -- Animal Farm
-(gen_random_uuid(), 1, 14, 1, 16.50, 16.50), -- Shadow of Wind
-(gen_random_uuid(), 1, 15, 3, 11.50, 34.50), -- Little Prince (qty 3)
-(gen_random_uuid(), 1, 16, 1, 15.00, 15.00), -- Odyssey
-(gen_random_uuid(), 1, 17, 1, 12.00, 12.00), -- Shadows of Ancestors
-(gen_random_uuid(), 1, 18, 1, 14.99, 14.99), -- The Road
-(gen_random_uuid(), 1, 19, 1, 9.00, 9.00),   -- Intermezzo
-(gen_random_uuid(), 1, 20, 1, 17.99, 17.99); -- Anna Karenina
-UPDATE shopping_carts SET total_amount = 358.43 WHERE id = 1;
+(gen_random_uuid(), 1, 1, 1, 15.99, 15.99),
+(gen_random_uuid(), 1, 2, 1, 12.50, 12.50),
+(gen_random_uuid(), 1, 4, 1, 25.99, 25.99),
+(gen_random_uuid(), 1, 6, 1, 11.99, 11.99),
+(gen_random_uuid(), 1, 8, 1, 10.00, 10.00),
+(gen_random_uuid(), 1, 10, 1, 13.00, 13.00),
+(gen_random_uuid(), 1, 11, 1, 14.50, 14.50),
+(gen_random_uuid(), 1, 12, 1, 16.00, 16.00),
+(gen_random_uuid(), 1, 13, 1, 8.99, 8.99),
+(gen_random_uuid(), 1, 14, 1, 16.50, 16.50),
+(gen_random_uuid(), 1, 15, 3, 11.50, 34.50),
+(gen_random_uuid(), 1, 16, 1, 15.00, 15.00),
+(gen_random_uuid(), 1, 17, 1, 12.00, 12.00),
+(gen_random_uuid(), 1, 19, 1, 9.00, 9.00),
+(gen_random_uuid(), 1, 20, 1, 17.99, 17.99);
+UPDATE shopping_carts SET total_amount = 233.95 WHERE id = 1;
