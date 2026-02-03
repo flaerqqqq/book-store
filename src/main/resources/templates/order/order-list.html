@@ -90,6 +90,14 @@
         <td th:text="${order.status}"></td>
         <td>
             <a th:href="@{/orders/{id}(id=${order.publicId})}">View Details</a>
+            <span sec:authorize="hasRole('EMPLOYEE')">
+            <form th:if="${order.status.name() == 'CREATED'}"
+                  th:action="@{/orders/{id}/claim(id=${order.publicId})}"
+                  method="post"
+                  style="display:inline;">
+                <button type="submit">Claim</button>
+            </form>
+            </span>
         </td>
     </tr>
     </tbody>

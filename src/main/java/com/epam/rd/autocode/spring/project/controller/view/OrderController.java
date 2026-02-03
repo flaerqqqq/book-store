@@ -85,6 +85,19 @@ public class OrderController {
         orderService.cancelOrder(orderPublicId, userDetails.getPublicId(), reason);
 
         redirectAttributes.addAttribute("message" , "Order was cancelled");
+
+        return "redirect:/orders/" + orderPublicId;
+    }
+
+    @PostMapping("/{orderPublicId}/claim")
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public String claimOrder(@AuthenticationPrincipal CustomUserDetails userDetails,
+                             @PathVariable("orderPublicId") UUID orderPublicId,
+                             RedirectAttributes redirectAttributes) {
+        orderService.claimOrder(orderPublicId, userDetails.getPublicId());
+
+        redirectAttributes.addAttribute("message", "Order was claimed");
+
         return "redirect:/orders/" + orderPublicId;
     }
 
