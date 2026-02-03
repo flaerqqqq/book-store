@@ -123,7 +123,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderSummaryDto claimOrder(UUID orderPublicId, UUID employeePublicId) {
         Objects.requireNonNull(orderPublicId, "Order public ID must not be null");
-        Objects.requireNonNull(employeePublicId, "Order public ID must not be null");
+        Objects.requireNonNull(employeePublicId, "Employee public ID must not be null");
 
         Order order = getOrderWithLockOrThrow(orderPublicId);
 
@@ -148,7 +148,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderSummaryDto updateStatus(UUID orderPublicId, UUID employeePublicId, OrderStatus status) {
         Objects.requireNonNull(orderPublicId, "Order public ID must not be null");
-        Objects.requireNonNull(employeePublicId, "Order public ID must not be null");
+        Objects.requireNonNull(employeePublicId, "Employee public ID must not be null");
 
         if (status == OrderStatus.CREATED || status == OrderStatus.CLAIMED || status == OrderStatus.CANCELLED) {
             throw new IllegalOrderStateException(
@@ -217,6 +217,22 @@ public class OrderServiceImpl implements OrderService {
         Order savedOrder = orderRepository.save(order);
 
         return orderMapper.entityToSummaryDto(savedOrder);
+    }
+
+    @Override
+    public boolean isClaimedByEmployee(UUID orderPublicId, UUID employeePublicId) {
+        Objects.requireNonNull(orderPublicId, "Order public ID must not be null");
+        Objects.requireNonNull(employeePublicId, "Employee public ID must not be null");
+
+        return orderRepository.isClaimedByEmployee(orderPublicId, employeePublicId);
+    }
+
+    @Override
+    public boolean isCreatedByClient(UUID orderPublicId, UUID clientPublicId) {
+        Objects.requireNonNull(orderPublicId, "Order public ID must not be null");
+        Objects.requireNonNull(clientPublicId, "Client public ID must not be null");
+
+        return orderRepository.isCreatedByClient(orderPublicId, clientPublicId);
     }
 
     private Order getOrderWithLockOrThrow(UUID orderPublicId) {

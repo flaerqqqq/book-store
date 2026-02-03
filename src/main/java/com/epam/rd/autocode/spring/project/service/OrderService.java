@@ -23,4 +23,8 @@ public interface OrderService {
     OrderSummaryDto updateStatus(UUID orderPublicId, UUID employeePublicId, OrderStatus status);
 
     OrderSummaryDto cancelOrder(UUID orderPublicId, UUID cancelledByPublicId, String reason);
+
+    boolean isClaimedByEmployee(UUID orderPublicId, UUID employeePublicId);
+
+    boolean isCreatedByClient(UUID orderPublicId, UUID clientPublicId);
 }

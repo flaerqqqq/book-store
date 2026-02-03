@@ -101,7 +101,7 @@
         </a>
     </p>
 </div>
-<div th:if="${orderSummary.getStatus().name() == 'CREATED'}">
+<div th:if="${isCreatedByClient || isClaimedByEmployee}">
     <form th:action="@{/orders/{id}/cancel(id=${orderPublicId})}" method="post" class="mt-4">
         <div class="input-group">
             <input type="text" name="reason" placeholder="Reason for canceling" required class="form-control">

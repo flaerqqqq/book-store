@@ -22,5 +22,13 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT o FROM Order o WHERE o.publicId = :orderPublicId AND o.employee.publicId = :employeePublicId")
     Optional<Order> findClaimedOrderWithLock(@Param("orderPublicId") UUID orderPublicId,
-                                     @Param("employeePublicId") UUID employeePublicId);
+                                             @Param("employeePublicId") UUID employeePublicId);
+
+    @Query("SELECT COUNT(o) > 0 FROM Order o WHERE o.publicId = :orderPublicId AND o.employee.publicId = :employeePublicId")
+    boolean isClaimedByEmployee(@Param("orderPublicId") UUID orderPublicId,
+                                @Param("employeePublicId") UUID employeePublicId);
+
+    @Query("SELECT COUNT(o) > 0 FROM Order o WHERE o.publicId = :orderPublicId AND o.client.publicId = :clientPublicId")
+    boolean isCreatedByClient(@Param("orderPublicId") UUID orderPublicId,
+                              @Param("clientPublicId") UUID clientPublicId);
 }

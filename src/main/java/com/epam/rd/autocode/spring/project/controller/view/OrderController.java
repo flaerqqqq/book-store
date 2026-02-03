@@ -71,14 +71,19 @@ public class OrderController {
 
     @GetMapping("/{orderPublicId}")
     @PreAuthorize("hasAnyRole('CLIENT', 'EMPLOYEE')")
-    public String getOrderPage(@PathVariable("orderPublicId") UUID orderPublicId,
+    public String getOrderPage(@AuthenticationPrincipal CustomUserDetails userDetails,
+                               @PathVariable("orderPublicId") UUID orderPublicId,
                                @PageableDefault(sort = "quantity") Pageable pageable,
                                Model model) {
         Page<OrderItemDto> orderItemPage = orderService.getOrderItems(orderPublicId, pageable);
         OrderSummaryDto orderSummary = orderService.getOrderSummary(orderPublicId);
+        boolean isClaimedByEmployee = orderService.isClaimedByEmployee(orderPublicId, userDetails.getPublicId());
+        boolean isCreatedByClient = orderService.isCreatedByClient(orderPublicId, userDetails.getPublicId());
 
         model.addAttribute("orderItemPage", orderItemPage);
         model.addAttribute("orderSummary", orderSummary);
+        model.addAttribute("isClaimedByEmployee", isClaimedByEmployee);
+        model.addAttribute("isCreatedByClient", isCreatedByClient);
 
         return "order/order-page";
     }
@@ -104,6 +109,19 @@ public class OrderController {
         orderService.claimOrder(orderPublicId, userDetails.getPublicId());
 
         redirectAttributes.addAttribute("message", "Order was claimed");
+
+        return "redirect:/orders/" + orderPublicId;
+    }
+
+    @PostMapping("/{orderPublicId}/update-status")
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public String updateOrderStatus(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                    @PathVariable("orderPublicId") UUID orderPublicId,
+                                    @RequestParam("orderStatus") OrderStatus orderStatus,
+                                    RedirectAttributes redirectAttributes) {
+        orderService.updateStatus(orderPublicId, userDetails.getPublicId(), orderStatus);
+
+        redirectAttributes.addAttribute("message", "Order status was updated");
 
         return "redirect:/orders/" + orderPublicId;
     }
