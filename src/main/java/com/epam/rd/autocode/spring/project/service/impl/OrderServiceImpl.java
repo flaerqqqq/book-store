@@ -150,7 +150,7 @@ public class OrderServiceImpl implements OrderService {
         Objects.requireNonNull(orderPublicId, "Order public ID must not be null");
         Objects.requireNonNull(employeePublicId, "Order public ID must not be null");
 
-        if (status == OrderStatus.CREATED || status == OrderStatus.CLAIMED || status == OrderStatus.CANCELED) {
+        if (status == OrderStatus.CREATED || status == OrderStatus.CLAIMED || status == OrderStatus.CANCELLED) {
             throw new IllegalOrderStateException(
                     "Status %s must be updated via its dedicated action method, not a general update".formatted(status)
             );
@@ -175,7 +175,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = getOrderWithLockOrThrow(orderPublicId);
         OrderStatus status = order.getStatus();
 
-        if (status == OrderStatus.CANCELED) {
+        if (status == OrderStatus.CANCELLED) {
             throw new IllegalOrderStateException("Order already has status 'CANCELED' with publicId: %s".formatted(orderPublicId));
         }
 
@@ -201,7 +201,7 @@ public class OrderServiceImpl implements OrderService {
             }
         }
 
-        order.setStatus(OrderStatus.CANCELED);
+        order.setStatus(OrderStatus.CANCELLED);
         order.setCancelledBy(cancelledBy);
         order.setReason(reason);
         order.setCancelledAt(LocalDateTime.now());

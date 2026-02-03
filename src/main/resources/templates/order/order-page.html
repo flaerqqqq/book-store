@@ -10,6 +10,9 @@
 
 <hr/>
 
+<div th:if="${message}">
+    <span th:text="${message}"></span>
+</div>
 <section th:object="${orderSummary}">
     <h3>Summary</h3>
     <p><strong>Order ID:</strong> <span th:text="*{publicId}"></span></p>
@@ -18,6 +21,13 @@
         <p><strong>Employee ID:</strong> <span th:text="*{employeePublicId}"></span></p>
     </div>
     <p><strong>Status:</strong> <span th:text="*{status}"></span></p>
+    <div th:if="*{status.name() == 'CANCELLED'}">
+        <p><strong>Cancelled At:</strong> <span th:text="*{cancelledAt}"></span></p>
+        <p><strong>Reason:</strong> <span th:text="*{reason}"></span></p>
+        <div sec:authorize="hasRole('EMPLOYEE')">
+            <p><strong>Cancelled By:</strong> <span th:text="*{cancelledByPublicId}"></span></p>
+        </div>
+    </div>
     <p><strong>Date:</strong> <span th:text="${#temporals.format(orderSummary.orderDate, 'yyyy-MM-dd HH:mm')}"></span></p>
     <p><strong>Total Amount:</strong> <span th:text="*{totalAmount} + ' USD'"></span></p>
     <p><strong>Total Items:</strong> <span th:text="*{totalItems}"></span></p>
@@ -91,6 +101,13 @@
         </a>
     </p>
 </div>
-
+<div th:if="${orderSummary.getStatus().name() == 'CREATED'}">
+    <form th:action="@{/orders/{id}/cancel(id=${orderPublicId})}" method="post" class="mt-4">
+        <div class="input-group">
+            <input type="text" name="reason" placeholder="Reason for canceling" required class="form-control">
+            <button class="btn btn-outline-danger" type="submit">Cancel Order</button>
+        </div>
+    </form>
+</div>
 </body>
 </html>
