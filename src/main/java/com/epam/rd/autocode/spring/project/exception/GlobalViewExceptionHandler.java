@@ -72,16 +72,37 @@ public class GlobalViewExceptionHandler {
 
     @ExceptionHandler(AlreadyExistException.class)
     public String handleAlreadyExists(AlreadyExistException ex,
+                                      HttpServletResponse res,
                                       Model model) {
-        Class<?> entityClass = ex.getEntityClass();
+        String entityName = ex.getEntityClass() != null
+                ? ex.getEntityClass().getSimpleName()
+                : "resource";
 
-        if (entityClass != null) {
-            model.addAttribute("errorMessage",
-                    "Request cannot be completed because it conflicts with existing %s data"
-                            .formatted(entityClass.getSimpleName())
-            );
-        }
+        model.addAttribute("errorMessage",
+                "Request cannot be completed because it conflicts with existing %s data"
+                        .formatted(entityName)
+        );
 
+        res.setStatus(HttpStatus.CONFLICT.value());
         return "error/409";
+    }
+
+    @ExceptionHandler(IllegalOrderStateException.class)
+    public String handleIllegalOrderState(IllegalOrderStateException ex,
+                                          HttpServletResponse res,
+                                          Model model) {
+        model.addAttribute("errorMessage", ex.getMessage());
+
+        res.setStatus(HttpStatus.BAD_REQUEST.value());
+        return "error/400";
+    }
+
+    @ExceptionHandler(EmptyCartException.class)
+    public String handleEmptyCart(EmptyCartException ex,
+                                  RedirectAttributes redirectAttributes) {
+        redirectAttributes.addAttribute("errorMessage",
+                "Your shopping cart empty, add some books before trying to checkout");
+
+        return "redirect:/shopping-cart";
     }
 }
