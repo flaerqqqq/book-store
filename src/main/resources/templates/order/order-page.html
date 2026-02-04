@@ -1,125 +1,240 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="en">
 <head>
-    <title>Order Details</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details | My Bookstore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(45deg, #0d6efd, #6610f2);
+        }
+        body { background-color: #f8f9fa; font-family: 'Inter', sans-serif; }
+
+        .header-bg {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 2.5rem 0;
+            margin-bottom: -1.5rem;
+            clip-path: ellipse(100% 100% at 50% 0%);
+        }
+
+        .glass-card {
+            background: white;
+            border: none;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-pill {
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        /* Dynamic Status Colors */
+        .pill-CREATED { background: #e7f1ff; color: #0d6efd; }
+        .pill-CLAIMED { background: #fff4e6; color: #fd7e14; }
+        .pill-COMPLETED { background: #d1e7dd; color: #0f5132; }
+        .pill-CANCELLED { background: #f8d7da; color: #842029; }
+
+        .table thead th { background-color: #f8f9fa; color: #6c757d; font-size: 0.8rem; border: none; }
+
+        .action-zone {
+            background: #f8f9fa;
+            border-radius: 1.25rem;
+            border: 2px dashed #dee2e6;
+            padding: 1.5rem;
+        }
+    </style>
 </head>
 <body>
 
-<h1>Order Details</h1>
-<a th:href="@{/orders}">← Back to Orders</a>
-
-<hr/>
-
-<div th:if="${message}">
-    <span th:text="${message}"></span>
-</div>
-<section th:object="${orderSummary}">
-    <h3>Summary</h3>
-    <p><strong>Order ID:</strong> <span th:text="*{publicId}"></span></p>
-    <div sec:authorize="hasRole('EMPLOYEE')">
-        <p><strong>Client ID:</strong> <span th:text="*{clientPublicId}"></span></p>
-        <p><strong>Employee ID:</strong> <span th:text="*{employeePublicId}"></span></p>
-    </div>
-    <p><strong>Status:</strong> <span th:text="*{status}"></span></p>
-    <div th:if="*{status.name() == 'CANCELLED'}">
-        <p><strong>Cancelled At:</strong> <span th:text="*{cancelledAt}"></span></p>
-        <p><strong>Reason:</strong> <span th:text="*{reason}"></span></p>
-        <div sec:authorize="hasRole('EMPLOYEE')">
-            <p><strong>Cancelled By:</strong> <span th:text="*{cancelledByPublicId}"></span></p>
+<header class="header-bg shadow">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <a th:href="@{/orders}" class="btn btn-sm btn-light rounded-pill mb-2 text-primary fw-bold">
+                <i class="bi bi-arrow-left me-1"></i> Back to Orders
+            </a>
+            <h1 class="display-6 fw-bold mb-0">Order Details</h1>
+        </div>
+        <div class="text-end">
+            <span th:class="'status-pill pill-' + ${orderSummary.status}" th:text="${orderSummary.status}"></span>
         </div>
     </div>
-    <p><strong>Date:</strong> <span th:text="${#temporals.format(orderSummary.orderDate, 'yyyy-MM-dd HH:mm')}"></span></p>
-    <p><strong>Total Amount:</strong> <span th:text="*{totalAmount} + ' USD'"></span></p>
-    <p><strong>Total Items:</strong> <span th:text="*{totalItems}"></span></p>
+</header>
 
-    <h4>Shipping Info</h4>
-    <p><strong>Method:</strong> <span th:text="*{deliveryType}"></span></p>
-    <div th:if="*{deliveryAddress != null}">
-        <p><strong>Address:</strong> <span th:text="*{deliveryAddress}"></span></p>
-    </div>
-    <p><strong>Comment:</strong> <span th:text="*{comment != null && !comment.isEmpty() ? comment : 'No comment'}"></span></p>
-</section>
+<main class="container py-5">
 
-<hr/>
+    <div th:if="${message}" class="alert alert-info rounded-4 border-0 shadow-sm mb-4" th:text="${message}"></div>
 
-<h3>Items in this Order</h3>
-<form th:action="@{/orders/{orderPublicId}(orderPublicId=${orderSummary.getPublicId()})}">
-    <select name="sort" onchange="this.form.submit()">
-        <option value="quantity,asc" th:selected="${param.sort != null && param.sort[0] == 'quantity,asc'}">Quantity (Low-High)</option>
-        <option value="quantity,desc" th:selected="${param.sort != null && param.sort[0] == 'quantity,desc'}">Quantity (High-Low)</option>
-        <option value="subtotal,asc" th:selected="${param.sort != null && param.sort[0] == 'subtotal,asc'}">Subtotal (Low-High)</option>
-        <option value="subtotal,desc" th:selected="${param.sort != null && param.sort[0] == 'subtotal,desc'}">Subtotal (High-Low)</option>
-    </select>
-</form>
-<table border="1">
-    <thead>
-    <tr>
-        <th>Book Name</th>
-        <th>Price (at purchase)</th>
-        <th>Quantity</th>
-        <th>Subtotal</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="item : ${orderItemPage.content}">
-        <td th:text="${item.bookName}"></td>
-        <td th:text="${item.priceAtPurchase}"></td>
-        <td th:text="${item.quantity}"></td>
-        <td th:text="${item.subtotal}"></td>
-    </tr>
-    </tbody>
-</table>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <section class="glass-card h-100" th:object="${orderSummary}">
+                <h4 class="fw-bold mb-4"><i class="bi bi-info-circle me-2 text-primary"></i>Order Summary</h4>
 
-<div th:if="${orderItemPage.totalPages > 1}">
-    <p>
-        <a th:if="${orderItemPage.hasPrevious()}"
-           th:href="@{/orders/{orderPublicId}(page=${orderItemPage.number - 1},
-             size=${orderItemPage.size},
-             orderPublicId=${orderSummary.getPublicId()},
-             sort=${#strings.replace(orderItemPage.sort, ': ', ',')}
-             )}">
-            &laquo; Previous
-        </a>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="info-label">Order Reference</label>
+                        <p class="fw-bold text-dark" th:text="*{publicId}"></p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="info-label">Order Date</label>
+                        <p th:text="${#temporals.format(orderSummary.orderDate, 'MMMM dd, yyyy HH:mm')}"></p>
+                    </div>
 
-        <span th:each="i : ${#numbers.sequence(0, orderItemPage.totalPages - 1)}">
-                    <a th:if="${i != orderItemPage.number}"
-                       th:href="@{/orders/{orderPublicId}(page=${i},
-                        size=${orderItemPage.size},
-                        orderPublicId=${orderSummary.getPublicId()},
-                        sort=${#strings.replace(orderItemPage.sort, ': ', ',')})}"
-                       th:text="${i + 1}"></a>
-                    <span th:if="${i == orderItemPage.number}" th:text="${i + 1}" style="font-weight: bold;"></span>
-                </span>
+                    <div sec:authorize="hasRole('EMPLOYEE')" class="col-12">
+                        <div class="p-3 bg-light rounded-3 mb-3">
+                            <label class="info-label d-block mb-1">Internal Reference (Employee Only)</label>
+                            <small class="d-block">Client: <code th:text="*{clientPublicId}"></code></small>
+                            <small class="d-block">Assigned To: <code th:text="*{employeePublicId}"></code></small>
+                        </div>
+                    </div>
 
-        <a th:if="${orderItemPage.hasNext()}"
-           th:href="@{/orders/{orderPublicId}(page=${orderItemPage.number + 1},
-            size=${orderItemPage.size},
-             orderPublicId=${orderSummary.getPublicId()},
-             sort=${#strings.replace(orderItemPage.sort, ': ', ',')}
-             )}">
-            Next &raquo;
-        </a>
-    </p>
-</div>
-<div th:if="${(isCreatedByClient && orderSummary.getStatus().name() == 'CREATED') || isClaimedByEmployee}">
-    <form th:action="@{/orders/{id}/cancel(id=${orderPublicId})}" method="post" class="mt-4">
-        <div class="input-group">
-            <input type="text" name="reason" placeholder="Reason for canceling" required class="form-control">
-            <button class="btn btn-outline-danger" type="submit">Cancel Order</button>
+                    <div th:if="*{status.name() == 'CANCELLED'}" class="col-12">
+                        <div class="alert alert-danger rounded-4 border-0 mb-0">
+                            <h6 class="fw-bold"><i class="bi bi-x-circle-fill me-2"></i>Order Cancelled</h6>
+                            <p class="small mb-1"><strong>Reason:</strong> <span th:text="*{reason}"></span></p>
+                            <p class="small mb-0"><strong>At:</strong> <span th:text="*{cancelledAt}"></span></p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mt-4">
+                        <label class="info-label">Total Amount</label>
+                        <h3 class="fw-bold text-primary" th:text="*{totalAmount} + ' USD'"></h3>
+                    </div>
+                    <div class="col-md-6 mt-4">
+                        <label class="info-label">Item Count</label>
+                        <p class="h4 fw-bold" th:text="*{totalItems} + ' Items'"></p>
+                    </div>
+                </div>
+            </section>
         </div>
-    </form>
-    <div th:if="${isClaimedByEmployee}">
-        <form th:action="@{/orders/{id}/update-status(id=${orderPublicId})}" method="post">
-            <label for="orderStatus">Status:</label>
-            <select name="orderStatus" id="orderStatus">
-                <option th:each="status : ${orderStatuses}"
-                        th:value="${status}"
-                        th:text="${status}"
-                        th:selected="${status == orderSummary.status}"> </option>
-            </select>
-            <button type="submit">Update</button>
-        </form>
+
+        <div class="col-lg-5">
+            <section class="glass-card h-100" th:object="${orderSummary}">
+                <h4 class="fw-bold mb-4"><i class="bi bi-truck me-2 text-primary"></i>Shipping Details</h4>
+
+                <div class="mb-4">
+                    <label class="info-label">Delivery Method</label>
+                    <div class="d-flex align-items-center mt-1">
+                        <i class="bi bi-box-seam fs-3 me-3 text-secondary"></i>
+                        <span class="fw-bold h5 mb-0" th:text="*{deliveryType}"></span>
+                    </div>
+                </div>
+
+                <div class="mb-4" th:if="*{deliveryAddress != null}">
+                    <label class="info-label">Shipping Address</label>
+                    <p class="mt-1 text-dark fw-medium" th:text="*{deliveryAddress}"></p>
+                </div>
+
+                <div>
+                    <label class="info-label">Customer Comment</label>
+                    <p class="fst-italic text-muted mt-1"
+                       th:text="*{comment != null && !comment.isEmpty() ? comment : 'No specific instructions provided.'}"></p>
+                </div>
+            </section>
+        </div>
+
+        <div class="col-12">
+            <div class="glass-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold mb-0">Items in Order</h4>
+                    <form th:action="@{/orders/{orderPublicId}(orderPublicId=${orderSummary.getPublicId()})}" class="d-flex gap-2">
+                        <select name="sort" onchange="this.form.submit()" class="form-select form-select-sm rounded-pill px-3 shadow-sm">
+                            <option value="quantity,asc" th:selected="${param.sort != null && (param.sort[0] == 'quantity,asc' || param.sort[0] == 'quantity,ASC')}">Quantity ↑</option>
+                            <option value="quantity,desc" th:selected="${param.sort != null && (param.sort[0] == 'quantity,desc' || param.sort[0] == 'quantity,DESC')}">Quantity ↓</option>
+                            <option value="subtotal,asc" th:selected="${param.sort != null && (param.sort[0] == 'subtotal,asc' || param.sort[0] == 'subtotal,ASC')}">Subtotal ↑</option>
+                            <option value="subtotal,desc" th:selected="${param.sort != null && (param.sort[0] == 'subtotal,desc' || param.sort[0] == 'subtotal,DESC')}">Subtotal ↓</option>
+                        </select>
+                    </form>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                        <tr>
+                            <th>Book Name</th>
+                            <th>Unit Price</th>
+                            <th>Quantity</th>
+                            <th class="text-end">Subtotal</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="item : ${orderItemPage.content}">
+                            <td class="fw-bold text-dark" th:text="${item.bookName}"></td>
+                            <td th:text="${item.priceAtPurchase} + ' USD'"></td>
+                            <td th:text="${item.quantity}"></td>
+                            <td class="text-end fw-bold text-primary" th:text="${item.subtotal} + ' USD'"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <nav th:if="${orderItemPage.totalPages > 1}" class="mt-4">
+                    <ul class="pagination pagination-sm justify-content-center">
+                        <li th:each="i : ${#numbers.sequence(0, orderItemPage.totalPages - 1)}"
+                            class="page-item" th:classappend="${i == orderItemPage.number} ? 'active'">
+                            <a class="page-link" th:href="@{/orders/{id}(id=${orderSummary.publicId},
+                             size=${orderItemPage.size},
+                             sort=${#strings.replace(orderItemPage.sort, ': ', ',')},
+                             page=${i})}" th:text="${i + 1}"></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <div class="col-12" th:if="${(isCreatedByClient && orderSummary.getStatus().name() == 'CREATED') || isClaimedByEmployee}">
+            <div class="glass-card shadow border-0">
+                <h4 class="fw-bold mb-4 text-danger"><i class="bi bi-gear-fill me-2"></i>Manage Order</h4>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="action-zone">
+                            <label class="info-label mb-2 text-danger">Cancel This Order</label>
+                            <form th:action="@{/orders/{id}/cancel(id=${orderPublicId})}" method="post">
+                                <div class="input-group">
+                                    <input type="text" name="reason" placeholder="Provide a reason..." required class="form-control border-danger-subtle shadow-sm">
+                                    <button class="btn btn-danger px-4" type="submit">Cancel</button>
+                                </div>
+                                <small class="text-muted mt-2 d-block">This action cannot be undone.</small>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" th:if="${isClaimedByEmployee}">
+                        <div class="action-zone" style="border-color: #0d6efd;">
+                            <label class="info-label mb-2 text-primary">Update Fulfillment Status</label>
+                            <form th:action="@{/orders/{id}/update-status(id=${orderPublicId})}" method="post" class="d-flex gap-2">
+                                <select name="orderStatus" class="form-select shadow-sm" style="border-color: #cfe2ff;">
+                                    <option th:each="status : ${orderStatuses}"
+                                            th:value="${status}"
+                                            th:text="${status}"
+                                            th:selected="${status == orderSummary.status}"></option>
+                                </select>
+                                <button type="submit" class="btn btn-primary px-4">Update</button>
+                            </form>
+                            <small class="text-muted mt-2 d-block">Update the customer on progress.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+</main>
+
 </body>
 </html>

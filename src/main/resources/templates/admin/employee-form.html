@@ -1,48 +1,164 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Register</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Onboarding | Admin Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(45deg, #0d6efd, #6610f2);
+        }
+        body {
+            background: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+            padding: 3rem 0;
+        }
+
+        .bg-circle {
+            position: absolute;
+            z-index: -1;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            filter: blur(80px);
+            opacity: 0.1;
+        }
+
+        .admin-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            padding: 3.5rem;
+            width: 100%;
+            max-width: 550px;
+        }
+
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 1rem;
+            display: block;
+            border-bottom: 2px solid #f1f3f5;
+            padding-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            border: 2px solid #f1f3f5;
+            background-color: #fcfcfc;
+        }
+
+        .form-control:focus {
+            border-color: #6610f2;
+            box-shadow: 0 0 0 0.25rem rgba(102, 16, 242, 0.1);
+        }
+
+        .btn-register {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 1rem;
+            font-weight: 700;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 16, 242, 0.3);
+            color: white;
+        }
+
+        .input-group-text {
+            background: #f8f9fa;
+            border: 2px solid #f1f3f5;
+            border-right: none;
+            border-radius: 0.75rem 0 0 0.75rem;
+            color: #adb5bd;
+        }
+
+        .form-control-with-icon {
+            border-left: none;
+        }
+    </style>
 </head>
 <body>
-<h1>Register</h1>
+
+<div class="bg-circle" style="width: 600px; height: 600px; top: -200px; left: -200px;"></div>
+<div class="bg-circle" style="width: 400px; height: 400px; bottom: -100px; right: -100px;"></div>
+
+<div class="admin-card shadow">
+    <div class="text-center mb-5">
+        <div class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 mb-3 small fw-bold text-uppercase">Admin Tools</div>
+        <h2 class="fw-bold text-dark">Employee Onboarding</h2>
+        <p class="text-muted">Create a new staff account for the bookstore</p>
+    </div>
+
     <form th:action="@{/admin/employees/new}" th:object="${employee}" method="post">
-        <div>
-            <label>Name:</label>
-            <input type="text" th:field="*{name}"/>
-            <div th:if="${#fields.hasErrors('name')}">
-                <p th:errors="*{name}"></p>
+
+        <span class="section-label">Account Identity</span>
+
+        <div class="mb-3">
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-person-vcard"></i></span>
+                <input type="text" th:field="*{name}" class="form-control form-control-with-icon" placeholder="Full Employee Name" required/>
             </div>
+            <div th:if="${#fields.hasErrors('name')}" class="text-danger small mt-1 ps-2" th:errors="*{name}"></div>
         </div>
-        <div>
-            <label>Email:</label>
-            <input type="email" th:field="*{email}"/>
-            <div th:if="${#fields.hasErrors('email')}">
-                <p th:errors="*{email}"></p>
+
+        <div class="mb-3">
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-envelope-at"></i></span>
+                <input type="email" th:field="*{email}" class="form-control form-control-with-icon" placeholder="work.email@company.com" required/>
             </div>
+            <div th:if="${#fields.hasErrors('email')}" class="text-danger small mt-1 ps-2" th:errors="*{email}"></div>
         </div>
-        <div>
-            <label>Password:</label>
-            <input type="password" th:field="*{password}"/>
-            <div th:if="${#fields.hasErrors('password')}">
-                <p th:errors="*{password}"></p>
+
+        <div class="mb-4">
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-key"></i></span>
+                <input type="password" th:field="*{password}" class="form-control form-control-with-icon" placeholder="Temporary Password" required/>
             </div>
+            <div th:if="${#fields.hasErrors('password')}" class="text-danger small mt-1 ps-2" th:errors="*{password}"></div>
         </div>
-        <div>
-            <label>Phone Number:</label>
-            <input type="text" th:field="*{phone}"/>
-            <div th:if="${#fields.hasErrors('phone')}">
-                <p th:errors="*{phone}"></p>
+
+        <span class="section-label">Personal Details</span>
+
+        <div class="mb-3">
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                <input type="text" th:field="*{phone}" class="form-control form-control-with-icon" placeholder="+1 (555) 000-0000"/>
             </div>
+            <div th:if="${#fields.hasErrors('phone')}" class="text-danger small mt-1 ps-2" th:errors="*{phone}"></div>
         </div>
-        <div>
-            <label>Birth Date:</label>
-            <input type="date" th:field="*{birthDate}"/>
-            <div th:if="${#fields.hasErrors('birthDate')}">
-                <p th:errors="*{birthDate}"></p>
+
+        <div class="mb-5">
+            <label class="form-label small fw-bold text-muted ps-2">Date of Birth</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                <input type="date" th:field="*{birthDate}" class="form-control form-control-with-icon" required/>
             </div>
+            <div th:if="${#fields.hasErrors('birthDate')}" class="text-danger small mt-1 ps-2" th:errors="*{birthDate}"></div>
         </div>
-        <button type="submit">Register</button>
+
+        <button type="submit" class="btn btn-register w-100 shadow">
+            <i class="bi bi-person-plus-fill me-2"></i> Register Employee
+        </button>
+
     </form>
+</div>
+
 </body>
 </html>

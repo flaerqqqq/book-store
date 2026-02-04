@@ -1,140 +1,218 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="en">
 <head>
-    <title>My Orders</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders | My Bookstore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(45deg, #0d6efd, #6610f2);
+        }
+        body { background-color: #f8f9fa; font-family: 'Inter', sans-serif; }
+
+        .catalog-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: -2rem;
+            clip-path: ellipse(100% 100% at 50% 0%);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .filter-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.4rem;
+        }
+
+        /* Status Badge Colors */
+        .status-badge {
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+        }
+        .status-CREATED { background-color: #e7f1ff; color: #0d6efd; }
+        .status-CLAIMED { background-color: #fff4e6; color: #fd7e14; }
+        .status-COMPLETED { background-color: #d1e7dd; color: #0f5132; }
+        .status-CANCELED { background-color: #f8d7da; color: #842029; }
+
+        .table thead th { background-color: #f1f3f5; border: none; padding: 1rem; color: #495057; }
+        .table tbody td { padding: 1.2rem 1rem; vertical-align: middle; }
+
+        .btn-gradient { background: var(--primary-gradient); color: white; border: none; border-radius: 0.75rem; }
+        .btn-gradient:hover { color: white; opacity: 0.9; }
+
+        .admin-box {
+            background: #f1f3f5;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border-left: 5px solid #6610f2;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-light">
 
-<h1>Order History</h1>
+<header class="catalog-header text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold"><i class="bi bi-receipt me-2"></i>Order History</h1>
+        <p class="lead">Track your orders and fulfillment progress</p>
+    </div>
+</header>
 
-<form th:action="@{/orders}" th:object="${orderFilter}" method="get">
+<main class="container py-5">
+    <div class="glass-card shadow-sm">
+        <form th:action="@{/orders}" th:object="${orderFilter}" method="get" class="row g-3">
 
-    <div sec:authorize="hasRole('EMPLOYEE')">
-        <label>Order ID:</label>
-        <input type="text" th:field="*{orderPublicId}" placeholder="UUID format..." />
-        <span th:if="${#fields.hasErrors('orderPublicId')}" th:errors="*{orderPublicId}" style="color:red"></span>
-        <label>Client ID:</label>
-        <input type="text" th:field="*{clientPublicId}" placeholder="UUID format..." />
-        <span th:if="${#fields.hasErrors('clientPublicId')}" th:errors="*{clientPublicId}" style="color:red"></span>
-        <label>Employee ID:</label>
-        <input type="text" th:field="*{employeePublicId}" placeholder="UUID format..." />
-        <span th:if="${#fields.hasErrors('employeePublicId')}" th:errors="*{employeePublicId}" style="color:red"></span>
-        <br/>
-        <a th:href="@{/orders(employeePublicId=${#authentication.principal.publicId})}">
-            Show Only My Orders
-        </a>
+            <div sec:authorize="hasRole('EMPLOYEE')" class="col-12 mb-3">
+                <div class="admin-box shadow-sm">
+                    <h5 class="mb-3 text-dark fw-bold"><i class="bi bi-shield-lock me-2"></i>Employee Management Search</h5>
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <label class="filter-label">Order ID</label>
+                            <input type="text" th:field="*{orderPublicId}" class="form-control form-control-sm" placeholder="UUID...">
+                            <div class="text-danger small" th:if="${#fields.hasErrors('orderPublicId')}" th:errors="*{orderPublicId}"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="filter-label">Client ID</label>
+                            <input type="text" th:field="*{clientPublicId}" class="form-control form-control-sm" placeholder="UUID...">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="filter-label">Employee ID</label>
+                            <input type="text" th:field="*{employeePublicId}" class="form-control form-control-sm" placeholder="UUID...">
+                        </div>
+                        <div class="col-12 mt-3">
+                            <a th:href="@{/orders(employeePublicId=${#authentication.principal.publicId})}" class="btn btn-sm btn-outline-primary rounded-pill">
+                                <i class="bi bi-person-check me-1"></i> Show Only My Assigned Orders
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <label class="filter-label">Status</label>
+                <select th:field="*{status}" class="form-select shadow-sm">
+                    <option value="">All Statuses</option>
+                    <option th:each="st : ${orderStatuses}" th:value="${st}" th:text="${st}"></option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="filter-label">Delivery Type</label>
+                <select th:field="*{deliveryType}" class="form-select shadow-sm">
+                    <option value="">All Types</option>
+                    <option th:each="dt : ${deliveryTypes}" th:value="${dt}" th:text="${dt}"></option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="filter-label">Min Amount</label>
+                <input type="number" step="0.01" th:field="*{minTotalAmount}" class="form-control shadow-sm" placeholder="0.00">
+            </div>
+            <div class="col-md-3">
+                <label class="filter-label">Max Amount</label>
+                <input type="number" step="0.01" th:field="*{maxTotalAmount}" class="form-control shadow-sm" placeholder="Any">
+            </div>
+
+            <div class="col-md-4">
+                <label class="filter-label">From Date</label>
+                <input type="datetime-local" th:name="startOrderDate" th:value="${orderFilter.startOrderDate != null ? #temporals.format(orderFilter.startOrderDate, 'yyyy-MM-dd''T''HH:mm') : ''}" class="form-control shadow-sm">
+            </div>
+            <div class="col-md-4">
+                <label class="filter-label">To Date</label>
+                <input type="datetime-local" th:name="endOrderDate" th:value="${orderFilter.endOrderDate != null ? #temporals.format(orderFilter.endOrderDate, 'yyyy-MM-dd''T''HH:mm') : ''}" class="form-control shadow-sm">
+            </div>
+            <div class="col-md-4">
+                <label class="filter-label">Sort Order</label>
+                <select name="sort" class="form-select shadow-sm" onchange="this.form.submit()">
+                    <option value="orderDate,desc" th:selected="${param.sort != null && param.sort[0] == 'orderDate,desc'}">Newest First</option>
+                    <option value="orderDate,asc" th:selected="${param.sort != null && param.sort[0] == 'orderDate,asc'}">Oldest First</option>
+                    <option value="totalAmount,desc" th:selected="${param.sort != null && param.sort[0] == 'totalAmount,desc'}">Price (High-Low)</option>
+                    <option value="totalAmount,asc" th:selected="${param.sort != null && param.sort[0] == 'totalAmount,asc'}">Price (Low-High)</option>
+                </select>
+            </div>
+
+            <div class="col-12 mt-4 text-center">
+                <button type="submit" class="btn btn-gradient px-5 rounded-pill shadow">Apply Filters</button>
+                <a th:href="@{/orders}" class="btn btn-link text-decoration-none ms-3">Clear Filters</a>
+            </div>
+        </form>
     </div>
 
-    <div>
-        <label>Status:</label>
-        <select th:field="*{status}">
-            <option value="">All Statuses</option>
-            <option th:each="st : ${orderStatuses}" th:value="${st}" th:text="${st}"></option>
-        </select>
+    <div class="glass-card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Order Reference</th>
+                    <th>Total</th>
+                    <th class="text-center">Items</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-end">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="order : ${orderSummaryPage.content}">
+                    <td class="text-muted small">
+                        <i class="bi bi-calendar3 me-2"></i>
+                        <span th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}"></span>
+                    </td>
+                    <td><code class="text-dark fw-bold" th:text="${#strings.abbreviate(order.publicId, 13)}"></code></td>
+                    <td><span class="fw-bold" th:text="${'$ ' + order.totalAmount}"></span></td>
+                    <td class="text-center">
+                        <span class="badge bg-secondary rounded-pill" th:text="${order.totalItems}"></span>
+                    </td>
+                    <td class="text-center">
+                        <span th:class="'status-badge status-' + ${order.status}" th:text="${order.status}"></span>
+                    </td>
+                    <td class="text-end">
+                        <div class="d-flex justify-content-end gap-2">
+                            <a th:href="@{/orders/{id}(id=${order.publicId})}" class="btn btn-sm btn-outline-dark rounded-pill px-3">
+                                Details
+                            </a>
+                            <span sec:authorize="hasRole('EMPLOYEE')">
+                                    <form th:if="${order.status.name() == 'CREATED'}" th:action="@{/orders/{id}/claim(id=${order.publicId})}" method="post">
+                                        <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm">
+                                            Claim
+                                        </button>
+                                    </form>
+                                </span>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
 
-        <label>Delivery:</label>
-        <select th:field="*{deliveryType}">
-            <option value="">All Types</option>
-            <option th:each="dt : ${deliveryTypes}" th:value="${dt}" th:text="${dt}"></option>
-        </select>
+        <div th:if="${orderSummaryPage.isEmpty()}" class="text-center py-5">
+            <i class="bi bi-inbox text-muted display-1"></i>
+            <p class="mt-3 lead text-muted">No orders found matching your criteria.</p>
+        </div>
+
+        <nav th:if="${orderSummaryPage.totalPages > 1}" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li th:each="i : ${#numbers.sequence(0, orderSummaryPage.totalPages - 1)}"
+                    class="page-item" th:classappend="${i == orderSummaryPage.number} ? 'active'">
+                    <a class="page-link shadow-sm" th:href="@{/orders(page=${i}, status=${orderFilter.status}, sort=${#strings.replace(orderSummaryPage.sort, ': ', ',')})}" th:text="${i + 1}"></a>
+                </li>
+            </ul>
+        </nav>
     </div>
-
-    <div>
-        <label>Total Amount Min:</label>
-        <input type="number" step="0.01" th:field="*{minTotalAmount}" />
-        <span th:if="${#fields.hasErrors('minTotalAmount')}" th:errors="*{minTotalAmount}" style="color:red"></span>
-
-        <label>Max:</label>
-        <input type="number" step="0.01" th:field="*{maxTotalAmount}" />
-    </div>
-
-    <div>
-        <label>Date From:</label>
-        <input type="datetime-local"
-               th:name="startOrderDate"
-               th:value="${orderFilter.startOrderDate != null ? #temporals.format(orderFilter.startOrderDate, 'yyyy-MM-dd''T''HH:mm') : ''}" />
-        <span th:if="${#fields.hasErrors('startOrderDate')}" th:errors="*{startOrderDate}" style="color:red"></span>
-
-        <label>To:</label>
-        <input type="datetime-local"
-               th:name="endOrderDate"
-               th:value="${orderFilter.endOrderDate != null ? #temporals.format(orderFilter.endOrderDate, 'yyyy-MM-dd''T''HH:mm') : ''}" />
-    </div>
-
-    <div style="margin-top: 10px;">
-        <button type="submit">Apply Filters</button>
-        <a th:href="@{/orders}">Clear All</a>
-
-        <label style="margin-left: 20px;">Sort By:</label>
-        <select name="sort" onchange="this.form.submit()">
-            <option value="orderDate,desc" th:selected="${param.sort != null && param.sort[0] == 'orderDate,desc'}">Newest First</option>
-            <option value="orderDate,asc" th:selected="${param.sort != null && param.sort[0] == 'orderDate,asc'}">Oldest First</option>
-            <option value="totalAmount,desc" th:selected="${param.sort != null && param.sort[0] == 'totalAmount,desc'}">Price (High-Low)</option>
-            <option value="totalAmount,asc" th:selected="${param.sort != null && param.sort[0] == 'totalAmount,asc'}">Price (Low-High)</option>
-        </select>
-    </div>
-</form>
-
-<br/>
-
-<table border="1">
-    <thead>
-    <tr>
-        <th>Date</th>
-        <th>Order ID</th>
-        <th>Total Amount</th>
-        <th>Items</th>
-        <th>Status</th>
-        <th>Action</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="order : ${orderSummaryPage.content}">
-        <td th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}"></td>
-        <td th:text="${order.publicId}"></td>
-        <td th:text="${order.totalAmount} + ' USD'"></td>
-        <td th:text="${order.totalItems}"></td>
-        <td th:text="${order.status}"></td>
-        <td>
-            <a th:href="@{/orders/{id}(id=${order.publicId})}">View Details</a>
-            <span sec:authorize="hasRole('EMPLOYEE')">
-            <form th:if="${order.status.name() == 'CREATED'}"
-                  th:action="@{/orders/{id}/claim(id=${order.publicId})}"
-                  method="post"
-                  style="display:inline;">
-                <button type="submit">Claim</button>
-            </form>
-            </span>
-        </td>
-    </tr>
-    </tbody>
-</table>
-
-<div th:if="${orderSummaryPage.totalPages > 1}">
-    <hr/>
-    <span th:each="i : ${#numbers.sequence(0, orderSummaryPage.totalPages - 1)}">
-        <a th:if="${i != orderSummaryPage.number}"
-           th:href="@{/orders(page=${i},
-                      size=${orderSummaryPage.size},
-                      sort=${#strings.replace(orderSummaryPage.sort, ': ', ',')},
-                      status=${orderFilter.status},
-                      deliveryType=${orderFilter.deliveryType},
-                      minTotalAmount=${orderFilter.minTotalAmount},
-                      maxTotalAmount=${orderFilter.maxTotalAmount},
-                      startOrderDate=${orderFilter.startOrderDate},
-                      endOrderDate=${orderFilter.endOrderDate},
-                      clientPublicId=${orderFilter.clientPublicId},
-                      orderPublicId=${orderFilter.orderPublicId},
-                      employeePublicId=${orderFilter.employeePublicId})}"
-           th:text="${i + 1}"></a>
-        <span th:if="${i == orderSummaryPage.number}" th:text="${i + 1}" style="font-weight: bold;"></span>
-        &nbsp;
-    </span>
-</div>
-
-<div th:if="${orderSummaryPage.isEmpty()}">
-    <p>No orders found matching your criteria.</p>
-</div>
+</main>
 
 </body>
 </html>
