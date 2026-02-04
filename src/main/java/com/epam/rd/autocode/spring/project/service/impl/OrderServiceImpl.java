@@ -281,7 +281,12 @@ public class OrderServiceImpl implements OrderService {
 
     private void checkBalanceAndSubtract(Client client, BigDecimal totalAmount) {
         if (client.getBalance().compareTo(totalAmount) <= 0) {
-            throw new InsufficientFundsException("Insufficient funds: Required %s, but Client has only %s".formatted(totalAmount, client.getBalance()));
+            throw new InsufficientFundsException(
+                    "Insufficient funds: Required %s, but Client has only %s"
+                            .formatted(totalAmount, client.getBalance()),
+                    client.getBalance(),
+                    totalAmount
+            );
         }
         client.setBalance(client.getBalance().subtract(totalAmount));
     }

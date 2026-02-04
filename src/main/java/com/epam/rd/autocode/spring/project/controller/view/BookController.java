@@ -109,7 +109,7 @@ public class BookController {
 
     @PostMapping("/{publicId}/delete")
     @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
-    public String deleteBook(@PageableDefault(size = 10) Pageable pageable,
+    public String deleteBook(@PageableDefault Pageable pageable,
                              @PathVariable("publicId") UUID publicId,
                              RedirectAttributes redirectAttributes) {
         addPaginationAttributes(pageable, redirectAttributes);

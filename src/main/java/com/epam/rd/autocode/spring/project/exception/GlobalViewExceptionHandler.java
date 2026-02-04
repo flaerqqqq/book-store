@@ -35,10 +35,10 @@ public class GlobalViewExceptionHandler {
     @ExceptionHandler(value = {
             MethodArgumentTypeMismatchException.class
     })
-    public String handleNotFound(MethodArgumentTypeMismatchException ex,
-                                 HttpServletRequest req,
-                                 HttpServletResponse res,
-                                 Model model) {
+    public String handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex,
+                                                   HttpServletRequest req,
+                                                   HttpServletResponse res,
+                                                   Model model) {
         String errorMessage = "The provided identifier for a resource is not in a valid format";
 
         if (ex.getRequiredType() != null && ex.getRequiredType().equals(UUID.class)) {
@@ -68,5 +68,20 @@ public class GlobalViewExceptionHandler {
         redirectAttributes.addFlashAttribute("errorMessage", message);
 
         return "redirect:/login";
+    }
+
+    @ExceptionHandler(AlreadyExistException.class)
+    public String handleAlreadyExists(AlreadyExistException ex,
+                                      Model model) {
+        Class<?> entityClass = ex.getEntityClass();
+
+        if (entityClass != null) {
+            model.addAttribute("errorMessage",
+                    "Request cannot be completed because it conflicts with existing %s data"
+                            .formatted(entityClass.getSimpleName())
+            );
+        }
+
+        return "error/409";
     }
 }

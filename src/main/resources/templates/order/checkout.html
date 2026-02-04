@@ -44,12 +44,21 @@
             border-radius: 0.75rem;
             padding: 0.75rem 1rem;
             border: 2px solid #f1f3f5;
-            transition: all 0.2s ease;
         }
 
-        .form-control:focus, .form-select:focus {
-            border-color: #6610f2;
-            box-shadow: 0 0 0 0.25rem rgba(102, 16, 242, 0.1);
+        .summary-box {
+            background-color: #f8f9fa;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid #e9ecef;
+        }
+
+        .total-line {
+            border-top: 2px solid #dee2e6;
+            padding-top: 1rem;
+            margin-top: 1rem;
+            font-size: 1.25rem;
         }
 
         .btn-complete {
@@ -67,12 +76,6 @@
             transform: translateY(-2px);
             color: white;
         }
-
-        .error-message {
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-top: 0.25rem;
-        }
     </style>
 </head>
 <body>
@@ -80,76 +83,120 @@
 <header class="header-bg text-center">
     <div class="container">
         <h1 class="display-5 fw-bold"><i class="bi bi-shield-check me-2"></i>Finalize Order</h1>
-        <p class="lead opacity-75">You're just one step away from your new books</p>
+        <p class="lead opacity-75">Review your total and complete your purchase</p>
     </div>
 </header>
 
 <main class="container py-5">
     <div class="checkout-card">
 
+        <div class="summary-box shadow-sm">
+            <h5 class="fw-bold mb-3">Order Summary</h5>
+
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Items (<span th:text="${cartSummary.totalItems}">0</span>):</span>
+                <span class="fw-bold" id="cartTotalRaw" th:data-base-total="${cartSummary.totalAmount}"
+                      th:text="'$' + ${cartSummary.totalAmount}">$0.00</span>
+            </div>
+
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Delivery Fee:</span>
+                <span class="fw-bold text-success" id="deliveryFeeDisplay">+$0.00</span>
+            </div>
+
+            <div class="d-flex justify-content-between total-line">
+                <span class="fw-bold">Final Total:</span>
+                <span class="fw-bold text-primary" id="finalTotalDisplay"
+                      th:text="'$' + ${cartSummary.totalAmount}">$0.00</span>
+            </div>
+        </div>
+
         <form th:action="@{/orders/checkout}" th:object="${orderRequest}" method="post">
 
             <div class="mb-4">
-                <label class="form-label d-flex justify-content-between">
-                    Delivery Type
-                    <span class="text-primary" style="text-transform: none;">Required</span>
-                </label>
+                <label class="form-label">Delivery Type</label>
                 <div class="input-group">
                     <span class="input-group-text bg-light border-0"><i class="bi bi-truck"></i></span>
                     <select th:field="*{deliveryType}" id="deliveryType" class="form-select shadow-sm" required>
-                        <option value="">-- Choose how you'll receive it --</option>
+                        <option value="" th:data-cost="0">-- Choose delivery method --</option>
                         <option th:each="type : ${deliveryTypes}"
                                 th:value="${type}"
-                                th:text="${type}"></option>
+                                th:data-cost="${type.baseCost}"
+                                th:text="${type.name() + ' (+$' + type.baseCost + ')'}"></option>
                     </select>
                 </div>
-                <div th:if="${#fields.hasErrors('deliveryType')}" th:errors="*{deliveryType}" class="text-danger error-message"></div>
             </div>
 
             <div class="mb-4" id="addressContainer">
                 <label class="form-label">Delivery Address</label>
                 <div class="input-group">
                     <span class="input-group-text bg-light border-0"><i class="bi bi-geo-alt"></i></span>
-                    <input type="text" th:field="*{deliveryAddress}" class="form-control shadow-sm" placeholder="e.g. 123 Library St, Booktown"/>
+                    <input type="text" th:field="*{deliveryAddress}" id="addressInput" class="form-control shadow-sm" placeholder="123 Library St, Booktown"/>
                 </div>
-                <div th:if="${#fields.hasErrors('deliveryAddress')}" th:errors="*{deliveryAddress}" class="text-danger error-message"></div>
-                <div class="form-text mt-2 small">Full street address including city and postal code.</div>
+                <div th:if="${#fields.hasErrors('deliveryAddress')}" th:errors="*{deliveryAddress}" class="text-danger small mt-1"></div>
             </div>
 
             <div class="mb-5">
                 <label class="form-label">Order Comment <span class="text-muted">(Optional)</span></label>
-                <textarea th:field="*{comment}" class="form-control shadow-sm" rows="3" placeholder="Any special instructions for the courier?"></textarea>
+                <textarea th:field="*{comment}" class="form-control shadow-sm" rows="2" placeholder="Notes for the courier..."></textarea>
             </div>
 
             <div class="d-grid gap-3">
                 <button type="submit" class="btn btn-complete shadow-lg">
                     Place Order & Pay <i class="bi bi-arrow-right ms-2"></i>
                 </button>
-                <a th:href="@{/shopping-cart}" class="btn btn-link text-muted text-decoration-none">
+                <a th:href="@{/shopping-cart}" class="btn btn-link text-muted text-decoration-none text-center">
                     <i class="bi bi-arrow-left me-1"></i> Return to Cart
                 </a>
             </div>
         </form>
     </div>
-
-    <p class="text-center mt-4 text-muted small">
-        <i class="bi bi-lock-fill me-1"></i> Secure Transaction &bull; 256-bit Encryption
-    </p>
 </main>
 
 <script>
     const deliverySelect = document.getElementById('deliveryType');
     const addressContainer = document.getElementById('addressContainer');
+    const addressInput = document.getElementById('addressInput');
 
-    deliverySelect.addEventListener('change', function() {
-        if (this.value === 'PICKUP') {
-            addressContainer.style.opacity = '0.5';
-            addressContainer.querySelector('input').placeholder = "No address needed for pickup";
+    const cartTotalElement = document.getElementById('cartTotalRaw');
+    const deliveryFeeElement = document.getElementById('deliveryFeeDisplay');
+    const finalTotalElement = document.getElementById('finalTotalDisplay');
+
+    const baseCartTotal = parseFloat(cartTotalElement.getAttribute('data-base-total'));
+
+    // Encapsulate logic in a function to reuse it
+    function updateTotals() {
+        const selectedOption = deliverySelect.options[deliverySelect.selectedIndex];
+        const cost = parseFloat(selectedOption.getAttribute('data-cost') || 0);
+        const type = deliverySelect.value;
+
+        // 1. Update Delivery Fee Display
+        deliveryFeeElement.innerText = '+$' + cost.toFixed(2);
+
+        // 2. Calculate and Update Final Total
+        const finalTotal = baseCartTotal + cost;
+        finalTotalElement.innerText = '$' + finalTotal.toFixed(2);
+
+        // 3. Handle Pickup Logic
+        if (type === 'PICKUP') {
+            addressContainer.style.opacity = '0.4';
+            addressInput.value = "";
+            addressInput.readOnly = true;
+            addressInput.placeholder = "Not required for pickup";
         } else {
             addressContainer.style.opacity = '1';
-            addressContainer.querySelector('input').placeholder = "Enter address...";
+            addressInput.readOnly = false;
+            if (addressInput.placeholder === "Not required for pickup") {
+                addressInput.placeholder = "123 Library St, Booktown";
+            }
         }
-    });
+    }
+
+    // Trigger on manual change
+    deliverySelect.addEventListener('change', updateTotals);
+
+    // Trigger on Page Load (fixes the issue when returning with errors)
+    window.addEventListener('DOMContentLoaded', updateTotals);
 </script>
 
 </body>

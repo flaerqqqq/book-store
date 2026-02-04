@@ -150,6 +150,12 @@
 
         <div class="col-lg-4">
             <div class="glass-card sticky-summary">
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="border-radius: 1rem;">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                        <div th:text="${errorMessage}">Transaction failed message here.</div>
+                    </div>
+                </div>
                 <h5 class="fw-bold mb-4">Summary</h5>
                 <div class="d-flex justify-content-between mb-2">
                     <span>Items:</span>

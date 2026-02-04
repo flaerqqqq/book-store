@@ -1,10 +1,12 @@
 package com.epam.rd.autocode.spring.project.controller.view;
 
 import com.epam.rd.autocode.spring.project.dto.*;
+import com.epam.rd.autocode.spring.project.exception.InsufficientFundsException;
 import com.epam.rd.autocode.spring.project.model.enums.DeliveryType;
 import com.epam.rd.autocode.spring.project.model.enums.OrderStatus;
 import com.epam.rd.autocode.spring.project.security.CustomUserDetails;
 import com.epam.rd.autocode.spring.project.service.OrderService;
+import com.epam.rd.autocode.spring.project.service.ShoppingCartService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
@@ -30,6 +32,7 @@ import java.util.UUID;
 public class OrderController {
 
     private final OrderService orderService;
+    private final ShoppingCartService cartService;
 
     @GetMapping
     @PreAuthorize("hasAnyRole('CLIENT', 'EMPLOYEE')")
@@ -52,20 +55,42 @@ public class OrderController {
 
     @GetMapping("/checkout")
     @PreAuthorize("hasRole('CLIENT')")
-    public String getCheckoutPage(@ModelAttribute("orderRequest") OrderRequestDto requestDto) {
+    public String getCheckoutPage(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                  @ModelAttribute("orderRequest") OrderRequestDto requestDto,
+                                  Model model) {
+        addCartSummaryToModel(userDetails, model);
+
         return "order/checkout";
+    }
+
+    private void addCartSummaryToModel(CustomUserDetails userDetails, Model model) {
+        ShoppingCartSummaryDto cartSummary = cartService.getCartSummary(userDetails.getPublicId());
+        model.addAttribute("cartSummary", cartSummary);
     }
 
     @PostMapping("/checkout")
     @PreAuthorize("hasRole('CLIENT')")
     public String checkout(@AuthenticationPrincipal CustomUserDetails userDetails,
                            @ModelAttribute("orderRequest") @Valid OrderRequestDto requestDto,
-                           BindingResult bindingResult) {
+                           BindingResult bindingResult,
+                           Model model,
+                           RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
+            addCartSummaryToModel(userDetails, model);
             return "order/checkout";
         }
 
-        OrderDTO orderDto = orderService.createFromShoppingCart(userDetails.getPublicId(), requestDto);
+        OrderDTO orderDto;
+
+        try  {
+             orderDto = orderService.createFromShoppingCart(userDetails.getPublicId(), requestDto);
+        } catch (InsufficientFundsException e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Insufficient funds, current balance: %s"
+                            .formatted(e.getCurrentBalance())
+            );
+            return "redirect:/shopping-cart";
+        }
 
         return "redirect:/orders/" + orderDto.getPublicId();
     }
@@ -102,7 +127,7 @@ public class OrderController {
                                       RedirectAttributes redirectAttributes) {
         orderService.cancelOrder(orderPublicId, userDetails.getPublicId(), reason);
 
-        redirectAttributes.addAttribute("message" , "Order was cancelled");
+        redirectAttributes.addFlashAttribute("message" , "Order was cancelled");
 
         return "redirect:/orders/" + orderPublicId;
     }

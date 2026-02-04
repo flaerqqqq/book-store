@@ -30,7 +30,7 @@ public class ShoppingCartController {
 
     @GetMapping
     public String getCartPage(@AuthenticationPrincipal CustomUserDetails userDetails,
-                              @PageableDefault(size = 10, sort = "quantity") Pageable pageable,
+                              @PageableDefault(sort = "quantity") Pageable pageable,
                               Model model) {
         Page<ShoppingCartItemDto> cartItemPage = cartService.getCartItems(userDetails.getPublicId(), pageable);
         ShoppingCartSummaryDto summary = cartService.getCartSummary(userDetails.getPublicId());
