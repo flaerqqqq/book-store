@@ -220,7 +220,7 @@
                             <label class="info-label mb-2 text-primary">Update Fulfillment Status</label>
                             <form th:action="@{/orders/{id}/update-status(id=${orderPublicId})}" method="post" class="d-flex gap-2">
                                 <select name="orderStatus" class="form-select shadow-sm" style="border-color: #cfe2ff;">
-                                    <option th:each="status : ${orderStatuses}"
+                                    <option th:each="status : ${availableOrderStatuses}"
                                             th:value="${status}"
                                             th:text="${status}"
                                             th:selected="${status == orderSummary.status}"></option>

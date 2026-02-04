@@ -21,6 +21,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -79,6 +80,11 @@ public class OrderController {
         OrderSummaryDto orderSummary = orderService.getOrderSummary(orderPublicId);
         boolean isClaimedByEmployee = orderService.isClaimedByEmployee(orderPublicId, userDetails.getPublicId());
         boolean isCreatedByClient = orderService.isCreatedByClient(orderPublicId, userDetails.getPublicId());
+
+        if (isClaimedByEmployee) {
+            List<OrderStatus> availableOrderStatuses = orderService.getAvailableStatusesForOrder(orderPublicId, userDetails.getPublicId());
+            model.addAttribute("availableOrderStatuses", availableOrderStatuses);
+        }
 
         model.addAttribute("orderItemPage", orderItemPage);
         model.addAttribute("orderSummary", orderSummary);

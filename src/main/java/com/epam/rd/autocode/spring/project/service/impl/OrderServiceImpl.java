@@ -25,9 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +34,10 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
 
     private static final int DEFAULT_PAGE_SIZE = 10;
+
+    private static final Set<OrderStatus> PICKUP_FORBIDDEN_STATUSES = EnumSet.of(
+            OrderStatus.SHIPPED, OrderStatus.DELIVERED
+    );
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
@@ -159,6 +161,10 @@ public class OrderServiceImpl implements OrderService {
         Order claimedOrder = orderRepository.findClaimedOrderWithLock(orderPublicId, employeePublicId).orElseThrow(() ->
                 new NotFoundException("Order with publicId: %s is not found or not claimed by Employee with publicId: %s".formatted(orderPublicId, employeePublicId)));
 
+        if (claimedOrder.getStatus() == OrderStatus.CANCELLED) {
+            throw new IllegalOrderStateException("Status of a cancelled Order cannot be updated");
+        }
+
         claimedOrder.setStatus(status);
 
         Order savedOrder = orderRepository.save(claimedOrder);
@@ -233,6 +239,34 @@ public class OrderServiceImpl implements OrderService {
         Objects.requireNonNull(clientPublicId, "Client public ID must not be null");
 
         return orderRepository.isCreatedByClient(orderPublicId, clientPublicId);
+    }
+
+    @Override
+    public List<OrderStatus> getAvailableStatusesForOrder(UUID orderPublicId, UUID employeePublicId) {
+        Objects.requireNonNull(orderPublicId, "Order public ID must not be null");
+        Objects.requireNonNull(employeePublicId, "Employee public ID must not be null");
+
+        if (!isClaimedByEmployee(orderPublicId, employeePublicId)) {
+            throw new IllegalOrderStateException(
+                    "Order with publicId: %s is not claimed by current Employee with publicId: %s"
+                            .formatted(orderPublicId, employeePublicId)
+            );
+        }
+
+        Order order = getOrderOrThrow(orderPublicId);
+
+        List<OrderStatus> orderStatuses = new ArrayList<>(EnumSet.allOf(OrderStatus.class));
+
+        if (order.getDeliveryType() == DeliveryType.PICKUP) {
+            orderStatuses.removeAll(PICKUP_FORBIDDEN_STATUSES);
+        }
+
+        orderStatuses.remove(OrderStatus.CREATED);
+        orderStatuses.remove(OrderStatus.CLAIMED);
+        orderStatuses.remove(OrderStatus.CANCELLED);
+        orderStatuses.remove(order.getStatus());
+
+        return Collections.unmodifiableList(orderStatuses);
     }
 
     private Order getOrderWithLockOrThrow(UUID orderPublicId) {

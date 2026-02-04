@@ -16,7 +16,7 @@ public class RequiredForDeliveryConstraintValidator implements ConstraintValidat
         if (value.getDeliveryType() != DeliveryType.PICKUP && (value.getDeliveryAddress() == null
                 || value.getDeliveryAddress().isBlank())) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate("The address is required when choosing {deliveryType}")
+            context.buildConstraintViolationWithTemplate("The address is required when choosing " + value.getDeliveryType())
                     .addPropertyNode("deliveryAddress")
                     .addConstraintViolation();
             return false;

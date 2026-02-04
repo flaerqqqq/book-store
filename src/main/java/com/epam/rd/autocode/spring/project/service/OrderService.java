@@ -27,4 +27,6 @@ public interface OrderService {
     boolean isClaimedByEmployee(UUID orderPublicId, UUID employeePublicId);
 
     boolean isCreatedByClient(UUID orderPublicId, UUID clientPublicId);
+
+    List<OrderStatus> getAvailableStatusesForOrder(UUID orderPublicId, UUID employeePublicId);
 }
