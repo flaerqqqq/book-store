@@ -3,11 +3,13 @@ package com.epam.rd.autocode.spring.project.conf;
 import com.epam.rd.autocode.spring.project.security.CustomAuthenticationEntryPoint;
 import com.epam.rd.autocode.spring.project.security.JwtAuthenticationFilter;
 import jakarta.servlet.DispatcherType;
-import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.boot.web.server.Cookie;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -20,9 +22,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
 @EnableMethodSecurity
@@ -87,6 +88,7 @@ public class SecurityConfig {
                         .requestMatchers("favicon.ico").permitAll()
                         .requestMatchers("/css/**", "/js/**").permitAll()
 
+                        .requestMatchers("/logout").authenticated()
                         .requestMatchers("/shopping-cart", "/shopping-cart/**", "/api/shopping-carts/**").hasRole("CLIENT")
                         .requestMatchers("/orders/checkout").hasRole("CLIENT")
                         .requestMatchers("/orders/**").hasAnyRole("CLIENT", "EMPLOYEE")
@@ -97,7 +99,26 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(customAuthEntryPoint)
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .addLogoutHandler((request, response, authentication) -> {
+                            ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken")
+                                    .path("/")
+                                    .httpOnly(true)
+                                    .maxAge(0)
+                                    .sameSite(Cookie.SameSite.LAX.toString())
+                                    .build();
+                            response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+                        })
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            if (authentication != null) {
+                                response.sendRedirect("/login?logout");
+                            } else {
+                                response.sendRedirect("/login");
+                            }
+                        })
+                )
+                .addFilterBefore(jwtAuthenticationFilter, LogoutFilter.class)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(sessionConf -> sessionConf.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
