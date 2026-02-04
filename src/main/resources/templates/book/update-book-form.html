@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +10,9 @@
 </head>
 <body class="management-body">
 
-<header class="header-section text-center shadow">
+<div th:replace="~{fragments/navbar :: header}"></div>
+
+<header class="header-section text-center shadow py-4">
     <div class="container">
         <h1 class="display-5 fw-bold"><i class="bi bi-pencil-square me-2"></i>Update Catalog</h1>
         <p class="lead opacity-75">Modifying existing record: <span class="fw-bold" th:text="${updateBook.name}"></span></p>
@@ -20,7 +22,7 @@
 <main class="container py-5">
     <div class="management-glass-card shadow">
 
-        <div class="resource-id-banner d-flex align-items-center">
+        <div class="resource-id-banner d-flex align-items-center mb-4">
             <i class="bi bi-info-circle-fill text-primary fs-4 me-3"></i>
             <div>
                 <span class="banner-label">Current Resource ID</span>
@@ -107,6 +109,8 @@
         </form>
     </div>
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

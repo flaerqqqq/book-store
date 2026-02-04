@@ -17,8 +17,11 @@
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/books}">Catalog</a>
                 </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
+                <li class="nav-item" sec:authorize="hasRole('CLIENT')">
                     <a class="nav-link" th:href="@{/orders}">My Orders</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasRole('EMPLOYEE')">
+                    <a class="nav-link" th:href="@{/orders}">Orders</a>
                 </li>
                 <li class="nav-item" sec:authorize="hasAnyRole('EMPLOYEE', 'ADMIN')">
                     <a class="nav-link text-warning" th:href="@{/books/new}">Add Book</a>
