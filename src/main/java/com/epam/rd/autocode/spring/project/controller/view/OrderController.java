@@ -89,8 +89,8 @@ public class OrderController {
     }
 
     @PostMapping("/{orderPublicId}/cancel")
-    @PreAuthorize("hasRole('CLIENT')")
-    public String cancelOrderByClient(@AuthenticationPrincipal CustomUserDetails userDetails,
+    @PreAuthorize("hasAnyRole('CLIENT', 'EMPLOYEE')")
+    public String cancelOrder(@AuthenticationPrincipal CustomUserDetails userDetails,
                                       @PathVariable("orderPublicId") UUID orderPublicId,
                                       @RequestParam("reason") String reason,
                                       RedirectAttributes redirectAttributes) {

@@ -6,6 +6,8 @@ import com.epam.rd.autocode.spring.project.mapper.ClientMapper;
 import com.epam.rd.autocode.spring.project.service.ClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,7 +23,12 @@ public class ClientController {
     private final ClientMapper clientMapper;
 
     @GetMapping("/register")
-    public String getRegisterPage(Model model) {
+    public String getRegisterPage(Authentication authentication,
+                                  Model model) {
+        if (authentication != null && authentication.isAuthenticated()
+                && !(authentication instanceof AnonymousAuthenticationToken)) {
+            return "redirect:/";
+        }
         model.addAttribute("client", new ClientRegisterRequestDto());
         return "auth/register";
     }

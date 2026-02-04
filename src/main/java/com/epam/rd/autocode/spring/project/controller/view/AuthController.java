@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -25,7 +27,13 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/login")
-    public String getLoginPage(Model model) {
+    public String getLoginPage(Authentication authentication,
+                               Model model) {
+        if (authentication != null && authentication.isAuthenticated()
+                && !(authentication instanceof AnonymousAuthenticationToken)) {
+            return "redirect:/";
+        }
+
         model.addAttribute("login", new LoginRequestDto());
         return "auth/login";
     }
@@ -49,6 +57,6 @@ public class AuthController {
                 .build();
         resp.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
 
-        return "redirect:/books";
+        return "redirect:/";
     }
 }

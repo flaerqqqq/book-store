@@ -44,7 +44,7 @@ public class ShoppingCartController {
     public String emptyShoppingCart(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         cartService.emptyCart(customUserDetails.getPublicId());
 
-        return "redirect:/books";
+        return "redirect:/";
     }
 
     @PostMapping("/remove-item")
