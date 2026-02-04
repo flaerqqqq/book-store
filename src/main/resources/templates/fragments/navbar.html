@@ -26,13 +26,24 @@
                 <li class="nav-item" sec:authorize="hasAnyRole('EMPLOYEE', 'ADMIN')">
                     <a class="nav-link text-warning" th:href="@{/books/new}">Add Book</a>
                 </li>
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link text-info" th:href="@{/admin/employees/new}">Onboarding</a>
+                </li>
             </ul>
 
             <div class="d-flex align-items-center gap-3">
-                <a sec:authorize="hasRole('CLIENT')" th:href="@{/shopping-cart}" class="btn btn-outline-light rounded-pill position-relative">
-                    <i class="bi bi-cart3"></i>
-                    <span class="ms-1">Cart</span>
-                </a>
+
+                <div sec:authorize="hasRole('CLIENT')" class="d-flex align-items-center gap-2">
+                    <div th:if="${clientBalance != null}" class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2 d-flex align-items-center">
+                        <i class="bi bi-wallet2 me-2"></i>
+                        <span class="fw-bold" th:text="${#numbers.formatDecimal(clientBalance, 1, 2)} + ' USD'">0.00 USD</span>
+                    </div>
+
+                    <a th:href="@{/shopping-cart}" class="btn btn-outline-light rounded-pill position-relative">
+                        <i class="bi bi-cart3"></i>
+                        <span class="ms-1">Cart</span>
+                    </a>
+                </div>
 
                 <div sec:authorize="isAnonymous()" class="btn-group">
                     <a th:href="@{/login}" class="btn btn-link text-light text-decoration-none">Login</a>

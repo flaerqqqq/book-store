@@ -4,12 +4,15 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.Set;
+import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ClientDTO {
+
+    private UUID publicID;
 
     private String email;
 

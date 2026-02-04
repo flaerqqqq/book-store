@@ -7,6 +7,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .extra-small { font-size: 0.75rem; }
+    </style>
 </head>
 <body class="cart-page">
 
@@ -46,10 +49,10 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table">
+                        <table class="table table-hover align-middle">
                             <thead>
                             <tr>
-                                <th>Book</th>
+                                <th>Book Details</th>
                                 <th>Price</th>
                                 <th>Quantity</th>
                                 <th>Subtotal</th>
@@ -60,9 +63,25 @@
                             <tr th:each="item : ${cartItemPage.content}">
                                 <td>
                                     <div class="fw-bold text-dark d-block" th:text="${item.book.name}"></div>
-                                    <small class="text-muted" th:text="${item.book.author}"></small>
+                                    <div class="small fw-medium mb-1">
+                                        <i class="bi bi-person text-secondary me-1"></i>
+                                        <span th:text="${item.book.author}"></span>
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-2 align-items-center mt-1">
+                                        <span class="badge bg-primary-subtle text-primary extra-small" th:text="${item.book.genre}"></span>
+                                        <span class="extra-small text-muted border-start ps-2">
+                                            <i class="bi bi-translate me-1"></i><span th:text="${item.book.language}"></span>
+                                        </span>
+                                        <span class="extra-small text-muted border-start ps-2">
+                                            <i class="bi bi-people me-1"></i><span th:text="${item.book.ageGroup}"></span>
+                                        </span>
+                                    </div>
                                 </td>
-                                <td class="price-text" th:text="${item.priceAtAdd}"></td>
+
+                                <td>
+                                    <span class="badge bg-light text-dark shadow-sm px-3" th:text="${'$' + item.priceAtAdd}"></span>
+                                </td>
+
                                 <td>
                                     <form th:action="@{/shopping-cart/update-item}" method="post" class="d-flex gap-2">
                                         <input type="hidden" name="bookPublicId" th:value="${item.book.publicId}"/>
@@ -75,7 +94,11 @@
                                         </button>
                                     </form>
                                 </td>
-                                <td class="subtotal-text" th:text="${item.subtotal}"></td>
+
+                                <td>
+                                    <span class="badge bg-primary-subtle text-primary shadow-sm px-3" th:text="${'$' + item.subtotal}"></span>
+                                </td>
+
                                 <td>
                                     <form th:action="@{/shopping-cart/remove-item}" method="post">
                                         <input type="hidden" name="bookPublicId" th:value="${item.book.publicId}"/>

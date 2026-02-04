@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -75,7 +76,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public ClientDTO addClient(ClientDTO client) {
-        Objects.requireNonNull(client, "Method argument cannot be null");
+        Objects.requireNonNull(client, "Client data cannot be null");
 
         if (clientRepository.existsByEmail(client.getEmail())) {
             throw new AlreadyExistException(Client.class, "email", client.getEmail());
@@ -97,8 +98,20 @@ public class ClientServiceImpl implements ClientService {
         return clientMapper.entityToDto(savedClient);
     }
 
+    @Override
+    public ClientDTO getClientByPublicId(UUID publicId) {
+        Objects.requireNonNull(publicId, "Client public ID must not be null");
+
+        return clientMapper.entityToDto(getClientOrThrow(publicId));
+    }
+
     private Client getClientOrThrow(String email) {
         return clientRepository.findByEmail(email).orElseThrow(() ->
                 new NotFoundException(Client.class, "email", email));
+    }
+
+    private Client getClientOrThrow(UUID clientPublicId) {
+        return clientRepository.findByPublicId(clientPublicId).orElseThrow(() ->
+                new NotFoundException(Client.class, "publicId", clientPublicId));
     }
 }

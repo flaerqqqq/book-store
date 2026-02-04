@@ -20,7 +20,7 @@
 </header>
 
 <main class="container py-5">
-  <div class="glass-card">
+  <div class="glass-card mb-4">
     <form th:action="@{/books}" th:object="${bookFilter}" method="get" class="row g-3">
       <div class="col-12">
         <div class="input-group input-group-lg shadow-sm">
@@ -32,22 +32,22 @@
       </div>
 
       <div class="col-md-3 filter-section">
-        <label>Author</label>
+        <label class="form-label small fw-bold">Author</label>
         <input type="text" th:field="*{author}" class="form-control shadow-sm" placeholder="Author name">
       </div>
       <div class="col-md-3 filter-section">
-        <label>Genre</label>
+        <label class="form-label small fw-bold">Genre</label>
         <input type="text" th:field="*{genre}" class="form-control shadow-sm" placeholder="e.g. Fantasy">
       </div>
       <div class="col-md-3 filter-section">
-        <label>Age Group</label>
+        <label class="form-label small fw-bold">Age Group</label>
         <select th:field="*{ageGroup}" class="form-select shadow-sm">
           <option value="">All Ages</option>
           <option th:each="age : ${ageGroups}" th:value="${age}" th:text="${age}"></option>
         </select>
       </div>
       <div class="col-md-3 filter-section">
-        <label>Sort By</label>
+        <label class="form-label small fw-bold">Sort By</label>
         <select name="sort" class="form-select shadow-sm" onchange="this.form.submit()">
           <option value="name,asc" th:selected="${param.sort != null && param.sort[0] == 'name,asc'}">Name (A-Z)</option>
           <option value="name,desc" th:selected="${param.sort != null && param.sort[0] == 'name,desc'}">Name (Z-A)</option>
@@ -58,14 +58,14 @@
 
       <div class="col-md-6 d-flex gap-2">
         <div class="w-50 filter-section">
-          <label>Price Range</label>
+          <label class="form-label small fw-bold">Price Range</label>
           <div class="input-group input-group-sm">
             <input type="number" step="0.01" th:field="*{minPrice}" class="form-control" placeholder="Min">
             <input type="number" step="0.01" th:field="*{maxPrice}" class="form-control" placeholder="Max">
           </div>
         </div>
         <div class="w-50 filter-section">
-          <label>Publication Period</label>
+          <label class="form-label small fw-bold">Publication Period</label>
           <div class="input-group input-group-sm">
             <input type="date" th:name="startPublicationDate" th:value="${bookFilter.startPublicationDate}" class="form-control">
             <input type="date" th:name="endPublicationDate" th:value="${bookFilter.endPublicationDate}" class="form-control">
@@ -74,7 +74,7 @@
       </div>
 
       <div class="col-md-6 filter-section">
-        <label class="d-block mb-2">Languages</label>
+        <label class="d-block mb-2 small fw-bold">Languages</label>
         <div class="d-flex flex-wrap gap-3">
           <div class="form-check" th:each="lang : ${languages}">
             <input class="form-check-input" type="checkbox" th:field="*{languages}" th:value="${lang}" th:id="'lang-'+${lang}">
@@ -93,22 +93,43 @@
   <div class="glass-card">
     <div class="table-responsive">
       <table class="table table-hover align-middle">
-        <thead>
+        <thead class="table-light">
         <tr>
-          <th>Name</th>
-          <th>Author</th>
+          <th style="width: 25%">Book Title & Desc</th>
+          <th>Author & Genre</th>
+          <th>Publication</th>
+          <th>Technical Specs</th>
           <th>Price</th>
-          <th>Language</th>
           <th sec:authorize="hasRole('CLIENT')" class="text-center">Purchase</th>
           <th sec:authorize="hasAnyRole('EMPLOYEE', 'ADMIN')" class="text-end">Actions</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="book : ${bookPage.content}">
-          <td><strong th:text="${book.name}" class="text-dark"></strong></td>
-          <td th:text="${book.author}" class="text-muted"></td>
-          <td><span class="badge bg-light text-dark shadow-sm px-3" th:text="${'$' + book.price}"></span></td>
-          <td><span class="text-uppercase small fw-bold" th:text="${book.language}"></span></td>
+          <td>
+            <div class="fw-bold text-dark h6 mb-1" th:text="${book.name}"></div>
+            <div class="text-muted small text-truncate-2" th:title="${book.description}" th:text="${book.description}"></div>
+          </td>
+
+          <td>
+            <div class="small fw-medium"><i class="bi bi-person-fill me-1 text-secondary"></i><span th:text="${book.author}"></span></div>
+            <div class="badge bg-primary-subtle text-primary extra-small mt-1" th:text="${book.genre}"></div>
+          </td>
+
+          <td>
+            <div class="small text-dark" th:text="${#temporals.format(book.publicationDate, 'MMM dd, yyyy')}"></div>
+            <div class="text-uppercase extra-small fw-bold text-muted" th:text="${book.language}"></div>
+          </td>
+
+          <td>
+            <div class="small"><i class="bi bi-file-earmark-text me-1"></i> <span th:text="${book.pages} + ' pages'"></span></div>
+            <div class="small text-secondary"><i class="bi bi-people me-1"></i> <span th:text="${book.ageGroup}"></span></div>
+            <div class="extra-small text-muted fst-italic mt-1" th:text="${book.characteristics}"></div>
+          </td>
+
+          <td>
+            <span class="fw-bold text-primary" th:text="'$' + ${book.price}"></span>
+          </td>
 
           <td sec:authorize="hasRole('CLIENT')" class="text-center">
             <span th:if="${book.inCart}" class="badge rounded-pill bg-success p-2 px-3">
@@ -123,28 +144,14 @@
 
           <td sec:authorize="hasAnyRole('EMPLOYEE', 'ADMIN')" class="text-end">
             <div class="btn-group gap-2">
-              <a th:href="@{/books/{uuid}/update(uuid=${book.publicId})}" class="btn btn-sm btn-light border">
+              <a th:href="@{/books/{uuid}/update(uuid=${book.publicId})}" class="btn btn-sm btn-light border shadow-sm">
                 <i class="bi bi-pencil"></i>
               </a>
               <form th:action="@{/books/{uuid}/delete(uuid=${book.publicId})}" th:method="post" class="d-inline">
                 <input type="hidden" name="page" th:value="${bookPage.number}"/>
                 <input type="hidden" name="size" th:value="${bookPage.size}"/>
                 <input type="hidden" name="sort" th:value="${param.sort}"/>
-
-                <input type="hidden" name="searchQuery" th:value="${bookFilter.searchQuery}"/>
-                <input type="hidden" name="author" th:value="${bookFilter.author}"/>
-                <input type="hidden" name="genre" th:value="${bookFilter.genre}"/>
-                <input type="hidden" name="ageGroup" th:value="${bookFilter.ageGroup}"/>
-                <input type="hidden" name="minPrice" th:value="${bookFilter.minPrice}"/>
-                <input type="hidden" name="maxPrice" th:value="${bookFilter.maxPrice}"/>
-                <input type="hidden" name="startPublicationDate" th:value="${bookFilter.startPublicationDate}"/>
-                <input type="hidden" name="endPublicationDate" th:value="${bookFilter.endPublicationDate}"/>
-
-                <th:block th:each="lang : ${bookFilter.languages}">
-                  <input type="hidden" name="languages" th:value="${lang}"/>
-                </th:block>
-
-                <button type="submit" class="btn btn-sm btn-outline-danger"
+                <button type="submit" class="btn btn-sm btn-outline-danger shadow-sm"
                         onclick="return confirm('Are you sure you want to delete this book?')">
                   <i class="bi bi-trash"></i>
                 </button>
@@ -161,19 +168,7 @@
         <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
             class="page-item" th:classappend="${currentPage == i} ? 'active'">
           <a class="page-link shadow-sm"
-             th:href="@{/books(
-            page=${i},
-            searchQuery=${bookFilter.searchQuery},
-            author=${bookFilter.author},
-            genre=${bookFilter.genre},
-            ageGroup=${bookFilter.ageGroup},
-            minPrice=${bookFilter.minPrice},
-            maxPrice=${bookFilter.maxPrice},
-            startPublicationDate=${bookFilter.startPublicationDate},
-            endPublicationDate=${bookFilter.endPublicationDate},
-            languages=${bookFilter.languages},
-            sort=${param.sort}
-          )}"
+             th:href="@{/books(page=${i}, searchQuery=${bookFilter.searchQuery}, author=${bookFilter.author}, genre=${bookFilter.genre}, ageGroup=${bookFilter.ageGroup}, minPrice=${bookFilter.minPrice}, maxPrice=${bookFilter.maxPrice}, startPublicationDate=${bookFilter.startPublicationDate}, endPublicationDate=${bookFilter.endPublicationDate}, languages=${bookFilter.languages}, sort=${param.sort})}"
              th:text="${i + 1}"></a>
         </li>
       </ul>
