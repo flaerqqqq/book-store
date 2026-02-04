@@ -6,79 +6,9 @@
     <title>Update Book | Inventory Control</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-
-    <style>
-        :root {
-            --primary-gradient: linear-gradient(45deg, #0d6efd, #6610f2);
-        }
-        body { background: #f8f9fa; font-family: 'Inter', sans-serif; padding: 3rem 0; }
-
-        .header-section {
-            background: var(--primary-gradient);
-            color: white;
-            padding: 3rem 0;
-            margin-bottom: -2.5rem;
-            clip-path: ellipse(100% 100% at 50% 0%);
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(15px);
-            border: none;
-            border-radius: 2rem;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.08);
-            padding: 3rem;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .edit-info-banner {
-            background: #f1f3f5;
-            border-radius: 1rem;
-            padding: 1rem 1.5rem;
-            border-left: 5px solid #0d6efd;
-            margin-bottom: 2rem;
-        }
-
-        .form-label {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: #6c757d;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 0.5rem;
-        }
-
-        .form-control, .form-select {
-            border-radius: 0.75rem;
-            padding: 0.75rem 1rem;
-            border: 2px solid #f1f3f5;
-            transition: all 0.2s ease;
-        }
-
-        .form-control:focus, .form-select:focus {
-            border-color: #6610f2;
-            box-shadow: 0 0 0 0.25rem rgba(102, 16, 242, 0.1);
-        }
-
-        .btn-update {
-            background: var(--primary-gradient);
-            color: white;
-            border: none;
-            padding: 1rem 3rem;
-            font-weight: 700;
-            border-radius: 50px;
-            transition: all 0.3s ease;
-        }
-
-        .btn-update:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 16, 242, 0.3);
-            color: white;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
-<body>
+<body class="management-body">
 
 <header class="header-section text-center shadow">
     <div class="container">
@@ -88,17 +18,17 @@
 </header>
 
 <main class="container py-5">
-    <div class="glass-card">
+    <div class="management-glass-card shadow">
 
-        <div class="edit-info-banner d-flex align-items-center">
+        <div class="resource-id-banner d-flex align-items-center">
             <i class="bi bi-info-circle-fill text-primary fs-4 me-3"></i>
             <div>
-                <small class="text-muted text-uppercase fw-bold d-block">Current Resource ID</small>
-                <code class="text-dark" th:text="${currentPublicId}"></code>
+                <span class="banner-label">Current Resource ID</span>
+                <code class="resource-code" th:text="${currentPublicId}">3ebe3481-06f3-4eca-bf2b-8ad22f9cadc9</code>
             </div>
         </div>
 
-        <form th:action="@{/books/{uuid}/update(uuid=${currentPublicId})}" th:object="${updateBook}" method="post">
+        <form th:action="@{/books/{uuid}/update(uuid=${currentPublicId})}" th:object="${updateBook}" method="post" class="management-form">
 
             <h5 class="fw-bold mb-4 text-dark">General Content</h5>
 

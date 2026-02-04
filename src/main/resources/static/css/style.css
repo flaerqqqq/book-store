@@ -1,0 +1,576 @@
+/* --- Global Variables --- */
+:root {
+    --primary-gradient: linear-gradient(45deg, #0d6efd, #6610f2);
+}
+
+/* --- 1. LOGIN PAGE (Original Names) --- */
+.login-body {
+    background: #f8f9fa;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 2rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+    padding: 3rem;
+    width: 100%;
+    max-width: 450px;
+}
+
+.btn-login {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    padding: 0.8rem;
+    font-weight: 700;
+    border-radius: 50px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* --- 2. REGISTER PAGE (Original Names) --- */
+.register-body {
+    background: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    padding: 2rem 0;
+}
+
+.register-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 2rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+    padding: 3rem;
+    width: 100%;
+    max-width: 500px;
+}
+
+.btn-register {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    padding: 0.9rem;
+    font-weight: 700;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+/* --- 3. CATALOG PAGE (Original Names) --- */
+.catalog-header {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: -2rem;
+    clip-path: ellipse(100% 100% at 50% 0%);
+}
+
+.catalog-card { /* Specifically for catalog glass-card */
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border: none;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.table { border-radius: 1rem; overflow: hidden; vertical-align: middle; }
+.table thead { background-color: #f1f3f5; }
+.table thead th { border: none; color: #495057; font-weight: 600; padding: 1rem; }
+.table tbody td { padding: 1.2rem 1rem; border-color: #f1f3f5; }
+
+/* --- 4. ADD/UPDATE BOOK (Management Names) --- */
+.management-body {
+    background: #f8f9fa;
+    font-family: 'Inter', sans-serif;
+    padding: 3rem 0;
+}
+
+.header-section {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: -2rem;
+    clip-path: ellipse(100% 100% at 50% 0%);
+}
+
+.management-glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    border: none;
+    border-radius: 2rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+    padding: 3rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.btn-submit, .btn-update {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    padding: 1rem 3rem;
+    font-weight: 700;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+/* --- Shared/Misc --- */
+.bg-circle {
+    position: absolute;
+    z-index: -1;
+    border-radius: 50%;
+    background: var(--primary-gradient);
+    filter: blur(80px);
+    opacity: 0.12;
+}
+
+.brand-icon {
+    font-size: 3rem;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* --- INVENTORY & MANAGEMENT --- */
+.management-body {
+    background: #f8f9fa;
+    font-family: 'Inter', sans-serif;
+    padding: 3rem 0;
+}
+
+.header-section {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: -2rem;
+    clip-path: ellipse(100% 100% at 50% 0%);
+}
+
+.management-glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    border: none;
+    border-radius: 2rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+    padding: 3rem;
+    max-width: 900px; /* Wider layout for the complex form */
+    margin: 0 auto;
+}
+
+.management-form .form-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+.btn-submit {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    padding: 1rem 3rem;
+    font-weight: 700;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+/* --- Resource ID Banner (Original Look) --- */
+.management-body .resource-id-banner {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-left: 5px solid #0d6efd; /* The blue accent line */
+    border-radius: 1rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.management-body .banner-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.management-body .resource-code {
+    font-family: 'Monaco', 'Consolas', monospace;
+    color: #212529;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* --- Catalog Page Scoped Styles --- */
+.catalog-page .catalog-header {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: -2rem;
+    clip-path: ellipse(100% 100% at 50% 0%);
+}
+
+.catalog-page .glass-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border: none;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.catalog-page .filter-section label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6c757d;
+    margin-bottom: 0.3rem;
+}
+
+/* Table Specifics */
+.catalog-page .table {
+    border-radius: 1rem;
+    overflow: hidden;
+    vertical-align: middle;
+}
+.catalog-page .table thead { background-color: #f1f3f5; }
+.catalog-page .table thead th { border: none; color: #495057; font-weight: 600; padding: 1rem; }
+.catalog-page .table tbody td { padding: 1.2rem 1rem; border-color: #f1f3f5; }
+
+/* Buttons & Pagination */
+.catalog-page .btn-primary { background: var(--primary-gradient); border: none; border-radius: 0.75rem; }
+.catalog-page .pagination .page-link { border: none; color: #6610f2; margin: 0 3px; border-radius: 8px; }
+.catalog-page .pagination .active .page-link { background: var(--primary-gradient); color: white; }
+
+/* --- Checkout Page Scoped Styles --- */
+.checkout-page .header-bg {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: -2rem;
+    clip-path: ellipse(100% 100% at 50% 0%);
+}
+
+.checkout-page .checkout-card {
+    background: white;
+    border: none;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    padding: 2.5rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.checkout-page .form-label {
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.checkout-page .summary-box {
+    background-color: #f8f9fa;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #e9ecef;
+}
+
+.checkout-page .total-line {
+    border-top: 2px solid #dee2e6;
+    padding-top: 1rem;
+    margin-top: 1rem;
+    font-size: 1.25rem;
+}
+
+.checkout-page .btn-complete {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    padding: 1rem;
+    font-weight: 700;
+    border-radius: 50px;
+    transition: transform 0.2s ease;
+}
+
+.checkout-page .btn-complete:hover {
+    opacity: 0.95;
+    transform: translateY(-2px);
+    color: white;
+}
+
+/* --- Shopping Cart Scoped Styles --- */
+.cart-page .header-bg {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 2.5rem 0;
+    margin-bottom: 1.5rem;
+}
+
+.cart-page .glass-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border: none;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Table Customization */
+.cart-page .table thead th {
+    background-color: #f8f9fa;
+    border: none;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    color: #6c757d;
+}
+
+.cart-page .table tbody td {
+    vertical-align: middle;
+    border-color: #f1f3f5;
+    padding: 1.2rem 0.75rem;
+}
+
+/* Form Elements & Text */
+.cart-page .qty-input { width: 75px; border-radius: 8px; text-align: center; }
+
+.cart-page .btn-update {
+    border: none;
+    background: #e7f1ff;
+    color: #0d6efd;
+    transition: 0.2s;
+}
+
+.cart-page .btn-update:hover {
+    background: #0d6efd;
+    color: white;
+}
+
+.cart-page .price-text { font-weight: 700; color: #212529; }
+.cart-page .subtotal-text { font-weight: 700; color: #6610f2; }
+
+/* Sticky behavior for the Summary sidebar */
+.cart-page .sticky-summary {
+    position: sticky;
+    top: 20px;
+}
+
+/* --- Order History Scoped Styles --- */
+.orders-page .catalog-header {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: -2rem;
+    clip-path: ellipse(100% 100% at 50% 0%);
+}
+
+.orders-page .glass-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border: none;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.orders-page .filter-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.4rem;
+    display: block;
+}
+
+/* Status Badge Colors */
+.orders-page .status-badge {
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    display: inline-block;
+}
+.orders-page .status-CREATED { background-color: #e7f1ff; color: #0d6efd; }
+.orders-page .status-CLAIMED { background-color: #fff4e6; color: #fd7e14; }
+.orders-page .status-COMPLETED { background-color: #d1e7dd; color: #0f5132; }
+.orders-page .status-CANCELED { background-color: #f8d7da; color: #842029; }
+
+/* Table Styling */
+.orders-page .table thead th {
+    background-color: #f1f3f5;
+    border: none;
+    padding: 1rem;
+    color: #495057;
+}
+.orders-page .table tbody td {
+    padding: 1.2rem 1rem;
+    vertical-align: middle;
+}
+
+.orders-page .btn-gradient {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
+}
+.orders-page .btn-gradient:hover { color: white; opacity: 0.9; }
+
+/* Employee Specific Box */
+.orders-page .admin-box {
+    background: #f1f3f5;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    border-left: 5px solid #6610f2;
+}
+
+/* --- Order Details Scoped Styles --- */
+.order-details-page .header-bg {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 2.5rem 0;
+    margin-bottom: -1.5rem;
+    clip-path: ellipse(100% 100% at 50% 0%);
+}
+
+.order-details-page .glass-card {
+    background: white;
+    border: none;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.order-details-page .info-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.order-details-page .status-pill {
+    padding: 0.5rem 1.25rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: inline-block;
+}
+
+/* Detailed Status Colors */
+.order-details-page .pill-CREATED { background: #e7f1ff; color: #0d6efd; }
+.order-details-page .pill-CLAIMED { background: #fff4e6; color: #fd7e14; }
+.order-details-page .pill-COMPLETED { background: #d1e7dd; color: #0f5132; }
+.order-details-page .pill-CANCELLED { background: #f8d7da; color: #842029; }
+
+.order-details-page .table thead th {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    font-size: 0.8rem;
+    border: none;
+}
+
+/* Management Zone Styling */
+.order-details-page .action-zone {
+    background: #f8f9fa;
+    border-radius: 1.25rem;
+    border: 2px dashed #dee2e6;
+    padding: 1.5rem;
+}
+
+.onboarding-page {
+    background: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    padding: 3rem 0;
+    position: relative;
+}
+
+.onboarding-page .admin-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 2rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+    padding: 3.5rem;
+    width: 100%;
+    max-width: 550px;
+    position: relative;
+    z-index: 1;
+}
+
+.onboarding-page .section-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 1rem;
+    display: block;
+    border-bottom: 2px solid #f1f3f5;
+    padding-bottom: 0.5rem;
+}
+
+.onboarding-page .form-control {
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    border: 2px solid #f1f3f5;
+    background-color: #fcfcfc;
+}
+
+.onboarding-page .form-control:focus {
+    border-color: #6610f2;
+    box-shadow: 0 0 0 0.25rem rgba(102, 16, 242, 0.1);
+}
+
+.onboarding-page .input-group-text {
+    background: #f8f9fa;
+    border: 2px solid #f1f3f5;
+    border-right: none;
+    border-radius: 0.75rem 0 0 0.75rem;
+    color: #adb5bd;
+}
+
+.onboarding-page .form-control-with-icon {
+    border-left: none;
+}
+
+.onboarding-page .btn-register {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    padding: 1rem;
+    font-weight: 700;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.onboarding-page .btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 16, 242, 0.3);
+    color: white;
+}

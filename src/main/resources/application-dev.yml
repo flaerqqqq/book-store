@@ -11,10 +11,6 @@ spring:
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
 
-  web:
-    resources:
-      add-mappings: false
-
   jpa:
     hibernate:
       ddl-auto: create-drop

@@ -85,6 +85,7 @@ public class SecurityConfig {
                         .requestMatchers("/register", "/login").permitAll()
                         .requestMatchers("/books").permitAll()
                         .requestMatchers("favicon.ico").permitAll()
+                        .requestMatchers("/css/**", "/js/**").permitAll()
 
                         .requestMatchers("/shopping-cart", "/shopping-cart/**", "/api/shopping-carts/**").hasRole("CLIENT")
                         .requestMatchers("/orders/checkout").hasRole("CLIENT")
