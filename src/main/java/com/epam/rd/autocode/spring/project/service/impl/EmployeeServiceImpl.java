@@ -23,52 +23,10 @@ import java.util.Objects;
 @Transactional(readOnly = true)
 public class EmployeeServiceImpl implements EmployeeService {
 
-    private static final Integer DEFAULT_PAGE_SIZE = 10;
-
     private final EmployeeRepository employeeRepository;
     private final RoleRepository roleRepository;
     private final EmployeeMapper employeeMapper;
     private final PasswordEncoder passwordEncoder;
-
-    @Override
-    public Page<EmployeeDTO> getAllEmployees(Pageable pageable) {
-        pageable = Objects.requireNonNullElse(pageable, Pageable.ofSize(DEFAULT_PAGE_SIZE));
-
-        return employeeRepository.findAll(pageable).map(employeeMapper::entityToDto);
-    }
-
-    @Override
-    public EmployeeDTO getEmployeeByEmail(String email) {
-        Objects.requireNonNull(email, "Email must not be null");
-
-        Employee employee = getEmployeeOrThrow(email);
-        return employeeMapper.entityToDto(employee);
-    }
-
-    @Override
-    @Transactional
-    public EmployeeDTO updateEmployeeByEmail(String email, EmployeeDTO employee) {
-        Objects.requireNonNull(email, "Email must not be null");
-        Objects.requireNonNull(employee, "Employee data must not be null");
-
-        Employee existingEmployee = getEmployeeOrThrow(email);
-        employeeMapper.updateEmployeeFromDto(employee, existingEmployee);
-        Employee savedEmployee = employeeRepository.save(existingEmployee);
-
-        return employeeMapper.entityToDto(savedEmployee);
-    }
-
-    @Override
-    @Transactional
-    public void deleteEmployeeByEmail(String email) {
-        Objects.requireNonNull(email, "Email must not be null");
-
-        Long deletedCount = employeeRepository.deleteByEmail(email);
-
-        if (deletedCount == 0) {
-            throw new NotFoundException(Employee.class, "email", email);
-        }
-    }
 
     @Override
     @Transactional
@@ -90,10 +48,5 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee savedEmployee = employeeRepository.save(employeeEntity);
 
         return employeeMapper.entityToDto(savedEmployee);
-    }
-
-    private Employee getEmployeeOrThrow(String email) {
-        return employeeRepository.findByEmail(email).orElseThrow(() ->
-                new NotFoundException(Employee.class, "email", email));
     }
 }

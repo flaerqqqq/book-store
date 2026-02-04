@@ -7,13 +7,5 @@ import org.springframework.data.domain.Pageable;
 
 public interface EmployeeService {
 
-    Page<EmployeeDTO> getAllEmployees(Pageable pageable);
-
-    EmployeeDTO getEmployeeByEmail(String email);
-
-    EmployeeDTO updateEmployeeByEmail(String email, EmployeeDTO employee);
-
-    void deleteEmployeeByEmail(String email);
-
     EmployeeDTO addEmployee(EmployeeDTO employee);
 }

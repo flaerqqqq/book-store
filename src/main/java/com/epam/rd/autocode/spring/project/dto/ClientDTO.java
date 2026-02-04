@@ -12,7 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ClientDTO {
 
-    private UUID publicID;
+    private UUID publicId;
 
     private String email;
 

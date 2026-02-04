@@ -94,10 +94,6 @@ public class BookServiceImpl implements BookService {
     public BookDTO addBook(BookDTO book) {
         Objects.requireNonNull(book, "Book data must not be null");
 
-        if (bookRepository.existsByPublicId(book.getPublicId())) {
-            throw new AlreadyExistException(Book.class, "publicId", book.getPublicId());
-        }
-
         Book bookEntity = bookMapper.dtoToEntity(book);
         Book savedBook = bookRepository.save(bookEntity);
 

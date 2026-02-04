@@ -41,39 +41,6 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public ClientDTO getClientByEmail(String email) {
-        Objects.requireNonNull(email, "Email must not be null");
-
-        Client client = getClientOrThrow(email);
-        return clientMapper.entityToDto(client);
-    }
-
-    @Override
-    @Transactional
-    public ClientDTO updateClientByEmail(String email, ClientDTO client) {
-        Objects.requireNonNull(email, "Email must not be null");
-        Objects.requireNonNull(client, "Client data must not be null");
-
-        Client existingClient = getClientOrThrow(email);
-        clientMapper.updateClientFromDto(client, existingClient);
-        Client savedClient = clientRepository.save(existingClient);
-
-        return clientMapper.entityToDto(savedClient);
-    }
-
-    @Override
-    @Transactional
-    public void deleteClientByEmail(String email) {
-        Objects.requireNonNull(email, "Email must not be null");
-
-        Long deletedCount = clientRepository.deleteByEmail(email);
-
-        if (deletedCount == 0) {
-            throw new NotFoundException(Client.class, "email", email);
-        }
-    }
-
-    @Override
     @Transactional
     public ClientDTO addClient(ClientDTO client) {
         Objects.requireNonNull(client, "Client data cannot be null");
@@ -103,11 +70,6 @@ public class ClientServiceImpl implements ClientService {
         Objects.requireNonNull(publicId, "Client public ID must not be null");
 
         return clientMapper.entityToDto(getClientOrThrow(publicId));
-    }
-
-    private Client getClientOrThrow(String email) {
-        return clientRepository.findByEmail(email).orElseThrow(() ->
-                new NotFoundException(Client.class, "email", email));
     }
 
     private Client getClientOrThrow(UUID clientPublicId) {

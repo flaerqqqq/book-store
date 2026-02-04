@@ -5,7 +5,9 @@ import com.epam.rd.autocode.spring.project.exception.AlreadyExistException;
 import com.epam.rd.autocode.spring.project.exception.NotFoundException;
 import com.epam.rd.autocode.spring.project.mapper.ClientMapper;
 import com.epam.rd.autocode.spring.project.model.Client;
+import com.epam.rd.autocode.spring.project.model.Role;
 import com.epam.rd.autocode.spring.project.repo.ClientRepository;
+import com.epam.rd.autocode.spring.project.repo.RoleRepository;
 import com.epam.rd.autocode.spring.project.service.fixture.ClientTestFixture;
 import com.epam.rd.autocode.spring.project.service.impl.ClientServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,8 +25,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -34,28 +38,47 @@ public class ClientServiceTest {
 
     @Mock
     private ClientRepository clientRepository;
-
+    @Mock
+    private RoleRepository roleRepository;
+    @Mock
+    private ShoppingCartService shoppingCartService;
     @Mock
     private PasswordEncoder passwordEncoder;
-
     private ClientMapper clientMapper = Mappers.getMapper(ClientMapper.class);
 
     private ClientServiceImpl clientService;
 
+    private static final int DEFAULT_PAGE_SIZE = 10;
+    private final Role.RoleName CLIENT_ROLE_NAME = Role.RoleName.ROLE_CLIENT;
+
+    private String clientEmail;
+    private UUID clientPublicId;
+    private Client clientEntity;
+    private ClientDTO clientDto;
+
     @BeforeEach
-    public void setUp() {
+    public void setUpFixture() {
+        clientEmail = ClientTestFixture.DEFAULT_EMAIL;
+        clientPublicId = ClientTestFixture.DEFAULT_PUBLIC_ID;
+        clientEntity = ClientTestFixture.getDefaultClient();
+        clientDto = ClientTestFixture.getDefaultClientDto();
+    }
+
+    @BeforeEach
+    public void setUpService() {
         clientService = new ClientServiceImpl(
                 clientRepository,
+                roleRepository,
                 clientMapper,
-                passwordEncoder
+                passwordEncoder,
+                shoppingCartService
         );
     }
 
     @Test
     void getAllClients_ShouldReturnRequestedPage_WhenPageableIsPresent() {
-        Client client = ClientTestFixture.getDefaultClient();
         Pageable inputPageable = PageRequest.of(0, 1);
-        Page<Client> clientPage = new PageImpl<>(Collections.singletonList(client), inputPageable, 1);
+        Page<Client> clientPage = new PageImpl<>(Collections.singletonList(clientEntity), inputPageable, 1);
 
         when(clientRepository.findAll(any(Pageable.class))).thenReturn(clientPage);
 
@@ -66,16 +89,14 @@ public class ClientServiceTest {
         assertThat(actualReturnPage.getContent()).hasSize(1);
 
         ClientDTO actualClientDto = actualReturnPage.getContent().get(0);
-        assertThat(actualClientDto.getEmail()).isEqualTo(client.getEmail());
+        assertThat(actualClientDto.getEmail()).isEqualTo(clientEmail);
 
         verify(clientRepository, times(1)).findAll(inputPageable);
     }
 
     @Test
     void getAllClient_ShouldReturnDefaultPage_WhenPageableIsNull() {
-        int expectedDefaultSize = 10;
-
-        Page<Client> clientPage = new PageImpl<>(Collections.emptyList());
+        Page<Client> clientPage = Page.empty();
         when(clientRepository.findAll(any(Pageable.class))).thenReturn(clientPage);
 
         clientService.getAllClients(null);
@@ -87,136 +108,19 @@ public class ClientServiceTest {
         Pageable capturedPageable = argCaptor.getValue();
 
         assertThat(capturedPageable).isNotNull();
-        assertThat(capturedPageable.getPageSize()).isEqualTo(expectedDefaultSize);
+        assertThat(capturedPageable.getPageSize()).isEqualTo(DEFAULT_PAGE_SIZE);
     }
 
     @Test
-    void getClientByEmail_ShouldReturnClient_WhenClientExistsByEmail() {
-        String inputEmail = ClientTestFixture.DEFAULT_EMAIL;
-        Client client = ClientTestFixture.getDefaultClient();
-
-        when(clientRepository.findByEmail(inputEmail)).thenReturn(Optional.of(client));
-
-        ClientDTO actualReturnClient = clientService.getClientByEmail(inputEmail);
-
-        assertThat(actualReturnClient).isNotNull();
-        assertThat(actualReturnClient.getEmail()).isEqualTo(inputEmail);
-        assertThat(actualReturnClient.getName()).isEqualTo(client.getName());
-
-        verify(clientRepository, times(1)).findByEmail(inputEmail);
-    }
-
-    @Test
-    void getClientByEmail_ShouldThrowNotFound_WhenClientDoesNotExistByEmail() {
-        String inputEmail = ClientTestFixture.DEFAULT_EMAIL;
-
-        when(clientRepository.findByEmail(inputEmail)).thenReturn(Optional.empty());
-
-        NotFoundException thrown = assertThrows(NotFoundException.class, () ->
-                clientService.getClientByEmail(inputEmail));
-
-        assertThat(thrown.getMessage()).contains(inputEmail);
-
-        verify(clientRepository, times(1)).findByEmail(inputEmail);
-    }
-
-    @Test
-    void getClientByEmail_ShouldThrowNullPointer_WhenEmailIsNull() {
-        String inputEmail = null;
-
-        assertThrows(NullPointerException.class, () ->
-                clientService.getClientByEmail(inputEmail));
-    }
-
-    @Test
-    void updateClientByEmail_ShouldUpdateAndReturnClient_whenClientExistsByEmail() {
-        String updateClientEmail = ClientTestFixture.DEFAULT_EMAIL;
-        Client clientToBeUpdated = ClientTestFixture.getDefaultClient();
-        ClientDTO updateClientDto = ClientDTO.builder()
-                        .name("name2")
-                        .build();
-
-        when(clientRepository.findByEmail(updateClientEmail)).thenReturn(Optional.of(clientToBeUpdated));
-        when(clientRepository.save(clientToBeUpdated)).thenReturn(clientToBeUpdated);
-
-        ClientDTO actualReturnClientDto = clientService.updateClientByEmail(updateClientEmail, updateClientDto);
-
-        assertThat(actualReturnClientDto).isNotNull();
-        assertThat(actualReturnClientDto.getEmail()).isEqualTo(updateClientEmail);
-        assertThat(actualReturnClientDto.getName()).isEqualTo(updateClientDto.getName());
-        assertThat(actualReturnClientDto.getBalance()).isEqualTo(clientToBeUpdated.getBalance());
-
-        verify(clientRepository, times(1)).findByEmail(updateClientEmail);
-        verify(clientRepository, times(1)).save(clientToBeUpdated);
-    }
-
-    @Test
-    void updateClientByEmail_ShouldThrowNullPointer_WhenEmailIsNull() {
-        assertThrows(NullPointerException.class, () ->
-                clientService.updateClientByEmail(null, ClientDTO.builder().build()));
-    }
-
-    @Test
-    void updateClientByEmail_ShouldThrowNullPointer_WhenClientDtoIsNull() {
-        assertThrows(NullPointerException.class, () ->
-                clientService.updateClientByEmail(ClientTestFixture.DEFAULT_EMAIL, null));
-    }
-
-    @Test
-    void updateClientByEmail_ShouldThrowNotFond_WhenClientIsNotFoundByEmail() {
-        String inputEmail = ClientTestFixture.DEFAULT_EMAIL;
-
-        when(clientRepository.findByEmail(inputEmail)).thenReturn(Optional.empty());
-
-        NotFoundException thrown = assertThrows(NotFoundException.class, () ->
-                clientService.updateClientByEmail(inputEmail, ClientDTO.builder().build()));
-        assertThat(thrown.getMessage()).contains(inputEmail);
-
-        verify(clientRepository, times(1)).findByEmail(inputEmail);
-    }
-
-    @Test
-    void deleteClientByEmail_ShouldDelete_WhenClientExistsByEmail() {
-        String inputEmail = ClientTestFixture.DEFAULT_EMAIL;
-        Long deletedCount = 1L;
-
-        when(clientRepository.deleteByEmail(inputEmail)).thenReturn(deletedCount);
-
-        clientService.deleteClientByEmail(inputEmail);
-
-        verify(clientRepository, times(1)).deleteByEmail(inputEmail);
-    }
-
-    @Test
-    void deleteClientByEmail_ShouldThrowNotFound_WhenClientIsNotFound() {
-        String inputEmail = ClientTestFixture.DEFAULT_EMAIL;
-        Long deletedCount = 0L;
-
-        when(clientRepository.deleteByEmail(inputEmail)).thenReturn(deletedCount);
-
-        NotFoundException thrown = assertThrows(NotFoundException.class, () ->
-                clientService.deleteClientByEmail(inputEmail));
-        assertThat(thrown.getMessage()).contains(inputEmail);
-    }
-
-    @Test
-    void deleteClientByEmail_ShouldThrowNullPointer_WhenInputEmailIsNull() {
-        assertThrows(NullPointerException.class, () ->
-                clientService.deleteClientByEmail(null));
-    }
-
-    @Test
-    void addClient_ShouldSuccessfullyReturn_WhenEmailIsUnique() {
-        String email = ClientTestFixture.DEFAULT_EMAIL;
+    void addClient_ShouldSuccessfullyReturn_WhenRoleFound() {
         String passwordHash = "passwordHash";
-        Client savedClient = ClientTestFixture.getDefaultClient();
-        ClientDTO inputClientDto = ClientTestFixture.getDefaultClientDto();
+        Role role = new Role(1L, CLIENT_ROLE_NAME);
 
-        when(clientRepository.existsByEmail(email)).thenReturn(false);
-        when(passwordEncoder.encode(inputClientDto.getPassword())).thenReturn(passwordHash);
-        when(clientRepository.save(any(Client.class))).thenReturn(savedClient);
+        when(roleRepository.findByName(CLIENT_ROLE_NAME)).thenReturn(Optional.of(role));
+        when(passwordEncoder.encode(clientDto.getPassword())).thenReturn(passwordHash);
+        when(clientRepository.save(any(Client.class))).thenReturn(clientEntity);
 
-        ClientDTO actualReturnClientDto = clientService.addClient(inputClientDto);
+        ClientDTO actualReturnClientDto = clientService.addClient(clientDto);
 
         ArgumentCaptor<Client> clientCaptor = ArgumentCaptor.forClass(Client.class);
         verify(clientRepository, times(1)).save(clientCaptor.capture());
@@ -225,26 +129,53 @@ public class ClientServiceTest {
         assertThat(capturedClient).isNotNull();
         assertThat(capturedClient.getPassword()).isEqualTo(passwordHash);
 
-        assertThat(actualReturnClientDto.getEmail()).isEqualTo(savedClient.getEmail());
+        assertThat(actualReturnClientDto.getEmail()).isEqualTo(clientEntity.getEmail());
 
-        verify(clientRepository, times(1)).existsByEmail(email);
-        verify(passwordEncoder, times(1)).encode(inputClientDto.getPassword());
+        verify(clientRepository, times(1)).existsByEmail(clientEmail);
+        verify(passwordEncoder, times(1)).encode(clientDto.getPassword());
+    }
+
+    @Test
+    void addClient_ShouldThrowNotFound_WhenRoleNotFound() {
+        when(roleRepository.findByName(CLIENT_ROLE_NAME)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> clientService.addClient(clientDto))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining(CLIENT_ROLE_NAME.toString());
     }
 
     @Test
     void addClient_ShouldThrowAlreadyExist_WhenEmailIsNotUnique() {
-        String inputEmail = ClientTestFixture.DEFAULT_EMAIL;
-
-        when(clientRepository.existsByEmail(inputEmail)).thenReturn(true);
+        when(clientRepository.existsByEmail(clientEmail)).thenReturn(true);
 
         AlreadyExistException thrown = assertThrows(AlreadyExistException.class, () ->
-                clientService.addClient(ClientDTO.builder().email(inputEmail).build()));
-        assertThat(thrown.getMessage()).contains(inputEmail);
+                clientService.addClient(ClientDTO.builder().email(clientEmail).build()));
+        assertThat(thrown.getMessage()).contains(clientEmail);
     }
 
     @Test
     void addClient_ShouldThrowNullPointer_WhenInputClientDtoIsNull() {
         assertThrows(NullPointerException.class, () ->
                 clientService.addClient(null));
+    }
+
+    @Test
+    void getClientByPublicId_ShouldReturnCorrectClient() {
+        when(clientRepository.findByPublicId(clientPublicId)).thenReturn(Optional.of(clientEntity));
+
+        ClientDTO actualReturnClient = clientService.getClientByPublicId(clientPublicId);
+
+        assertThat(actualReturnClient).isNotNull()
+                .extracting(ClientDTO::getPublicId)
+                .isEqualTo(clientPublicId);
+    }
+
+    @Test
+    void getClientByPublicId_ShouldThrowNotFound() {
+        when(clientRepository.findByPublicId(clientPublicId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> clientService.getClientByPublicId(clientPublicId))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining(clientPublicId.toString());
     }
 }

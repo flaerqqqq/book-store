@@ -23,6 +23,7 @@ public interface EmployeeMapper {
     EmployeeDTO registerDtoToDto(EmployeeRegisterRequestDto registerDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "publicId", ignore = true)
     @Mapping(target = "email", ignore = true)
     @Mapping(target = "roles", ignore = true)
     @Mapping(target = "password", ignore = true)

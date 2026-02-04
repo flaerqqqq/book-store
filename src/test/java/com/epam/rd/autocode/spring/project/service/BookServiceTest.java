@@ -1,11 +1,12 @@
 package com.epam.rd.autocode.spring.project.service;
 
 import com.epam.rd.autocode.spring.project.dto.BookDTO;
-import com.epam.rd.autocode.spring.project.exception.AlreadyExistException;
+import com.epam.rd.autocode.spring.project.dto.BookFilterDto;
 import com.epam.rd.autocode.spring.project.exception.NotFoundException;
 import com.epam.rd.autocode.spring.project.mapper.BookMapper;
 import com.epam.rd.autocode.spring.project.model.Book;
 import com.epam.rd.autocode.spring.project.repo.BookRepository;
+import com.epam.rd.autocode.spring.project.repo.ShoppingCartItemRepository;
 import com.epam.rd.autocode.spring.project.service.fixture.BookTestFixture;
 import com.epam.rd.autocode.spring.project.service.impl.BookServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,9 +19,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -30,15 +33,34 @@ public class BookServiceTest {
 
     @Mock
     private BookRepository bookRepository;
-
+    @Mock
+    private ShoppingCartItemRepository cartItemRepository;
+    @Mock
+    private ShoppingCartService cartService;
     private BookMapper bookMapper = Mappers.getMapper(BookMapper.class);
 
     private BookServiceImpl bookService;
 
+    private UUID bookPublicId;
+    private String bookName;
+    private Book bookEntity;
+    private BookDTO bookDto;
+    private static final int DEFAULT_PAGE_SIZE = 10;
+
     @BeforeEach
-    void setUp() {
+    void setUpFixture() {
+        bookPublicId = BookTestFixture.DEFAULT_PUBLIC_ID;
+        bookName = BookTestFixture.DEFAULT_NAME;
+        bookEntity = BookTestFixture.getDefaultBook();
+        bookDto = BookTestFixture.getDefaultBookDto();
+    }
+
+    @BeforeEach
+    void setUpService() {
         bookService = new BookServiceImpl(
                 bookRepository,
+                cartItemRepository,
+                cartService,
                 bookMapper
         );
     }
@@ -46,8 +68,7 @@ public class BookServiceTest {
     @Test
     void getAllPages_ShouldReturnPage_WhenPageableProvided() {
         Pageable inputPageable = Pageable.ofSize(1);
-        Book foundBookInPage = BookTestFixture.getDefaultBook();
-        Page<Book> foundPage = new PageImpl<>(Collections.singletonList(foundBookInPage), inputPageable, 1);
+        Page<Book> foundPage = new PageImpl<>(Collections.singletonList(bookEntity), inputPageable, 1);
 
         when(bookRepository.findAll(inputPageable)).thenReturn(foundPage);
 
@@ -55,19 +76,17 @@ public class BookServiceTest {
 
         assertThat(actualBookPage).isNotNull()
                 .hasSize(1)
-                .extracting(BookDTO::getName)
-                .containsExactly(foundBookInPage.getName());
+                .extracting(BookDTO::getPublicId)
+                .containsExactly(bookPublicId);
     }
 
     @Test
     void getAllPages_ShouldReturnDefaultPage_WhenInputPageableIsNull() {
-        int defaultPageSize = 10;
-        Pageable inputPageable = null;
-        Page<Book> foundPage = new PageImpl<>(Collections.emptyList());
+        Page<Book> foundPage = Page.empty();
 
         when(bookRepository.findAll(any(Pageable.class))).thenReturn(foundPage);
 
-        bookService.findBooks(inputPageable);
+        bookService.findBooks(null);
 
         ArgumentCaptor<Pageable> pageableArgCaptor = ArgumentCaptor.forClass(Pageable.class);
         verify(bookRepository, times(1)).findAll(pageableArgCaptor.capture());
@@ -75,140 +94,113 @@ public class BookServiceTest {
 
         assertThat(actualPageable).isNotNull()
                 .extracting(Pageable::getPageSize)
-                .isEqualTo(defaultPageSize);
+                .isEqualTo(DEFAULT_PAGE_SIZE);
     }
 
     @Test
-    void getBookByName_ShouldReturnCorrectBook_WhenBookWithSuchNameExists() {
-        String inputBookName = BookTestFixture.DEFAULT_NAME;
-        Book foundBook = BookTestFixture.getDefaultBook();
+    void getBookByPublicId_ShouldReturnCorrectBook_WhenBookWithSuchPublicIdExists() {
+        when(bookRepository.findByPublicId(bookPublicId)).thenReturn(Optional.of(bookEntity));
 
-        when(bookRepository.findByName(inputBookName)).thenReturn(Optional.of(foundBook));
-
-        BookDTO actualBookDto = bookService.getBookByName(inputBookName);
+        BookDTO actualBookDto = bookService.getBookByPublicId(bookPublicId);
 
         assertThat(actualBookDto).isNotNull()
-                .extracting(BookDTO::getName)
-                .isEqualTo(inputBookName);
+                .extracting(BookDTO::getPublicId)
+                .isEqualTo(bookPublicId);
     }
 
     @Test
-    void getBookByName_ShouldThrowNotFound_WhenBookWithSuchNameDoesNotExist() {
-        String inputBookName = BookTestFixture.DEFAULT_NAME;
+    void getBookByPublicId_ShouldThrowNotFound_WhenBookWithSuchPublicIdDoesNotExist() {
+        when(bookRepository.findByPublicId(bookPublicId)).thenReturn(Optional.empty());
 
-        when(bookRepository.findByName(inputBookName)).thenReturn(Optional.empty());
-
-
-        assertThatThrownBy(() -> bookService.getBookByName(inputBookName))
+        assertThatThrownBy(() -> bookService.getBookByPublicId(bookPublicId))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining(inputBookName);
+                .hasMessageContaining(bookPublicId.toString());
     }
 
     @Test
-    void getBookByName_ShouldThrowNullPointer_WhenInputBookNameIsNull() {
-        String inputBookName = null;
-
-        assertThatThrownBy(() -> bookService.getBookByName(inputBookName))
+    void getBookByPublicId_ShouldThrowNullPointer_WhenInputBookNameIsNull() {
+        assertThatThrownBy(() -> bookService.getBookByPublicId(null))
                 .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining("Name must not be null");
+                .hasMessageContaining("Public ID must not be null");
     }
 
     @Test
-    void updateBookByName_ShouldReturnUpdatedBook_WhenBookExists() {
-        String inputBookName = BookTestFixture.DEFAULT_NAME;
-        BookDTO inputDto = BookTestFixture.getDefaultBookDto();
-        Book foundBook = BookTestFixture.getDefaultBook();
+    void updateBookByPublicId_ShouldReturnUpdatedBook_WhenBookExists() {
+        when(bookRepository.findByPublicId(bookPublicId)).thenReturn(Optional.of(bookEntity));
+        when(bookRepository.save(bookEntity)).thenReturn(bookEntity);
 
-        when(bookRepository.findByName(inputBookName)).thenReturn(Optional.of(foundBook));
-        when(bookRepository.save(foundBook)).thenReturn(foundBook);
-
-        BookDTO actualBookDto = bookService.updateBookByName(inputBookName, inputDto);
+        BookDTO actualBookDto = bookService.updateBookByPublicId(bookPublicId, bookDto);
 
         assertThat(actualBookDto).isNotNull()
-                .extracting(BookDTO::getName)
-                .isEqualTo(inputBookName);
+                .extracting(BookDTO::getPublicId)
+                .isEqualTo(bookPublicId);
 
-        verify(bookRepository).save(foundBook);
+        verify(bookRepository).save(bookEntity);
     }
 
     @Test
-    void updateBookByName_ShouldThrowNotFound_WhenBookDoesNotExist() {
-        String inputBookName = BookTestFixture.DEFAULT_NAME;
-        BookDTO inputDto = BookDTO.builder().build();
+    void updateBookByPublicId_ShouldThrowNotFound_WhenBookDoesNotExist() {
+        when(bookRepository.findByPublicId(bookPublicId)).thenReturn(Optional.empty());
 
-        when(bookRepository.findByName(inputBookName)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> bookService.updateBookByName(inputBookName, inputDto))
+        assertThatThrownBy(() -> bookService.updateBookByPublicId(bookPublicId, bookDto))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining(inputBookName);
+                .hasMessageContaining(bookPublicId.toString());
     }
 
     @Test
-    void updateBookByName_ShouldThrowNullPointer_WhenInputNameIsNull() {
-        String inputBookName = null;
-        BookDTO inputDto = BookDTO.builder().build();
-
-        assertThatThrownBy(() -> bookService.updateBookByName(inputBookName, inputDto))
+    void updateBookByPublicId_ShouldThrowNullPointer_WhenInputPublicIdIsNull() {
+        assertThatThrownBy(() -> bookService.updateBookByPublicId(null, bookDto))
                 .isInstanceOf(NullPointerException.class)
-                .hasMessage("Name must not be null");
+                .hasMessage("Public ID must not be null");
     }
 
     @Test
-    void updateBookByName_ShouldThrowNullPointer_WhenInputDtoIsNull() {
-        String inputBookName = BookTestFixture.DEFAULT_NAME;
-        BookDTO inputDto = null;
-
-        assertThatThrownBy(() -> bookService.updateBookByName(inputBookName, inputDto))
+    void updateBookByPublicId_ShouldThrowNullPointer_WhenInputDtoIsNull() {
+        assertThatThrownBy(() -> bookService.updateBookByPublicId(bookPublicId, null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Book data must not be null");
     }
 
     @Test
-    void deleteBookByName_ShouldDelete_WhenBookExists() {
-        String inputBookName = BookTestFixture.DEFAULT_NAME;
+    void deleteBookByPublicId_ShouldDelete_WhenBookExists() {
         Long deletedCount = 1L;
 
-        when(bookRepository.deleteByName(inputBookName)).thenReturn(deletedCount);
+        when(bookRepository.deleteByPublicId(bookPublicId)).thenReturn(deletedCount);
 
-        bookService.deleteBookByName(inputBookName);
+        bookService.deleteBookByPublicId(bookPublicId);
 
-        verify(bookRepository).deleteByName(inputBookName);
+        verify(cartService).syncCartsWithDeletedBook(bookPublicId);
+        verify(cartItemRepository).deleteByBook_PublicId(bookPublicId);
+        verify(bookRepository).deleteByPublicId(bookPublicId);
     }
 
     @Test
-    void deleteBookByName_ShouldThrowNotFound_WhenBookDoesNotExist() {
-        String inputBookName = BookTestFixture.DEFAULT_NAME;
+    void deleteBookByPublicId_ShouldThrowNotFound_WhenBookDoesNotExist() {
         Long deletedCount = 0L;
 
-        when(bookRepository.deleteByName(inputBookName)).thenReturn(deletedCount);
+        when(bookRepository.deleteByPublicId(bookPublicId)).thenReturn(deletedCount);
 
-        assertThatThrownBy(() -> bookService.deleteBookByName(inputBookName))
+        assertThatThrownBy(() -> bookService.deleteBookByPublicId(bookPublicId))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining(inputBookName);
+                .hasMessageContaining(bookPublicId.toString());
 
-        verify(bookRepository).deleteByName(inputBookName);
+        verify(cartService).syncCartsWithDeletedBook(bookPublicId);
+        verify(cartItemRepository).deleteByBook_PublicId(bookPublicId);
+        verify(bookRepository).deleteByPublicId(bookPublicId);
     }
 
     @Test
-    void deleteBookByName_ShouldThrowNullPointer_WhenInputNameIsNull() {
-        String inputBookName = null;
-
-        assertThatThrownBy(() -> bookService.deleteBookByName(inputBookName))
+    void deleteBookByPublicId_ShouldThrowNullPointer_WhenInputNameIsNull() {
+        assertThatThrownBy(() -> bookService.deleteBookByPublicId(null))
                 .isInstanceOf(NullPointerException.class)
-                .hasMessage("Name must not be null");
+                .hasMessage("Public ID must not be null");
     }
 
     @Test
-    void addBook_ShouldReturnCorrectBookDto_WhenBookNameIsUnique() {
-        BookDTO inputDto = BookTestFixture.getDefaultBookDto();
-        String inputDtoName = inputDto.getName();
-        Book mappedBookEntity = BookTestFixture.getDefaultBook();
+    void addBook_ShouldReturnCorrectBookDto() {
+        when(bookRepository.save(any(Book.class))).thenReturn(bookEntity);
 
-
-        when(bookRepository.existsByName(inputDtoName)).thenReturn(false);
-        when(bookRepository.save(any(Book.class))).thenReturn(mappedBookEntity);
-
-        BookDTO actualBookDto = bookService.addBook(inputDto);
+        BookDTO actualBookDto = bookService.addBook(bookDto);
 
         ArgumentCaptor<Book> bookArgCaptor = ArgumentCaptor.forClass(Book.class);
         verify(bookRepository).save(bookArgCaptor.capture());
@@ -216,31 +208,60 @@ public class BookServiceTest {
 
         assertThat(capturedBook).isNotNull()
                 .extracting(Book::getName)
-                .isEqualTo(inputDtoName);
+                .isEqualTo(bookName);
 
         assertThat(actualBookDto).isNotNull()
                 .extracting(BookDTO::getName)
-                .isEqualTo(inputDtoName);
-    }
-
-    @Test
-    void addBook_ShouldThrowAlreadyExistsOnBookNameDuplicate() {
-        String inputDtoName = BookTestFixture.DEFAULT_NAME;
-        BookDTO inputDto = BookDTO.builder().name(inputDtoName).build();
-
-        when(bookRepository.existsByName(inputDtoName)).thenReturn(true);
-
-        assertThatThrownBy(() -> bookService.addBook(inputDto))
-                .isInstanceOf(AlreadyExistException.class)
-                .hasMessageContaining(inputDtoName);
+                .isEqualTo(bookName);
     }
 
     @Test
     void addBook_ShouldThrowNullPointer_WhenInputDtoIsNull() {
-        BookDTO inputDto = null;
-
-        assertThatThrownBy(() -> bookService.addBook(inputDto))
+        assertThatThrownBy(() -> bookService.addBook(null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Book data must not be null");
+    }
+
+    @Test
+    void getBooksCountByFilter_ShouldReturnCount_WhenFilterProvided() {
+        BookFilterDto filterDto = new BookFilterDto();
+        Long expectedCount = 1L;
+
+        when(bookRepository.count(any(Specification.class))).thenReturn(expectedCount);
+
+        Long actualCount = bookService.getBooksCountByFilter(filterDto);
+
+        assertThat(actualCount).isEqualTo(expectedCount);
+        verify(bookRepository).count(any(Specification.class));
+    }
+
+    @Test
+    void getBooksCountByFilter_ShouldUserDefaultFilter_WhenFilterNotProvided() {
+        Long expectedCount = 1L;
+
+        when(bookRepository.count(any(Specification.class))).thenReturn(expectedCount);
+
+        Long actualCount = bookService.getBooksCountByFilter(null);
+
+        assertThat(actualCount).isEqualTo(expectedCount);
+        verify(bookRepository).count(any(Specification.class));
+    }
+
+    @Test
+    void findFilteredBooks_ShouldReturnCorrectPage_WhenFilterAndPageableProvided() {
+        BookFilterDto filterDto = new BookFilterDto();
+        Pageable pageable = Pageable.ofSize( 1);
+        Page<Book> bookPage = new PageImpl<>(Collections.singletonList(bookEntity), pageable, 1);
+
+        when(bookRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(bookPage);
+
+        Page<BookDTO> actualBookPage = bookService.findFilteredBooks(filterDto, pageable);
+
+        assertThat(actualBookPage).isNotNull();
+        assertThat(actualBookPage.getTotalElements()).isEqualTo(1L);
+        assertThat(actualBookPage.getContent())
+                .hasSize(1)
+                .extracting(BookDTO::getPublicId)
+                .containsExactly(bookPublicId);
     }
 }
