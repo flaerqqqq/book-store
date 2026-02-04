@@ -21,5 +21,5 @@ public interface BookService {
 
     BookDTO addBook(BookDTO book);
 
-    long getBooksCount();
+    long getBooksCountByFilter(BookFilterDto filter);
 }

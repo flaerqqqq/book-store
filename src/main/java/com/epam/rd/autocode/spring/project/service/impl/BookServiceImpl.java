@@ -105,8 +105,12 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public long getBooksCount() {
-        return bookRepository.count();
+    public long getBooksCountByFilter(BookFilterDto bookFilter) {
+        bookFilter = Objects.requireNonNullElse(bookFilter, new BookFilterDto());
+
+        Specification<Book> bookSpecs = BookSpecifications.withFilters(bookFilter);
+
+        return bookRepository.count(bookSpecs);
     }
 
     private Book getBookByPublicIdOrThrow(UUID publicId) {

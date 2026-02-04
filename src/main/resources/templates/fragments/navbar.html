@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+
+<nav th:fragment="header" class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3">
+    <div class="container">
+        <a class="navbar-brand fw-bold" th:href="@{/books}">
+            <i class="bi bi-book-half me-2"></i>My Bookstore
+        </a>
+
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/books}">Catalog</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link" th:href="@{/orders}">My Orders</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAnyRole('EMPLOYEE', 'ADMIN')">
+                    <a class="nav-link text-warning" th:href="@{/books/new}">Add Book</a>
+                </li>
+            </ul>
+
+            <div class="d-flex align-items-center gap-3">
+                <a sec:authorize="hasRole('CLIENT')" th:href="@{/shopping-cart}" class="btn btn-outline-light rounded-pill position-relative">
+                    <i class="bi bi-cart3"></i>
+                    <span class="ms-1">Cart</span>
+                </a>
+
+                <div sec:authorize="isAnonymous()" class="btn-group">
+                    <a th:href="@{/login}" class="btn btn-link text-light text-decoration-none">Login</a>
+                    <a th:href="@{/register}" class="btn btn-primary rounded-pill px-4">Sign Up</a>
+                </div>
+
+                <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-3">
+                    <span class="text-light small opacity-75">
+                        Hello, <span class="fw-bold" th:text="${#authentication.name}">User</span>
+                    </span>
+                    <form th:action="@{/logout}" method="post" class="m-0">
+                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                            <i class="bi bi-box-arrow-left me-1"></i>Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+</body>
+</html>

@@ -10,6 +10,8 @@ import com.epam.rd.autocode.spring.project.model.enums.Language;
 import com.epam.rd.autocode.spring.project.security.CustomUserDetails;
 import com.epam.rd.autocode.spring.project.service.BookService;
 import com.epam.rd.autocode.spring.project.service.ShoppingCartService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,6 +25,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -34,6 +37,7 @@ public class BookController {
     private final BookService bookService;
     private final ShoppingCartService cartService;
     private final BookMapper bookMapper;
+    private final ObjectMapper objectMapper;
 
     @GetMapping("/new")
     @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
@@ -111,15 +115,18 @@ public class BookController {
     @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
     public String deleteBook(@PageableDefault Pageable pageable,
                              @PathVariable("publicId") UUID publicId,
+                             @ModelAttribute("bookFilter") @Valid BookFilterDto bookFilter,
                              RedirectAttributes redirectAttributes) {
         addPaginationAttributes(pageable, redirectAttributes);
 
         bookService.deleteBookByPublicId(publicId);
 
-        long totalItems = bookService.getBooksCount();
+        long totalItems = bookService.getBooksCountByFilter(bookFilter);
         if (totalItems == (long) pageable.getPageSize() * (pageable.getPageNumber()) && pageable.getPageNumber() > 0) {
             redirectAttributes.addAttribute("page", pageable.getPageNumber() - 1);
         }
+
+        addFiltersToRedirect(redirectAttributes, bookFilter);
 
         return "redirect:/books";
     }
@@ -141,5 +148,15 @@ public class BookController {
             redirectAttributes.addAttribute("sort",
                     pageable.getSort().toString().replace(": ", ","));
         }
+    }
+
+    private void addFiltersToRedirect(RedirectAttributes ra, BookFilterDto filter) {
+        Map<String, Object> filterMap = objectMapper.convertValue(filter, new TypeReference<Map<String, Object>>() {});
+
+        filterMap.forEach((key, value) -> {
+            if (value != null && !value.toString().isBlank()) {
+                ra.addAttribute(key, value);
+            }
+        });
     }
 }
