@@ -557,3 +557,105 @@
 2026-02-05 15:36:47.165 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8084"]
 2026-02-05 15:36:47.183 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8084 (http) with context path ''
 2026-02-05 15:36:47.195 [main] INFO  c.e.r.a.s.p.BookStoreServiceSolutionApplication - Started BookStoreServiceSolutionApplication in 7.543 seconds (process running for 8.282)
+2026-02-05 15:38:55.040 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final
+2026-02-05 15:38:55.072 [main] INFO  c.e.r.a.s.p.BookStoreServiceSolutionApplication - Starting BookStoreServiceSolutionApplication using Java 21.0.9 with PID 32289 (/home/vitalii_v/idea_projects/book-store-service-task/target/classes started by vitalii_v in /home/vitalii_v/idea_projects/book-store-service-task)
+2026-02-05 15:38:55.073 [main] DEBUG c.e.r.a.s.p.BookStoreServiceSolutionApplication - Running with Spring Boot v3.2.1, Spring v6.1.2
+2026-02-05 15:38:55.074 [main] INFO  c.e.r.a.s.p.BookStoreServiceSolutionApplication - The following 1 profile is active: "dev"
+2026-02-05 15:38:55.984 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-05 15:38:56.086 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 95 ms. Found 9 JPA repository interfaces.
+2026-02-05 15:38:56.815 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8084 (http)
+2026-02-05 15:38:56.826 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8084"]
+2026-02-05 15:38:56.829 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-02-05 15:38:56.829 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.17]
+2026-02-05 15:38:56.882 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-02-05 15:38:56.882 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1754 ms
+2026-02-05 15:38:56.909 [main] INFO  c.e.r.a.s.p.s.impl.JwtServiceImpl - JWT Service initialized with expiration time: 3600000 ms
+2026-02-05 15:38:57.082 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-05 15:38:57.133 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.1.Final
+2026-02-05 15:38:57.166 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-02-05 15:38:57.398 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-05 15:38:57.426 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-02-05 15:38:57.593 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@629cbb1
+2026-02-05 15:38:57.595 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-02-05 15:38:58.988 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-05 15:38:59.037 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-05 15:38:59.509 [main] DEBUG c.e.r.a.s.p.s.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
+2026-02-05 15:39:00.254 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-05 15:39:00.915 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-05 15:39:01.272 [main] INFO  o.s.s.web.DefaultSecurityFilterChain - Will secure Or [Mvc [pattern='/admin/**']] with [org.springframework.security.web.session.DisableEncodeUrlFilter@17c95612, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@1ca2d595, org.springframework.security.web.context.SecurityContextHolderFilter@59a79420, org.springframework.security.web.header.HeaderWriterFilter@18f6ccf4, org.springframework.web.filter.CorsFilter@92a584f, org.springframework.security.web.authentication.logout.LogoutFilter@223c42b0, com.epam.rd.autocode.spring.project.security.JwtAuthenticationFilter@257da215, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@2de57397, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@75552781, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@36e23af, org.springframework.security.web.session.SessionManagementFilter@24f6f6bf, org.springframework.security.web.access.ExceptionTranslationFilter@4e6f3d08, org.springframework.security.web.access.intercept.AuthorizationFilter@6bac199f]
+2026-02-05 15:39:01.314 [main] INFO  o.s.s.web.DefaultSecurityFilterChain - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@5634c26c, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@37a5ac85, org.springframework.security.web.context.SecurityContextHolderFilter@2c9573f1, org.springframework.security.web.header.HeaderWriterFilter@178826db, org.springframework.web.filter.CorsFilter@5d4f0fd5, com.epam.rd.autocode.spring.project.security.JwtAuthenticationFilter@257da215, org.springframework.security.web.authentication.logout.LogoutFilter@4b954cbb, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@6cf58989, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@3a1dc432, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@2092b072, org.springframework.security.web.session.SessionManagementFilter@7f913c47, org.springframework.security.web.access.ExceptionTranslationFilter@b997735, org.springframework.security.web.access.intercept.AuthorizationFilter@5f04449a]
+2026-02-05 15:39:01.953 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8084"]
+2026-02-05 15:39:01.975 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8084 (http) with context path ''
+2026-02-05 15:39:01.987 [main] INFO  c.e.r.a.s.p.BookStoreServiceSolutionApplication - Started BookStoreServiceSolutionApplication in 7.597 seconds (process running for 8.319)
+2026-02-05 15:39:02.640 [http-nio-8084-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-05 15:39:02.641 [http-nio-8084-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-02-05 15:39:02.642 [http-nio-8084-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2026-02-05 15:39:02.755 [http-nio-8084-exec-1] DEBUG c.e.r.a.s.p.s.JwtAuthenticationFilter - Found JWT for user: admin@gmail.com. Attempting authentication.
+2026-02-05 15:39:02.755 [http-nio-8084-exec-1] DEBUG c.e.r.a.s.p.s.CustomUserDetailsService - Loading user details for email: admin@gmail.com
+2026-02-05 15:39:02.930 [http-nio-8084-exec-1] DEBUG c.e.r.a.s.p.s.CustomUserDetailsService - User found: admin@gmail.com. Mapping to CustomUserDetails.
+2026-02-05 15:39:02.931 [http-nio-8084-exec-1] DEBUG c.e.r.a.s.p.s.impl.JwtServiceImpl - Validating token for user: admin@gmail.com
+2026-02-05 15:39:02.934 [http-nio-8084-exec-1] DEBUG c.e.r.a.s.p.s.JwtAuthenticationFilter - Successfully authenticated user: admin@gmail.com for URI: /books/new
+2026-02-05 15:39:05.931 [http-nio-8084-exec-2] DEBUG c.e.r.a.s.p.s.JwtAuthenticationFilter - Found JWT for user: admin@gmail.com. Attempting authentication.
+2026-02-05 15:39:05.931 [http-nio-8084-exec-2] DEBUG c.e.r.a.s.p.s.CustomUserDetailsService - Loading user details for email: admin@gmail.com
+2026-02-05 15:39:05.938 [http-nio-8084-exec-2] DEBUG c.e.r.a.s.p.s.CustomUserDetailsService - User found: admin@gmail.com. Mapping to CustomUserDetails.
+2026-02-05 15:39:05.938 [http-nio-8084-exec-2] DEBUG c.e.r.a.s.p.s.impl.JwtServiceImpl - Validating token for user: admin@gmail.com
+2026-02-05 15:39:05.940 [http-nio-8084-exec-2] DEBUG c.e.r.a.s.p.s.JwtAuthenticationFilter - Successfully authenticated user: admin@gmail.com for URI: /
+2026-02-05 15:39:05.962 [http-nio-8084-exec-3] DEBUG c.e.r.a.s.p.s.JwtAuthenticationFilter - Found JWT for user: admin@gmail.com. Attempting authentication.
+2026-02-05 15:39:05.962 [http-nio-8084-exec-3] DEBUG c.e.r.a.s.p.s.CustomUserDetailsService - Loading user details for email: admin@gmail.com
+2026-02-05 15:39:05.968 [http-nio-8084-exec-3] DEBUG c.e.r.a.s.p.s.CustomUserDetailsService - User found: admin@gmail.com. Mapping to CustomUserDetails.
+2026-02-05 15:39:05.969 [http-nio-8084-exec-3] DEBUG c.e.r.a.s.p.s.impl.JwtServiceImpl - Validating token for user: admin@gmail.com
+2026-02-05 15:39:05.971 [http-nio-8084-exec-3] DEBUG c.e.r.a.s.p.s.JwtAuthenticationFilter - Successfully authenticated user: admin@gmail.com for URI: /books
+2026-02-05 15:39:06.054 [http-nio-8084-exec-3] DEBUG c.e.r.a.s.p.s.impl.BookServiceImpl - Fetching filtered books with filters: BookFilterDto(searchQuery=null, genre=null, ageGroup=null, minPrice=null, maxPrice=null, startPublicationDate=null, endPublicationDate=null, author=null, languages=null)
+2026-02-05 15:39:06.293 [http-nio-8084-exec-4] DEBUG c.e.r.a.s.p.s.JwtAuthenticationFilter - Found JWT for user: admin@gmail.com. Attempting authentication.
+2026-02-05 15:39:06.293 [http-nio-8084-exec-4] DEBUG c.e.r.a.s.p.s.CustomUserDetailsService - Loading user details for email: admin@gmail.com
+2026-02-05 15:39:06.300 [http-nio-8084-exec-4] DEBUG c.e.r.a.s.p.s.CustomUserDetailsService - User found: admin@gmail.com. Mapping to CustomUserDetails.
+2026-02-05 15:39:06.300 [http-nio-8084-exec-4] DEBUG c.e.r.a.s.p.s.impl.JwtServiceImpl - Validating token for user: admin@gmail.com
+2026-02-05 15:39:06.303 [http-nio-8084-exec-4] DEBUG c.e.r.a.s.p.s.JwtAuthenticationFilter - Successfully authenticated user: admin@gmail.com for URI: /css/style.css
+2026-02-05 15:39:06.308 [http-nio-8084-exec-5] DEBUG c.e.r.a.s.p.s.JwtAuthenticationFilter - Found JWT for user: admin@gmail.com. Attempting authentication.
+2026-02-05 15:39:06.308 [http-nio-8084-exec-5] DEBUG c.e.r.a.s.p.s.CustomUserDetailsService - Loading user details for email: admin@gmail.com
+2026-02-05 15:39:06.316 [http-nio-8084-exec-5] DEBUG c.e.r.a.s.p.s.CustomUserDetailsService - User found: admin@gmail.com. Mapping to CustomUserDetails.
+2026-02-05 15:39:06.316 [http-nio-8084-exec-5] DEBUG c.e.r.a.s.p.s.impl.JwtServiceImpl - Validating token for user: admin@gmail.com
+2026-02-05 15:39:06.318 [http-nio-8084-exec-5] DEBUG c.e.r.a.s.p.s.JwtAuthenticationFilter - Successfully authenticated user: admin@gmail.com for URI: /js/catalog.js
+2026-02-05 15:39:09.174 [http-nio-8084-exec-6] DEBUG c.e.r.a.s.p.s.JwtAuthenticationFilter - Found JWT for user: admin@gmail.com. Attempting authentication.
+2026-02-05 15:39:09.174 [http-nio-8084-exec-6] DEBUG c.e.r.a.s.p.s.CustomUserDetailsService - Loading user details for email: admin@gmail.com
+2026-02-05 15:39:09.180 [http-nio-8084-exec-6] DEBUG c.e.r.a.s.p.s.CustomUserDetailsService - User found: admin@gmail.com. Mapping to CustomUserDetails.
+2026-02-05 15:39:09.181 [http-nio-8084-exec-6] DEBUG c.e.r.a.s.p.s.impl.JwtServiceImpl - Validating token for user: admin@gmail.com
+2026-02-05 15:39:09.182 [http-nio-8084-exec-6] DEBUG c.e.r.a.s.p.s.JwtAuthenticationFilter - Successfully authenticated user: admin@gmail.com for URI: /logout
+2026-02-05 15:39:09.183 [http-nio-8084-exec-6] DEBUG c.e.r.a.s.p.conf.SecurityConfig - Removing access token cookie for user: admin@gmail.com
+2026-02-05 15:40:18.088 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-05 15:40:18.090 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-02-05 15:40:18.094 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-02-05 15:40:22.740 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final
+2026-02-05 15:40:22.781 [main] INFO  c.e.r.a.s.p.BookStoreServiceSolutionApplication - Starting BookStoreServiceSolutionApplication using Java 21.0.9 with PID 32571 (/home/vitalii_v/idea_projects/book-store-service-task/target/classes started by vitalii_v in /home/vitalii_v/idea_projects/book-store-service-task)
+2026-02-05 15:40:22.782 [main] DEBUG c.e.r.a.s.p.BookStoreServiceSolutionApplication - Running with Spring Boot v3.2.1, Spring v6.1.2
+2026-02-05 15:40:22.783 [main] INFO  c.e.r.a.s.p.BookStoreServiceSolutionApplication - The following 1 profile is active: "dev"
+2026-02-05 15:40:23.707 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-05 15:40:23.819 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 104 ms. Found 9 JPA repository interfaces.
+2026-02-05 15:40:24.548 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8084 (http)
+2026-02-05 15:40:24.560 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8084"]
+2026-02-05 15:40:24.562 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-02-05 15:40:24.563 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.17]
+2026-02-05 15:40:24.618 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-02-05 15:40:24.618 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1782 ms
+2026-02-05 15:40:24.643 [main] INFO  c.e.r.a.s.p.s.impl.JwtServiceImpl - JWT Service initialized with expiration time: 3600000 ms
+2026-02-05 15:40:24.816 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-05 15:40:24.867 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.1.Final
+2026-02-05 15:40:24.899 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-02-05 15:40:25.138 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-05 15:40:25.166 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-02-05 15:40:25.336 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@627acb38
+2026-02-05 15:40:25.337 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-02-05 15:40:26.799 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-05 15:40:26.849 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-05 15:40:27.267 [main] DEBUG c.e.r.a.s.p.s.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
+2026-02-05 15:40:27.898 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-05 15:40:28.559 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-05 15:40:28.908 [main] INFO  o.s.s.web.DefaultSecurityFilterChain - Will secure Or [Mvc [pattern='/admin/**'], Mvc [pattern='/books/new'], Mvc [pattern='/books/*/update'], Mvc [pattern='/books/*/delete']] with [org.springframework.security.web.session.DisableEncodeUrlFilter@11303cb, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@655e3f4c, org.springframework.security.web.context.SecurityContextHolderFilter@379ddab2, org.springframework.security.web.header.HeaderWriterFilter@352b5f3c, org.springframework.web.filter.CorsFilter@26e74d50, org.springframework.security.web.authentication.logout.LogoutFilter@141cee26, com.epam.rd.autocode.spring.project.security.JwtAuthenticationFilter@334ac669, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@67c64b9c, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@311d8595, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@6bdc984, org.springframework.security.web.session.SessionManagementFilter@6acedf54, org.springframework.security.web.access.ExceptionTranslationFilter@ace45e9, org.springframework.security.web.access.intercept.AuthorizationFilter@64001530]
+2026-02-05 15:40:28.943 [main] INFO  o.s.s.web.DefaultSecurityFilterChain - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@6ba6f4e7, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@3d45ea17, org.springframework.security.web.context.SecurityContextHolderFilter@e18848d, org.springframework.security.web.header.HeaderWriterFilter@1acd660d, org.springframework.web.filter.CorsFilter@685efb22, com.epam.rd.autocode.spring.project.security.JwtAuthenticationFilter@334ac669, org.springframework.security.web.authentication.logout.LogoutFilter@578036a2, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@53a65166, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@22aaa811, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@24a696c0, org.springframework.security.web.session.SessionManagementFilter@22f3b213, org.springframework.security.web.access.ExceptionTranslationFilter@239fdf8f, org.springframework.security.web.access.intercept.AuthorizationFilter@41d1bcbd]
+2026-02-05 15:40:29.567 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8084"]
+2026-02-05 15:40:29.585 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8084 (http) with context path ''
+2026-02-05 15:40:29.599 [main] INFO  c.e.r.a.s.p.BookStoreServiceSolutionApplication - Started BookStoreServiceSolutionApplication in 7.463 seconds (process running for 8.198)
+2026-02-05 15:40:37.698 [http-nio-8084-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-05 15:40:37.699 [http-nio-8084-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-02-05 15:40:37.701 [http-nio-8084-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-02-05 15:40:37.730 [http-nio-8084-exec-1] WARN  c.e.r.a.s.p.conf.SecurityConfig - Unauthenticated access to admin path: /books/new - redirecting to /error
