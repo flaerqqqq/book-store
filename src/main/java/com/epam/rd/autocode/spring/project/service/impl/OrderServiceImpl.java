@@ -51,7 +51,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderDTO createFromShoppingCart(UUID clientPublicId, OrderRequestDto orderRequest) {
-        Objects.requireNonNull(clientPublicId, "Client public ID mus not be null");
+        Objects.requireNonNull(orderRequest, "Order request data must not be null");
+        Objects.requireNonNull(clientPublicId, "Client public ID must not be null");
 
         Client client = getClientOrThrow(clientPublicId);
         ShoppingCart cart = getCartOrThrow(client);
@@ -103,6 +104,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderSummaryDto> getFilteredOrderSummaries(OrderFilterDto filter, Pageable pageable, CustomUserDetails userDetails) {
+        Objects.requireNonNull(userDetails, "User details must not be null");
         pageable = Objects.requireNonNullElse(pageable, Pageable.ofSize(DEFAULT_PAGE_SIZE));
         filter = Objects.requireNonNullElse(filter, new OrderFilterDto());
 
