@@ -109,14 +109,10 @@
             <div class="col-md-4">
                 <label class="filter-label">Sort Order</label>
                 <select name="sort" class="form-select shadow-sm" onchange="this.form.submit()">
-                    <option value="orderDate,desc"
-                            th:selected="${param.sort != null and param.sort[0].toLowerCase().equals('orderdate,desc')}">Newest First</option>
-                    <option value="orderDate,asc"
-                            th:selected="${param.sort != null and param.sort[0].toLowerCase().equals('orderdate,asc')}">Oldest First</option>
-                    <option value="totalAmount,desc"
-                            th:selected="${param.sort != null and param.sort[0].toLowerCase().equals('totalamount,desc')}">Price (High-Low)</option>
-                    <option value="totalAmount,asc"
-                            th:selected="${param.sort != null and param.sort[0].toLowerCase().equals('totalamount,asc')}">Price (Low-High)</option>
+                    <option value="orderDate,desc" th:selected="${param.sort != null and param.sort[0].toLowerCase().equals('orderdate,desc')}">Newest First</option>
+                    <option value="orderDate,asc" th:selected="${param.sort != null and param.sort[0].toLowerCase().equals('orderdate,asc')}">Oldest First</option>
+                    <option value="totalAmount,desc" th:selected="${param.sort != null and param.sort[0].toLowerCase().equals('totalamount,desc')}">Price (High-Low)</option>
+                    <option value="totalAmount,asc" th:selected="${param.sort != null and param.sort[0].toLowerCase().equals('totalamount,asc')}">Price (Low-High)</option>
                 </select>
             </div>
 
@@ -135,6 +131,7 @@
                     <th>Date</th>
                     <th>Order Reference</th>
                     <th>Total</th>
+                    <th class="text-center">Delivery</th>
                     <th class="text-center">Items</th>
                     <th class="text-center">Status</th>
                     <th class="text-end">Action</th>
@@ -148,6 +145,14 @@
                     </td>
                     <td><code class="text-dark fw-bold" th:text="${#strings.abbreviate(order.publicId, 13)}"></code></td>
                     <td><span class="fw-bold" th:text="${'$ ' + order.totalAmount}"></span></td>
+
+                    <td class="text-center">
+                        <small class="text-uppercase fw-semibold text-muted">
+                            <i th:class="${order.deliveryType.name() == 'PICKUP'} ? 'bi bi-shop me-1' : 'bi bi-truck me-1'"></i>
+                            <span th:text="${order.deliveryType}"></span>
+                        </small>
+                    </td>
+
                     <td class="text-center">
                         <span class="badge bg-secondary rounded-pill" th:text="${order.totalItems}"></span>
                     </td>
