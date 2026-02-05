@@ -16,6 +16,7 @@ import com.epam.rd.autocode.spring.project.security.CustomUserDetails;
 import com.epam.rd.autocode.spring.project.service.OrderService;
 import com.epam.rd.autocode.spring.project.service.ShoppingCartService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -28,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -51,6 +53,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderDTO createFromShoppingCart(UUID clientPublicId, OrderRequestDto orderRequest) {
+        log.info("Creating order for client: {}", clientPublicId);
         Objects.requireNonNull(orderRequest, "Order request data must not be null");
         Objects.requireNonNull(clientPublicId, "Client public ID must not be null");
 
@@ -58,6 +61,7 @@ public class OrderServiceImpl implements OrderService {
         ShoppingCart cart = getCartOrThrow(client);
 
         if (cart.getCartItems().isEmpty()) {
+            log.warn("Cart empty for client: {}", clientPublicId);
             throw new EmptyCartException("Cannot create an Order for Client with publicId: %s because the Shopping Cart is empty".formatted(clientPublicId));
         }
 
@@ -80,14 +84,15 @@ public class OrderServiceImpl implements OrderService {
         checkBalanceAndSubtract(client, order.getTotalAmount());
 
         Order savedOrder = orderRepository.save(order);
-
         cartService.emptyCart(clientPublicId);
 
+        log.info("Order created: {} with total: {}", savedOrder.getPublicId(), savedOrder.getTotalAmount());
         return orderMapper.entityToDto(savedOrder);
     }
 
     @Override
     public Page<OrderItemDto> getOrderItems(UUID orderPublicId, Pageable pageable) {
+        log.debug("Fetching items for order: {}", orderPublicId);
         Objects.requireNonNull(orderPublicId, "Order public ID must not be null");
         pageable = Objects.requireNonNullElse(pageable, Pageable.ofSize(DEFAULT_PAGE_SIZE));
 
@@ -97,6 +102,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderSummaryDto getOrderSummary(UUID orderPublicId) {
+        log.debug("Fetching summary for order: {}", orderPublicId);
         Objects.requireNonNull(orderPublicId, "Order public ID must not be null");
 
         return orderMapper.entityToSummaryDto(getOrderOrThrow(orderPublicId));
@@ -104,6 +110,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderSummaryDto> getFilteredOrderSummaries(OrderFilterDto filter, Pageable pageable, CustomUserDetails userDetails) {
+        log.debug("Filtering orders for user: {}", userDetails.getPublicId());
         Objects.requireNonNull(userDetails, "User details must not be null");
         pageable = Objects.requireNonNullElse(pageable, Pageable.ofSize(DEFAULT_PAGE_SIZE));
         filter = Objects.requireNonNullElse(filter, new OrderFilterDto());
@@ -126,12 +133,14 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderSummaryDto claimOrder(UUID orderPublicId, UUID employeePublicId) {
+        log.info("Employee {} claiming order {}", employeePublicId, orderPublicId);
         Objects.requireNonNull(orderPublicId, "Order public ID must not be null");
         Objects.requireNonNull(employeePublicId, "Employee public ID must not be null");
 
         Order order = getOrderWithLockOrThrow(orderPublicId);
 
         if (order.getEmployee() != null) {
+            log.warn("Order {} already claimed", orderPublicId);
             throw new IllegalOrderStateException("Order is already claimed by another Employee");
         }
 
@@ -144,6 +153,7 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(OrderStatus.CLAIMED);
 
         Order savedOrder = orderRepository.save(order);
+        log.info("Order {} claimed successfully", orderPublicId);
 
         return orderMapper.entityToSummaryDto(savedOrder);
     }
@@ -151,6 +161,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderSummaryDto updateStatus(UUID orderPublicId, UUID employeePublicId, OrderStatus status) {
+        log.info("Status update to {} for order {} by employee {}", status, orderPublicId, employeePublicId);
         Objects.requireNonNull(orderPublicId, "Order public ID must not be null");
         Objects.requireNonNull(employeePublicId, "Employee public ID must not be null");
 
@@ -168,7 +179,6 @@ public class OrderServiceImpl implements OrderService {
         }
 
         claimedOrder.setStatus(status);
-
         Order savedOrder = orderRepository.save(claimedOrder);
 
         return orderMapper.entityToSummaryDto(savedOrder);
@@ -177,6 +187,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderSummaryDto cancelOrder(UUID orderPublicId, UUID cancelledByPublicId, String reason) {
+        log.info("Cancelling order {} by user {}", orderPublicId, cancelledByPublicId);
         Objects.requireNonNull(orderPublicId, "Order public ID must not be null");
         Objects.requireNonNull(cancelledByPublicId, "User public ID must not be null");
 
@@ -205,7 +216,7 @@ public class OrderServiceImpl implements OrderService {
         } else if (cancelledBy instanceof Employee employee) {
             if (order.getEmployee() == null
                     || !Objects.equals(employee.getPublicId(), order.getEmployee().getPublicId())) {
-               throw new IllegalOrderStateException("Order with publicId: %s is not claimed by Employee with publicId: %s".formatted(orderPublicId, cancelledByPublicId));
+                throw new IllegalOrderStateException("Order with publicId: %s is not claimed by Employee with publicId: %s".formatted(orderPublicId, cancelledByPublicId));
             }
         }
 
@@ -223,12 +234,14 @@ public class OrderServiceImpl implements OrderService {
         order.getClient().setBalance(clientBalance.add(orderTotalAmount));
 
         Order savedOrder = orderRepository.save(order);
+        log.info("Order {} cancelled and refunded", orderPublicId);
 
         return orderMapper.entityToSummaryDto(savedOrder);
     }
 
     @Override
     public boolean isClaimedByEmployee(UUID orderPublicId, UUID employeePublicId) {
+        log.debug("Checking if order {} is claimed by employee {}", orderPublicId, employeePublicId);
         Objects.requireNonNull(orderPublicId, "Order public ID must not be null");
         Objects.requireNonNull(employeePublicId, "Employee public ID must not be null");
 
@@ -237,6 +250,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public boolean isCreatedByClient(UUID orderPublicId, UUID clientPublicId) {
+        log.debug("Checking if order {} was created by client {}", orderPublicId, clientPublicId);
         Objects.requireNonNull(orderPublicId, "Order public ID must not be null");
         Objects.requireNonNull(clientPublicId, "Client public ID must not be null");
 
@@ -245,6 +259,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderStatus> getAvailableStatusesForOrder(UUID orderPublicId, UUID employeePublicId) {
+        log.debug("Calculating available statuses for order: {}", orderPublicId);
         Objects.requireNonNull(orderPublicId, "Order public ID must not be null");
         Objects.requireNonNull(employeePublicId, "Employee public ID must not be null");
 
@@ -283,6 +298,7 @@ public class OrderServiceImpl implements OrderService {
 
     private void checkBalanceAndSubtract(Client client, BigDecimal totalAmount) {
         if (client.getBalance().compareTo(totalAmount) <= 0) {
+            log.warn("Insufficient funds for client {}. Needed: {}", client.getPublicId(), totalAmount);
             throw new InsufficientFundsException(
                     "Insufficient funds: Required %s, but Client has only %s"
                             .formatted(totalAmount, client.getBalance()),
@@ -308,6 +324,7 @@ public class OrderServiceImpl implements OrderService {
 
     private ShoppingCart getCartOrThrow(Client client) {
         if (client.getShoppingCart() == null) {
+            log.error("ShoppingCart missing for client {}", client.getPublicId());
             throw new NotFoundException("Shopping Cart for is not found for a Client with publicId: %s".formatted(client.getPublicId()));
         }
 

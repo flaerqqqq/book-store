@@ -11,6 +11,7 @@ import com.epam.rd.autocode.spring.project.repo.RoleRepository;
 import com.epam.rd.autocode.spring.project.service.ClientService;
 import com.epam.rd.autocode.spring.project.service.ShoppingCartService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Objects;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -35,6 +37,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Page<ClientDTO> getAllClients(Pageable pageable) {
+        log.debug("Fetching all clients page");
         pageable = Objects.requireNonNullElse(pageable, Pageable.ofSize(DEFAULT_PAGE_SIZE));
 
         return clientRepository.findAll(pageable).map(clientMapper::entityToDto);
@@ -43,9 +46,11 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public ClientDTO addClient(ClientDTO client) {
+        log.info("Attempting to register new client with email: {}", client.getEmail());
         Objects.requireNonNull(client, "Client data cannot be null");
 
         if (clientRepository.existsByEmail(client.getEmail())) {
+            log.warn("Registration failed: email {} already exists", client.getEmail());
             throw new AlreadyExistException(Client.class, "email", client.getEmail());
         }
 
@@ -59,21 +64,26 @@ public class ClientServiceImpl implements ClientService {
         clientEntity.getRoles().add(clientRole);
 
         Client savedClient = clientRepository.save(clientEntity);
+        log.debug("Client entity saved with public ID: {}", savedClient.getPublicId());
 
         shoppingCartService.createCart(savedClient.getPublicId());
+        log.info("New client registered successfully: {}", savedClient.getPublicId());
 
         return clientMapper.entityToDto(savedClient);
     }
 
     @Override
     public ClientDTO getClientByPublicId(UUID publicId) {
+        log.debug("Fetching client data for ID: {}", publicId);
         Objects.requireNonNull(publicId, "Client public ID must not be null");
 
         return clientMapper.entityToDto(getClientOrThrow(publicId));
     }
 
     private Client getClientOrThrow(UUID clientPublicId) {
-        return clientRepository.findByPublicId(clientPublicId).orElseThrow(() ->
-                new NotFoundException(Client.class, "publicId", clientPublicId));
+        return clientRepository.findByPublicId(clientPublicId).orElseThrow(() -> {
+            log.warn("Client not found with ID: {}", clientPublicId);
+            return new NotFoundException(Client.class, "publicId", clientPublicId);
+        });
     }
 }

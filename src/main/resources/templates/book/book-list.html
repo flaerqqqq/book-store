@@ -61,10 +61,22 @@
       <div class="col-md-3 filter-section">
         <label class="form-label small fw-bold">Sort By</label>
         <select name="sort" class="form-select shadow-sm" onchange="this.form.submit()">
-          <option value="name,asc" th:selected="${param.sort != null && param.sort[0] == 'name,asc'}">Name (A-Z)</option>
-          <option value="name,desc" th:selected="${param.sort != null && param.sort[0] == 'name,desc'}">Name (Z-A)</option>
-          <option value="price,asc" th:selected="${param.sort != null && param.sort[0] == 'price,asc'}">Price (Low-High)</option>
-          <option value="price,desc" th:selected="${param.sort != null && param.sort[0] == 'price,desc'}">Price (High-Low)</option>
+          <option value="name,asc"
+                  th:selected="${param.sort != null and param.sort[0].equalsIgnoreCase('name,asc')}">
+            Name (A-Z)
+          </option>
+          <option value="name,desc"
+                  th:selected="${param.sort != null and param.sort[0].equalsIgnoreCase('name,desc')}">
+            Name (Z-A)
+          </option>
+          <option value="price,asc"
+                  th:selected="${param.sort != null and param.sort[0].equalsIgnoreCase('price,asc')}">
+            Price (Low-High)
+          </option>
+          <option value="price,desc"
+                  th:selected="${param.sort != null and param.sort[0].equalsIgnoreCase('price,desc')}">
+            Price (High-Low)
+          </option>
         </select>
       </div>
 
