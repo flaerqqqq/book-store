@@ -7,6 +7,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -21,6 +22,7 @@ import org.springframework.web.util.WebUtils;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -35,9 +37,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
+
+        log.trace("Processing request: {} {}", request.getMethod(), request.getRequestURI());
         Cookie cookie = WebUtils.getCookie(request, ACCESS_TOKEN_COOKIE_NAME);
 
         if (cookie == null) {
+            log.trace("No JWT cookie found for request: {}", request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
         }
@@ -47,7 +52,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String email = jwtService.extractSubject(accessToken);
 
             SecurityContext securityContext = SecurityContextHolder.getContext();
+
             if (email != null && securityContext.getAuthentication() == null) {
+                log.debug("Found JWT for user: {}. Attempting authentication.", email);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
                 if (jwtService.isTokenValid(accessToken, userDetails)) {
@@ -59,12 +66,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     securityContext.setAuthentication(authentication);
-                }
 
+                    log.debug("Successfully authenticated user: {} for URI: {}", email, request.getRequestURI());
+                } else {
+                    log.warn("Invalid JWT token provided for user: {}", email);
+                }
             }
 
             filterChain.doFilter(request, response);
         } catch (AuthenticationException authException) {
+            log.error("Authentication failed: {}", authException.getMessage());
             customAuthenticationEntryPoint.commence(request, response, authException);
         }
     }

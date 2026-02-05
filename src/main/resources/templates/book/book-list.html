@@ -134,7 +134,7 @@
           <th>Technical Specs</th>
           <th>Price</th>
           <th sec:authorize="hasRole('CLIENT')" class="text-center">Purchase</th>
-          <th sec:authorize="hasAnyRole('EMPLOYEE', 'ADMIN')" class="text-end">Actions</th>
+          <th sec:authorize="hasRole('EMPLOYEE')" class="text-end">Actions</th>
         </tr>
         </thead>
         <tbody>
@@ -169,7 +169,7 @@
               Add to Cart
             </button>
           </td>
-          <td sec:authorize="hasAnyRole('EMPLOYEE', 'ADMIN')" class="text-end">
+          <td sec:authorize="hasRole('EMPLOYEE')" class="text-end">
             <div class="btn-group gap-2">
               <a th:href="@{/books/{uuid}/update(uuid=${book.publicId})}" class="btn btn-sm btn-light border shadow-sm">
                 <i class="bi bi-pencil"></i>

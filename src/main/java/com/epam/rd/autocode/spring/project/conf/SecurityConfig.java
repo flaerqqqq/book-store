@@ -3,6 +3,7 @@ package com.epam.rd.autocode.spring.project.conf;
 import com.epam.rd.autocode.spring.project.security.CustomAuthenticationEntryPoint;
 import com.epam.rd.autocode.spring.project.security.JwtAuthenticationFilter;
 import jakarta.servlet.DispatcherType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.server.Cookie;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +26,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 
+@Slf4j
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
@@ -61,17 +63,20 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((req, res, authEx) -> {
+                            log.warn("Unauthenticated access to admin path: {} - redirecting to /error", req.getRequestURI());
                             res.sendError(HttpStatus.NOT_FOUND.value());
-                        }).accessDeniedHandler((req, res, authEx) -> {
+                        })
+                        .accessDeniedHandler((req, res, authEx) -> {
+                            log.warn("Access denied for admin path: {} - redirecting to /error", req.getRequestURI());
                             res.sendError(HttpStatus.NOT_FOUND.value());
                         })
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .sessionManagement(sessionConf -> sessionConf.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); ;
+                .sessionManagement(sessionConf -> sessionConf.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
         return http.build();
     }
-
     @Bean
     @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
@@ -102,6 +107,7 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .addLogoutHandler((request, response, authentication) -> {
+                            log.debug("Removing access token cookie for user: {}", authentication.getName());
                             ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken")
                                     .path("/")
                                     .httpOnly(true)

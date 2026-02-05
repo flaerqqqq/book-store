@@ -40,7 +40,7 @@ public class BookController {
     private final ObjectMapper objectMapper;
 
     @GetMapping("/new")
-    @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public String getBookCreatePage(Model model) {
         model.addAttribute("bookRequest", new BookRequestDto());
 
@@ -48,7 +48,7 @@ public class BookController {
     }
 
     @PostMapping("/new")
-    @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public String addBook(@ModelAttribute("bookRequest") @Valid BookRequestDto requestDto,
                           BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -85,7 +85,7 @@ public class BookController {
     }
 
     @GetMapping("/{publicId}/update")
-    @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public String getUpdateBookPage(@PathVariable("publicId") UUID publicId,
                                     Model model) {
         BookDTO foundBook = bookService.getBookByPublicId(publicId);
@@ -95,7 +95,7 @@ public class BookController {
     }
 
     @PostMapping("/{publicId}/update")
-    @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public String updateBook(@PathVariable("publicId") UUID publicId,
                              @ModelAttribute("updateBook") @Valid BookRequestDto requestDto,
                              BindingResult bindingResult,
@@ -112,7 +112,7 @@ public class BookController {
     }
 
     @PostMapping("/{publicId}/delete")
-    @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public String deleteBook(@PageableDefault Pageable pageable,
                              @PathVariable("publicId") UUID publicId,
                              @ModelAttribute("bookFilter") @Valid BookFilterDto bookFilter,
