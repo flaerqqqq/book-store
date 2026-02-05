@@ -7,6 +7,7 @@ import com.epam.rd.autocode.spring.project.validation.annotation.ValidDecimalRan
 import com.epam.rd.autocode.spring.project.validation.validator.DateRangeAware;
 import com.epam.rd.autocode.spring.project.validation.validator.DecimalRangeAware;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,6 +37,7 @@ public class BookFilterDto implements DecimalRangeAware, DateRangeAware {
     @Min(value = 0, message = "Price must not be negative")
     private BigDecimal maxPrice;
 
+    @PastOrPresent(message = "Starting publication cannot be in the future")
     private LocalDate startPublicationDate;
 
     private LocalDate endPublicationDate;

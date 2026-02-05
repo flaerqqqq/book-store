@@ -20,6 +20,15 @@
 </header>
 
 <main class="container py-5">
+
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="border-radius: 1rem;">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+            <div th:text="${errorMessage}">Action failed</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+
     <div class="glass-card shadow-sm mb-4">
         <form th:action="@{/orders}" th:object="${orderFilter}" method="get" class="row g-3">
 
@@ -29,16 +38,24 @@
                     <div class="row g-2">
                         <div class="col-md-4">
                             <label class="filter-label">Order ID</label>
-                            <input type="text" th:field="*{orderPublicId}" class="form-control form-control-sm" placeholder="UUID...">
-                            <div class="text-danger small" th:if="${#fields.hasErrors('orderPublicId')}" th:errors="*{orderPublicId}"></div>
+                            <input type="text" th:field="*{orderPublicId}"
+                                   class="form-control form-control-sm"
+                                   th:classappend="${#fields.hasErrors('orderPublicId')} ? 'is-invalid'" placeholder="UUID...">
+                            <div class="invalid-feedback extra-small" th:errors="*{orderPublicId}">Invalid UUID</div>
                         </div>
                         <div class="col-md-4">
                             <label class="filter-label">Client ID</label>
-                            <input type="text" th:field="*{clientPublicId}" class="form-control form-control-sm" placeholder="UUID...">
+                            <input type="text" th:field="*{clientPublicId}"
+                                   class="form-control form-control-sm"
+                                   th:classappend="${#fields.hasErrors('clientPublicId')} ? 'is-invalid'" placeholder="UUID...">
+                            <div class="invalid-feedback extra-small" th:errors="*{clientPublicId}">Invalid UUID</div>
                         </div>
                         <div class="col-md-4">
                             <label class="filter-label">Employee ID</label>
-                            <input type="text" th:field="*{employeePublicId}" class="form-control form-control-sm" placeholder="UUID...">
+                            <input type="text" th:field="*{employeePublicId}"
+                                   class="form-control form-control-sm"
+                                   th:classappend="${#fields.hasErrors('employeePublicId')} ? 'is-invalid'" placeholder="UUID...">
+                            <div class="invalid-feedback extra-small" th:errors="*{employeePublicId}">Invalid UUID</div>
                         </div>
                         <div class="col-12 mt-3">
                             <a th:href="@{/orders(employeePublicId=${#authentication.principal.publicId})}" class="btn btn-sm btn-outline-primary rounded-pill">
@@ -65,28 +82,41 @@
             </div>
             <div class="col-md-3">
                 <label class="filter-label">Min Amount</label>
-                <input type="number" step="0.01" th:field="*{minTotalAmount}" class="form-control shadow-sm" placeholder="0.00">
+                <input type="number" step="0.01" th:field="*{minTotalAmount}"
+                       class="form-control shadow-sm" th:classappend="${#fields.hasErrors('minTotalAmount')} ? 'is-invalid'" placeholder="0.00">
+                <div class="invalid-feedback extra-small" th:errors="*{minTotalAmount}"></div>
             </div>
             <div class="col-md-3">
                 <label class="filter-label">Max Amount</label>
-                <input type="number" step="0.01" th:field="*{maxTotalAmount}" class="form-control shadow-sm" placeholder="Any">
+                <input type="number" step="0.01" th:field="*{maxTotalAmount}"
+                       class="form-control shadow-sm" th:classappend="${#fields.hasErrors('maxTotalAmount')} ? 'is-invalid'" placeholder="Any">
+                <div class="invalid-feedback extra-small" th:errors="*{maxTotalAmount}"></div>
             </div>
 
             <div class="col-md-4">
                 <label class="filter-label">From Date</label>
-                <input type="datetime-local" th:name="startOrderDate" th:value="${orderFilter.startOrderDate != null ? #temporals.format(orderFilter.startOrderDate, 'yyyy-MM-dd''T''HH:mm') : ''}" class="form-control shadow-sm">
+                <input type="datetime-local" th:field="*{startOrderDate}"
+                       class="form-control shadow-sm" th:classappend="${#fields.hasErrors('startOrderDate')} ? 'is-invalid'">
+                <div class="invalid-feedback extra-small" th:errors="*{startOrderDate}"></div>
             </div>
             <div class="col-md-4">
                 <label class="filter-label">To Date</label>
-                <input type="datetime-local" th:name="endOrderDate" th:value="${orderFilter.endOrderDate != null ? #temporals.format(orderFilter.endOrderDate, 'yyyy-MM-dd''T''HH:mm') : ''}" class="form-control shadow-sm">
+                <input type="datetime-local" th:field="*{endOrderDate}"
+                       class="form-control shadow-sm" th:classappend="${#fields.hasErrors('endOrderDate')} ? 'is-invalid'">
+                <div class="invalid-feedback extra-small" th:errors="*{endOrderDate}"></div>
             </div>
+
             <div class="col-md-4">
                 <label class="filter-label">Sort Order</label>
                 <select name="sort" class="form-select shadow-sm" onchange="this.form.submit()">
-                    <option value="orderDate,desc" th:selected="${param.sort != null && param.sort[0] == 'orderDate,desc'}">Newest First</option>
-                    <option value="orderDate,asc" th:selected="${param.sort != null && param.sort[0] == 'orderDate,asc'}">Oldest First</option>
-                    <option value="totalAmount,desc" th:selected="${param.sort != null && param.sort[0] == 'totalAmount,desc'}">Price (High-Low)</option>
-                    <option value="totalAmount,asc" th:selected="${param.sort != null && param.sort[0] == 'totalAmount,asc'}">Price (Low-High)</option>
+                    <option value="orderDate,desc"
+                            th:selected="${param.sort != null and param.sort[0].toLowerCase().equals('orderdate,desc')}">Newest First</option>
+                    <option value="orderDate,asc"
+                            th:selected="${param.sort != null and param.sort[0].toLowerCase().equals('orderdate,asc')}">Oldest First</option>
+                    <option value="totalAmount,desc"
+                            th:selected="${param.sort != null and param.sort[0].toLowerCase().equals('totalamount,desc')}">Price (High-Low)</option>
+                    <option value="totalAmount,asc"
+                            th:selected="${param.sort != null and param.sort[0].toLowerCase().equals('totalamount,asc')}">Price (Low-High)</option>
                 </select>
             </div>
 

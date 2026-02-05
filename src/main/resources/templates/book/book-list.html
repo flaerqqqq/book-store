@@ -22,30 +22,42 @@
 <main class="container py-5">
   <div class="glass-card mb-4">
     <form th:action="@{/books}" th:object="${bookFilter}" method="get" class="row g-3">
+
       <div class="col-12">
         <div class="input-group input-group-lg shadow-sm">
           <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-          <input type="text" th:field="*{searchQuery}" class="form-control border-start-0"
+          <input type="text" th:field="*{searchQuery}"
+                 class="form-control border-start-0"
+                 th:classappend="${#fields.hasErrors('searchQuery')} ? 'is-invalid'"
                  placeholder="Search by name, author, or description..."
                  onkeydown="if(event.key === 'Enter'){this.form.submit();}">
+          <div class="invalid-feedback" th:if="${#fields.hasErrors('searchQuery')}" th:errors="*{searchQuery}"></div>
         </div>
       </div>
 
       <div class="col-md-3 filter-section">
         <label class="form-label small fw-bold">Author</label>
-        <input type="text" th:field="*{author}" class="form-control shadow-sm" placeholder="Author name">
+        <input type="text" th:field="*{author}" class="form-control shadow-sm"
+               th:classappend="${#fields.hasErrors('author')} ? 'is-invalid'" placeholder="Author name">
+        <div class="invalid-feedback" th:errors="*{author}"></div>
       </div>
+
       <div class="col-md-3 filter-section">
         <label class="form-label small fw-bold">Genre</label>
-        <input type="text" th:field="*{genre}" class="form-control shadow-sm" placeholder="e.g. Fantasy">
+        <input type="text" th:field="*{genre}" class="form-control shadow-sm"
+               th:classappend="${#fields.hasErrors('genre')} ? 'is-invalid'" placeholder="e.g. Fantasy">
+        <div class="invalid-feedback" th:errors="*{genre}"></div>
       </div>
+
       <div class="col-md-3 filter-section">
         <label class="form-label small fw-bold">Age Group</label>
-        <select th:field="*{ageGroup}" class="form-select shadow-sm">
+        <select th:field="*{ageGroup}" class="form-select shadow-sm" th:classappend="${#fields.hasErrors('ageGroup')} ? 'is-invalid'">
           <option value="">All Ages</option>
           <option th:each="age : ${ageGroups}" th:value="${age}" th:text="${age}"></option>
         </select>
+        <div class="invalid-feedback" th:errors="*{ageGroup}"></div>
       </div>
+
       <div class="col-md-3 filter-section">
         <label class="form-label small fw-bold">Sort By</label>
         <select name="sort" class="form-select shadow-sm" onchange="this.form.submit()">
@@ -60,16 +72,24 @@
         <div class="w-50 filter-section">
           <label class="form-label small fw-bold">Price Range</label>
           <div class="input-group input-group-sm">
-            <input type="number" step="0.01" th:field="*{minPrice}" class="form-control" placeholder="Min">
-            <input type="number" step="0.01" th:field="*{maxPrice}" class="form-control" placeholder="Max">
+            <input type="number" step="0.01" th:field="*{minPrice}"
+                   class="form-control" th:classappend="${#fields.hasErrors('minPrice')} ? 'is-invalid'" placeholder="Min">
+            <input type="number" step="0.01" th:field="*{maxPrice}"
+                   class="form-control" th:classappend="${#fields.hasErrors('maxPrice')} ? 'is-invalid'" placeholder="Max">
           </div>
+          <div class="text-danger extra-small mt-1" th:if="${#fields.hasErrors('minPrice')}" th:errors="*{minPrice}"></div>
+          <div class="text-danger extra-small mt-1" th:if="${#fields.hasErrors('maxPrice')}" th:errors="*{maxPrice}"></div>
         </div>
         <div class="w-50 filter-section">
           <label class="form-label small fw-bold">Publication Period</label>
           <div class="input-group input-group-sm">
-            <input type="date" th:name="startPublicationDate" th:value="${bookFilter.startPublicationDate}" class="form-control">
-            <input type="date" th:name="endPublicationDate" th:value="${bookFilter.endPublicationDate}" class="form-control">
+            <input type="date" th:field="*{startPublicationDate}"
+                   class="form-control" th:classappend="${#fields.hasErrors('startPublicationDate')} ? 'is-invalid'">
+            <input type="date" th:field="*{endPublicationDate}"
+                   class="form-control" th:classappend="${#fields.hasErrors('endPublicationDate')} ? 'is-invalid'">
           </div>
+          <div class="text-danger extra-small mt-1" th:if="${#fields.hasErrors('startPublicationDate')}" th:errors="*{startPublicationDate}"></div>
+          <div class="text-danger extra-small mt-1" th:if="${#fields.hasErrors('endPublicationDate')}" th:errors="*{endPublicationDate}"></div>
         </div>
       </div>
 
@@ -81,6 +101,7 @@
             <label class="form-check-label" th:for="'lang-'+${lang}" th:text="${lang}"></label>
           </div>
         </div>
+        <div class="text-danger small" th:if="${#fields.hasErrors('languages')}" th:errors="*{languages}"></div>
       </div>
 
       <div class="col-12 mt-4 text-center">
@@ -110,38 +131,32 @@
             <div class="fw-bold text-dark h6 mb-1" th:text="${book.name}"></div>
             <div class="text-muted small text-truncate-2" th:title="${book.description}" th:text="${book.description}"></div>
           </td>
-
           <td>
             <div class="small fw-medium"><i class="bi bi-person-fill me-1 text-secondary"></i><span th:text="${book.author}"></span></div>
             <div class="badge bg-primary-subtle text-primary extra-small mt-1" th:text="${book.genre}"></div>
           </td>
-
           <td>
             <div class="small text-dark" th:text="${#temporals.format(book.publicationDate, 'MMM dd, yyyy')}"></div>
             <div class="text-uppercase extra-small fw-bold text-muted" th:text="${book.language}"></div>
           </td>
-
           <td>
             <div class="small"><i class="bi bi-file-earmark-text me-1"></i> <span th:text="${book.pages} + ' pages'"></span></div>
             <div class="small text-secondary"><i class="bi bi-people me-1"></i> <span th:text="${book.ageGroup}"></span></div>
             <div class="extra-small text-muted fst-italic mt-1" th:text="${book.characteristics}"></div>
           </td>
-
           <td>
             <span class="fw-bold text-primary" th:text="'$' + ${book.price}"></span>
           </td>
-
           <td sec:authorize="hasRole('CLIENT')" class="text-center">
-            <span th:if="${book.inCart}" class="badge rounded-pill bg-success p-2 px-3">
-                <i class="bi bi-cart-check-fill me-1"></i> In Cart
-            </span>
+                        <span th:if="${book.inCart}" class="badge rounded-pill bg-success p-2 px-3">
+                            <i class="bi bi-cart-check-fill me-1"></i> In Cart
+                        </span>
             <button th:unless="${book.inCart}"
                     class="btn btn-outline-primary btn-sm rounded-pill px-4 add-to-cart-btn"
                     th:data-uuid="${book.publicId}">
               Add to Cart
             </button>
           </td>
-
           <td sec:authorize="hasAnyRole('EMPLOYEE', 'ADMIN')" class="text-end">
             <div class="btn-group gap-2">
               <a th:href="@{/books/{uuid}/update(uuid=${book.publicId})}" class="btn btn-sm btn-light border shadow-sm">

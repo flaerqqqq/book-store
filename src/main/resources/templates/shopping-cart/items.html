@@ -40,10 +40,22 @@
                         <form th:action="@{/shopping-cart}" method="get" class="d-flex align-items-center">
                             <label class="small text-muted me-2">Sort:</label>
                             <select name="sort" onchange="this.form.submit()" class="form-select form-select-sm border-0 bg-light shadow-sm">
-                                <option value="quantity,asc" th:selected="${param.sort != null && param.sort[0] == 'quantity,asc'}">Qty (Low-High)</option>
-                                <option value="quantity,desc" th:selected="${param.sort != null && param.sort[0] == 'quantity,desc'}">Qty (High-Low)</option>
-                                <option value="subtotal,asc" th:selected="${param.sort != null && param.sort[0] == 'subtotal,asc'}">Subtotal (Low-High)</option>
-                                <option value="subtotal,desc" th:selected="${param.sort != null && param.sort[0] == 'subtotal,desc'}">Subtotal (High-Low)</option>
+                                <option value="quantity,asc"
+                                        th:selected="${param.sort != null and param.sort[0].equalsIgnoreCase('quantity,asc')}">
+                                    Qty (Low-High)
+                                </option>
+                                <option value="quantity,desc"
+                                        th:selected="${param.sort != null and param.sort[0].equalsIgnoreCase('quantity,desc')}">
+                                    Qty (High-Low)
+                                </option>
+                                <option value="subtotal,asc"
+                                        th:selected="${param.sort != null and (param.sort[0].equalsIgnoreCase('subtotal,asc') or param.sort[0].equalsIgnoreCase('subtotal,ASC'))}">
+                                    Subtotal (Low-High)
+                                </option>
+                                <option value="subtotal,desc"
+                                        th:selected="${param.sort != null and (param.sort[0].equalsIgnoreCase('subtotal,desc') or param.sort[0].equalsIgnoreCase('subtotal,DESC'))}">
+                                    Subtotal (High-Low)
+                                </option>
                             </select>
                         </form>
                     </div>
