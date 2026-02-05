@@ -63,11 +63,6 @@ public class OrderController {
         return "order/checkout";
     }
 
-    private void addCartSummaryToModel(CustomUserDetails userDetails, Model model) {
-        ShoppingCartSummaryDto cartSummary = cartService.getCartSummary(userDetails.getPublicId());
-        model.addAttribute("cartSummary", cartSummary);
-    }
-
     @PostMapping("/checkout")
     @PreAuthorize("hasRole('CLIENT')")
     public String checkout(@AuthenticationPrincipal CustomUserDetails userDetails,
@@ -157,18 +152,8 @@ public class OrderController {
         return "redirect:/orders/" + orderPublicId;
     }
 
-    @ModelAttribute("deliveryTypes")
-    public DeliveryType[] getDeliveryTypes() {
-        return DeliveryType.values();
-    }
-
-    @ModelAttribute("orderStatuses")
-    public OrderStatus[] getOrderStatuses() {
-        return OrderStatus.values();
-    }
-
-    @InitBinder
-    public void initBinder(WebDataBinder dataBinder) {
-        dataBinder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
+    private void addCartSummaryToModel(CustomUserDetails userDetails, Model model) {
+        ShoppingCartSummaryDto cartSummary = cartService.getCartSummary(userDetails.getPublicId());
+        model.addAttribute("cartSummary", cartSummary);
     }
 }
