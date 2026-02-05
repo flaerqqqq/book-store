@@ -109,7 +109,10 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .addLogoutHandler((request, response, authentication) -> {
-                            log.debug("Removing access token cookie for user: {}", authentication.getName());
+                            if (authentication != null) {
+                                log.debug("Removing access token cookie for user: {}", authentication.getName());
+                            }
+
                             ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken")
                                     .path("/")
                                     .httpOnly(true)
