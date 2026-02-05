@@ -95,14 +95,21 @@
 
             <div class="col-md-4">
                 <label class="filter-label">From Date</label>
-                <input type="datetime-local" th:field="*{startOrderDate}"
-                       class="form-control shadow-sm" th:classappend="${#fields.hasErrors('startOrderDate')} ? 'is-invalid'">
+                <input type="datetime-local"
+                       th:name="startOrderDate"
+                       th:value="${orderFilter.startOrderDate != null ? #temporals.format(orderFilter.startOrderDate, 'yyyy-MM-dd''T''HH:mm') : ''}"
+                       class="form-control shadow-sm"
+                       th:classappend="${#fields.hasErrors('startOrderDate')} ? 'is-invalid'">
                 <div class="invalid-feedback extra-small" th:errors="*{startOrderDate}"></div>
             </div>
+
             <div class="col-md-4">
                 <label class="filter-label">To Date</label>
-                <input type="datetime-local" th:field="*{endOrderDate}"
-                       class="form-control shadow-sm" th:classappend="${#fields.hasErrors('endOrderDate')} ? 'is-invalid'">
+                <input type="datetime-local"
+                       th:name="endOrderDate"
+                       th:value="${orderFilter.endOrderDate != null ? #temporals.format(orderFilter.endOrderDate, 'yyyy-MM-dd''T''HH:mm') : ''}"
+                       class="form-control shadow-sm"
+                       th:classappend="${#fields.hasErrors('endOrderDate')} ? 'is-invalid'">
                 <div class="invalid-feedback extra-small" th:errors="*{endOrderDate}"></div>
             </div>
 

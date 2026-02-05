@@ -40,6 +40,6 @@ public class AdminController {
         EmployeeDTO employeeDto = employeeMapper.registerDtoToDto(requestDto);
         employeeService.addEmployee(employeeDto);
 
-        return "redirect:/admin";
+        return "redirect:/";
     }
 }

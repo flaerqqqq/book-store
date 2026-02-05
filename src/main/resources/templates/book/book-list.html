@@ -95,14 +95,20 @@
         <div class="w-50 filter-section">
           <label class="form-label small fw-bold">Publication Period</label>
           <div class="input-group input-group-sm">
-            <input type="date" th:field="*{startPublicationDate}"
-                   class="form-control" th:classappend="${#fields.hasErrors('startPublicationDate')} ? 'is-invalid'">
-            <input type="date" th:field="*{endPublicationDate}"
-                   class="form-control" th:classappend="${#fields.hasErrors('endPublicationDate')} ? 'is-invalid'">
+            <input type="date"
+                   th:name="startPublicationDate"
+                   th:value="${bookFilter.startPublicationDate != null ? #temporals.format(bookFilter.startPublicationDate, 'yyyy-MM-dd') : ''}"
+                   class="form-control"
+                   th:classappend="${#fields.hasErrors('startPublicationDate')} ? 'is-invalid'">
+
+            <input type="date"
+                   th:name="endPublicationDate"
+                   th:value="${bookFilter.endPublicationDate != null ? #temporals.format(bookFilter.endPublicationDate, 'yyyy-MM-dd') : ''}"
+                   class="form-control"
+                   th:classappend="${#fields.hasErrors('endPublicationDate')} ? 'is-invalid'">
           </div>
           <div class="text-danger extra-small mt-1" th:if="${#fields.hasErrors('startPublicationDate')}" th:errors="*{startPublicationDate}"></div>
-          <div class="text-danger extra-small mt-1" th:if="${#fields.hasErrors('endPublicationDate')}" th:errors="*{endPublicationDate}"></div>
-        </div>
+          <div class="text-danger extra-small mt-1" th:if="${#fields.hasErrors('endPublicationDate')}" th:errors="*{endPublicationDate}"></div>        </div>
       </div>
 
       <div class="col-md-6 filter-section">
