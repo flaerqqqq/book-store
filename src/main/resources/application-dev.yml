@@ -14,7 +14,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-    defer-datasource-initialization: true
+#    defer-datasource-initialization: true
 
   thymeleaf:
     prefix: classpath:/templates/
