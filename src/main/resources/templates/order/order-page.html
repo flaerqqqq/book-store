@@ -152,7 +152,8 @@
                 <h4 class="fw-bold mb-4 text-danger"><i class="bi bi-gear-fill me-2"></i>Manage Order</h4>
                 <div class="row g-4">
 
-                    <div class="col-md-6">
+
+                    <div class="col-md-6" th:if="${orderSummary.status.name() != 'SHIPPED' and orderSummary.status.name() != 'DELIVERED'}">
                         <div class="action-zone">
                             <label class="info-label mb-2 text-danger">Cancel This Order</label>
                             <form th:action="@{/orders/{id}/cancel(id=${orderSummary.publicId})}" method="post">

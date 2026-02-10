@@ -36,6 +36,7 @@ DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS shopping_cart_items;
 DROP TABLE IF EXISTS shopping_carts;
 DROP TABLE IF EXISTS users_roles;
+DROP TABLE IF EXISTS user_login_states;
 DROP TABLE IF EXISTS roles;
 DROP TABLE IF EXISTS admins;
 DROP TABLE IF EXISTS employees;
@@ -134,4 +135,13 @@ CREATE TABLE order_items (
     price_at_purchase DECIMAL(19, 2) NOT NULL,
     quantity INTEGER NOT NULL,
     subtotal DECIMAL(19, 2) NOT NULL
+);
+
+CREATE TABLE user_login_states (
+    user_id BIGINT PRIMARY KEY REFERENCES users(id),
+    failed_attempts INT NOT NULL DEFAULT 0,
+    first_failed_at TIMESTAMPTZ,
+    last_failed_at TIMESTAMPTZ,
+    blocked_until TIMESTAMPTZ,
+    version BIGINT NOT NULL DEFAULT 0
 );

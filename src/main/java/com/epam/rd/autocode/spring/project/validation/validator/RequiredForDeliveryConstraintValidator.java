@@ -20,7 +20,7 @@ public class RequiredForDeliveryConstraintValidator implements ConstraintValidat
                     .addPropertyNode("deliveryAddress")
                     .addConstraintViolation();
             return false;
-        }
+       }
 
         return true;
     }
