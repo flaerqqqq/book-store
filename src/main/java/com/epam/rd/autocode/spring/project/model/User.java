@@ -1,29 +1,27 @@
 package com.epam.rd.autocode.spring.project.model;
 
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Inheritance(strategy = InheritanceType.JOINED)
 @Entity
 @Table(name = "users")
 @Getter
-@Setter
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Builder.Default
-    @Column(name = "public_id", nullable = false, unique = true)
+    @EqualsAndHashCode.Include
+    @Column(name = "public_id", nullable = false, unique = true, updatable = false)
     private UUID publicId = UUID.randomUUID();
 
     @Column(nullable = false, unique = true)
@@ -35,11 +33,40 @@ public class User {
     @Column(nullable = false)
     private String name;
 
-    @Builder.Default
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
     )
     private Set<Role> roles = new HashSet<>();
+
+    public User(String email, String password, String name) {
+        changeEmail(email);
+        changePassword(password);
+        changeName(name);
+    }
+
+    public void changeEmail(String email) {
+        this.email = Objects.requireNonNull(email, "Email must not be null");
+    }
+
+    public void changePassword(String password) {
+        this.password = Objects.requireNonNull(password, "Password must not be null");
+    }
+
+    public void changeName(String name) {
+        this.name = Objects.requireNonNull(name, "Name must not be null");
+    }
+
+    public Set<Role> getRoles() {
+        return Collections.unmodifiableSet(roles);
+    }
+
+    public void removeRole(Role role) {
+        this.roles.remove(Objects.requireNonNull(role, "Role must not be null"));
+    }
+
+    public void addRole(Role role) {
+        this.roles.add(Objects.requireNonNull(role, "Role must not be null"));
+    }
 }
